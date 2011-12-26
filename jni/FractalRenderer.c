@@ -50,6 +50,8 @@ JNIEXPORT void JNICALL Java_com_ijuru_refract_FractalRenderer_allocateInternal(J
 
 	jfieldID fid_context = (*env)->GetFieldID(env, this_class, "context", "J");
 	(*env)->SetLongField(env, obj, fid_context, (jlong)(intptr_t)context);
+
+	LOGI("Allocated FractalRenderer internal resources");
 }
 
 JNIEXPORT void JNICALL Java_com_ijuru_refract_FractalRenderer_updateInternal(JNIEnv* env, jobject obj) {
@@ -73,4 +75,6 @@ JNIEXPORT void JNICALL Java_com_ijuru_refract_FractalRenderer_updateInternal(JNI
 JNIEXPORT void JNICALL Java_com_ijuru_refract_FractalRenderer_freeInternal(JNIEnv* env, jobject obj) {
 	refract_context* context = get_context(env, obj);
 	refract_free(context);
+
+	LOGI("Freed FractalRenderer internal resources");
 }
