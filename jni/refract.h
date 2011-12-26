@@ -22,8 +22,10 @@
 #include <stdlib.h>
 #include <math.h>
 
-#define RGB(r,g,b)     ((pixel_t)(((uint8_t)(r)|((uint16_t)(g)<<8))|(((uint32_t)(uint8_t)(b))<<16)))
-#define RGBA(r,g,b,a)  ((pixel_t)(((uint8_t)(r)|((uint16_t)(g)<<8))|(((uint32_t)(uint8_t)(b))<<16)|(((uint32_t)(uint8_t)(a))<<24)))
+#define RGB(r,g,b)		((pixel_t)(((uint8_t)(r)|((uint16_t)(g)<<8))|(((uint32_t)(uint8_t)(b))<<16)))
+#define RGBA(r,g,b,a)	((pixel_t)(((uint8_t)(r)|((uint16_t)(g)<<8))|(((uint32_t)(uint8_t)(b))<<16)|(((uint32_t)(uint8_t)(a))<<24)))
+#define BLACK 			0xFF000000
+#define WHITE			0xFFFFFFFF
 
 typedef uint32_t pixel_t;
 
@@ -31,6 +33,9 @@ typedef struct {
 	uint32_t width;
 	uint32_t height;
 	uint32_t stride;
+	double real;
+	double imag;
+	double zoom;
 
 } refract_context;
 
