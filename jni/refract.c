@@ -20,7 +20,7 @@
 #include "refract.h"
 
 refract_context* refract_init(uint32_t width, uint32_t height, uint32_t stride) {
-	refract_context* context = malloc(sizeof (refract_context));
+	refract_context* context = (refract_context*)malloc(sizeof (refract_context));
 
 	context->width = width;
 	context->height = height;
@@ -29,19 +29,17 @@ refract_context* refract_init(uint32_t width, uint32_t height, uint32_t stride) 
 	return context;
 }
 
-void refract_render(refract_context* context, void* pixels) {
-	int  y;
-	for (y = 0; y < context->height; ++y) {
-		PIXEL32*  line = (PIXEL32*)pixels;
+void refract_render(refract_context* context, pixel_t* pixels) {
+	for (int y = 0; y < context->height; ++y) {
+		pixel_t*  line = (pixel_t*)pixels;
 
-		int x;
-		for (x = 0; x < context->width; ++x) {
+		for (int x = 0; x < context->width; ++x) {
 
 			line[x] = rand();//RGB(255, 128, 0);
 		}
 
 		// go to next line
-		pixels = (char*)pixels + context->stride;
+		pixels = (pixel_t*)((char*)pixels + context->stride);
 	}
 }
 

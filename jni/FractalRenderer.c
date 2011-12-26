@@ -22,6 +22,7 @@
 
 #include "refract.h"
 
+// Logging macros
 #define LOG_TAG    "librefract"
 #define LOGI(...)  __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
 #define LOGE(...)  __android_log_print(ANDROID_LOG_ERROR,LOG_TAG,__VA_ARGS__)
@@ -38,6 +39,9 @@ static refract_context* get_context(JNIEnv* env, jobject obj) {
 	return (refract_context*)(intptr_t)((*env)->GetLongField(env, obj, fid_context));
 }
 
+/**
+ * Allocates the refract context for the given FractalRenderer
+ */
 JNIEXPORT void JNICALL Java_com_ijuru_refract_FractalRenderer_allocateInternal(JNIEnv* env, jobject obj) {
 	jclass this_class = (*env)->GetObjectClass(env, obj);
 	jfieldID fid_bitmap = (*env)->GetFieldID(env, this_class, "bitmap", "Landroid/graphics/Bitmap;");
@@ -54,16 +58,20 @@ JNIEXPORT void JNICALL Java_com_ijuru_refract_FractalRenderer_allocateInternal(J
 	LOGI("Allocated FractalRenderer internal resources");
 }
 
+/**
+ * Updates (i.e. renders a frame) the refract context for the given FractalRenderer
+ */
 JNIEXPORT void JNICALL Java_com_ijuru_refract_FractalRenderer_updateInternal(JNIEnv* env, jobject obj) {
 	jclass this_class = (*env)->GetObjectClass(env, obj);
 	jfieldID fid_bitmap = (*env)->GetFieldID(env, this_class, "bitmap", "Landroid/graphics/Bitmap;");
 	jobject obj_bitmap = (*env)->GetObjectField(env, obj, fid_bitmap);
 
-	void* pixels;
+	pixel_t* pixels;
 	int ret;
 
-	if ((ret = AndroidBitmap_lockPixels(env, obj_bitmap, &pixels)) < 0) {
+	if ((ret = AndroidBitmap_lockPixels(env, obj_bitmap, (void**)&pixels)) < 0) {
 		LOGE("AndroidBitmap_lockPixels() failed: error=%d", ret);
+		return;
 	}
 
 	refract_context* context = get_context(env, obj);
@@ -72,6 +80,9 @@ JNIEXPORT void JNICALL Java_com_ijuru_refract_FractalRenderer_updateInternal(JNI
 	AndroidBitmap_unlockPixels(env, obj_bitmap);
 }
 
+/**
+ * Frees the refract context for the given FractalRenderer
+ */
 JNIEXPORT void JNICALL Java_com_ijuru_refract_FractalRenderer_freeInternal(JNIEnv* env, jobject obj) {
 	refract_context* context = get_context(env, obj);
 	refract_free(context);
