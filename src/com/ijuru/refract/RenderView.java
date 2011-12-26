@@ -20,7 +20,6 @@
 package com.ijuru.refract;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
 import android.view.View;
@@ -30,7 +29,7 @@ import android.view.View;
  */
 public class RenderView extends View {
 
-	private Bitmap bitmap;
+	private FractalRenderer renderer;
 
 	/**
 	 * Constructs a render view
@@ -42,23 +41,22 @@ public class RenderView extends View {
 	}
 
 	/**
-	 * Renders a fractal image
-	 * @param bitmap the bitmap to render to
-	 */
-	private static native void render(Bitmap bitmap);
-
-	private void init() {
-		bitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
-	}
-
-	/**
 	 * @see android.view.View#onSizeChanged(int, int, int, int)
 	 */
 	@Override
-	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-		init();
+	protected void onSizeChanged(int width, int height, int oldw, int oldh) {
+		initRenderer();
 
-		super.onSizeChanged(w, h, oldw, oldh);
+		super.onSizeChanged(width, height, oldw, oldh);
+	}
+	
+	private void initRenderer() {
+		if (renderer != null)
+			renderer.free();
+		
+		renderer = new FractalRenderer();
+		
+		renderer.allocate(getWidth(), getHeight());
 	}
 
 	/**
@@ -66,11 +64,12 @@ public class RenderView extends View {
 	 */
 	@Override
 	protected void onDraw(Canvas canvas) {
-		if (bitmap == null)
-			init();
+		if (renderer == null)
+			initRenderer();
+		
+		renderer.update();
 
-		render(bitmap);
-		canvas.drawBitmap(bitmap, 0, 0, null);
+		canvas.drawBitmap(renderer.getBitmap(), 0, 0, null);
 
 		invalidate();
 	}
