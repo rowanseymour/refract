@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <com.ijuru.refract.RenderView
+        android:id="@+id/renderView"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_weight="1" />
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="#444">
+
+        <TableRow >
+            <TextView android:text="Zoom" android:textColor="#EEE" />
+            <TextView android:text="12345345" android:textColor="#EEE" />
+        </TableRow>
+
+        <TableRow >
+            <TextView android:text="Real" android:textColor="#EEE" />
+            <TextView android:text="454354354" android:textColor="#EEE" />
+        </TableRow>
+
+        <TableRow >
+            <TextView android:text="Imag" android:textColor="#EEE" />
+            <TextView android:text="567678436545" android:textColor="#EEE" />
+        </TableRow>
+    </TableLayout>
+
+</RelativeLayout>
