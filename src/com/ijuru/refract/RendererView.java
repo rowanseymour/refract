@@ -26,7 +26,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Bitmap.Config;
-import android.util.AttributeSet;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -40,21 +40,23 @@ public class RendererView extends SurfaceView {
 	private Renderer renderer;
 	private RendererThread rendererThread;
 	
-	public RendererView(Context context, AttributeSet attrs) {
-		super(context, attrs);
+	public RendererView(Context context) {
+		super(context);
 		
 		rendererThread = new RendererThread(this);
 		holder = getHolder();
 		holder.addCallback(new SurfaceHolder.Callback() {
 			
 			@Override
-			public void surfaceCreated(SurfaceHolder holder) {			
+			public void surfaceCreated(SurfaceHolder holder) {		
 				bitmap = Bitmap.createBitmap(getWidth(), getHeight(), Config.ARGB_8888);
 				renderer = new NativeRenderer();
 				renderer.allocate(getWidth(), getHeight());
 				
 				rendererThread.setRunning(true);
 				rendererThread.start();
+				
+				Log.i("refract", "Render surface created [" + getWidth() + ", " + getHeight() + "]");
 			}
 
 			@Override
@@ -69,12 +71,16 @@ public class RendererView extends SurfaceView {
 					}
 				}
 				renderer.free();
+				
+				Log.i("refract", "Render surface destroyed");
 			}
 
 			@Override
 			public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
 				renderer.free();
 				renderer.allocate(width, height);
+				
+				Log.i("refract", "Render surface resized [" + width + ", " + height + "]");
 			}
 		});
 	}

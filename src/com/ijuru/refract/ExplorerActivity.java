@@ -39,6 +39,6 @@ public class ExplorerActivity extends Activity {
     {
         super.onCreate(savedInstanceState);
         
-        setContentView(R.layout.explorer_activity);
+        setContentView(new FractalViewer(this));
     }
 }

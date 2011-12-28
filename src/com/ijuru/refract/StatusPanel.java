@@ -20,7 +20,6 @@
 package com.ijuru.refract;
 
 import android.content.Context;
-import android.util.AttributeSet;
 import android.view.View;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -36,10 +35,13 @@ public class StatusPanel extends TableLayout {
 	/**
 	 * Creates a status panel
 	 * @param context the context
-	 * @param attrs the attributes
 	 */
-	public StatusPanel(Context context, AttributeSet attrs) {
-		super(context, attrs);
+	public StatusPanel(Context context) {
+		super(context);
+		
+		setBackgroundColor(0x55000000);
+		setColumnStretchable(1, true);
+		setColumnStretchable(3, true);
 		
 		txtReal = new TextView(context);
 		txtImag = new TextView(context);
