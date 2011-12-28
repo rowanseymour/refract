@@ -17,28 +17,32 @@
  * along with Refract. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.ijuru.refract;
+package com.ijuru.refract.renderer;
 
-import android.app.Activity;
-import android.os.Bundle;
+import android.graphics.Bitmap;
 
 /**
- * Activity for exploring fractals
+ * Native implementation of a fractal renderer
  */
-public class ExploreActivity extends Activity {
+public class NativeRenderer implements Renderer {
+	
+	private long context;
 	
 	/**
-	 * Load the native code
+	 * @see com.ijuru.refract.renderer.Renderer#allocate(int, int)
 	 */
-	static {
-        System.loadLibrary("refract");
-    }
-	
 	@Override
-    public void onCreate(Bundle savedInstanceState)
-    {
-        super.onCreate(savedInstanceState);
-        
-        setContentView(R.layout.explore);
-    }
+	public native void allocate(int width, int height);
+	
+	/**
+	 * @see com.ijuru.refract.renderer.Renderer#render(android.graphics.Bitmap, double, double, double)
+	 */
+	@Override
+	public native void render(Bitmap bitmap, double real, double imag, double zoom);
+	
+	/**
+	 * @see com.ijuru.refract.renderer.Renderer#free()
+	 */
+	@Override
+	public native void free();
 }

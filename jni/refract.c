@@ -22,15 +22,32 @@
 /**
  * Allocates a context
  */
-refract_context* refract_init(uint32_t width, uint32_t height, uint32_t stride) {
+refract_context* refract_init(uint32_t width, uint32_t height) {
+	// Allocate context
 	refract_context* context = (refract_context*)malloc(sizeof (refract_context));
+	if (!context)
+		return 0;
 
+	// Initialize context
+	memset(context, 0, sizeof (refract_context));
 	context->width = width;
 	context->height = height;
-	context->stride = stride;
-	context->real = 0.0;
-	context->imag = 0.0;
-	context->zoom = 200.0;
+
+	// Allocate cache buffers
+	context->iter_cache = malloc(sizeof (iterc_t) * width * height);
+	context->real_cache = malloc(sizeof (double) * width * height);
+	context->imag_cache = malloc(sizeof (double) * width * height);
+
+	// Check buffers were allocated
+	if (!(context->iter_cache && context->real_cache && context->imag_cache)) {
+		refract_free(context);
+		return 0;
+	}
+
+	// Zeroize cache buffers
+	memset(context->iter_cache, 0, sizeof (iterc_t) * width * height);
+	memset(context->real_cache, 0, sizeof (double) * width * height);
+	memset(context->imag_cache, 0, sizeof (double) * width * height);
 
 	return context;
 }
@@ -38,12 +55,9 @@ refract_context* refract_init(uint32_t width, uint32_t height, uint32_t stride) 
 /**
  * Renders a context to the given pixel buffer
  */
-void refract_render(refract_context* context, pixel_t* pixels) {
+void refract_render(refract_context* context, pixel_t* pixels, int stride, double real, double imag, double zoom) {
 	int half_cx = context->width / 2;
 	int half_cy = context->height / 2;
-	double real = context->real;
-	double imag = context->imag;
-	double zoom = context->zoom;
 
 	for (int y = 0, index = 0; y < context->height; ++y) {
 
@@ -78,7 +92,7 @@ void refract_render(refract_context* context, pixel_t* pixels) {
 		}
 
 		// go to next line
-		pixels = (pixel_t*)((char*)pixels + context->stride);
+		pixels = (pixel_t*)((char*)pixels + stride);
 	}
 }
 
@@ -86,5 +100,14 @@ void refract_render(refract_context* context, pixel_t* pixels) {
  * Frees a context
  */
 void refract_free(refract_context* context) {
+	// Free cache buffers
+	if (context->iter_cache)
+		free(context->iter_cache);
+	if (context->real_cache)
+		free(context->real_cache);
+	if (context->imag_cache)
+		free(context->imag_cache);
+
+	// Free context itself
 	free(context);
 }

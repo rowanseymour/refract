@@ -17,51 +17,24 @@
  * along with Refract. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.ijuru.refract;
+package com.ijuru.refract.renderer;
 
 import android.graphics.Bitmap;
-import android.graphics.Bitmap.Config;
 
-public class FractalRenderer {
-	
-	private Bitmap bitmap;
-	private double real, imag, zoom;
-	private long context;
-	
+/**
+ * Pure Java implementation of a fractal renderer
+ */
+public class JavaRenderer implements Renderer {
+
+	@Override
 	public void allocate(int width, int height) {
-		bitmap = Bitmap.createBitmap(width, height, Config.ARGB_8888);
-		
-		allocateInternal();
 	}
-	
-	public void update() {
-		updateInternal();
+
+	@Override
+	public void render(Bitmap bitmap, double real, double imag, double zoom) {
 	}
-	
+
+	@Override
 	public void free() {
-		bitmap = null;
-		
-		freeInternal();
 	}
-	
-	public Bitmap getBitmap() {
-		return bitmap;
-	}
-	
-	public void setCoords(double real, double imag) {
-		this.real = real;
-		this.imag = imag;
-	}
-	
-	public double getZoom() {
-		return zoom;
-	}
-	
-	public void setZoom(double zoom) {
-		this.zoom = zoom;
-	}
-	
-	private native void allocateInternal();
-	private native void updateInternal();
-	private native void freeInternal();
 }

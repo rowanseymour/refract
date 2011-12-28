@@ -28,17 +28,20 @@
 #define WHITE			0xFFFFFFFF
 
 typedef uint32_t pixel_t;
+typedef uint32_t iterc_t;
 
 typedef struct {
 	uint32_t width;
 	uint32_t height;
-	uint32_t stride;
-	double real;
-	double imag;
-	double zoom;
+	double last_real;
+	double last_imag;
+	double last_zoom;
+	iterc_t* iter_cache;
+	double* real_cache;
+	double* imag_cache;
 
 } refract_context;
 
-refract_context* refract_init(uint32_t width, uint32_t height, uint32_t stride);
-void refract_render(refract_context* context, pixel_t* pixels);
+refract_context* refract_init(uint32_t width, uint32_t height);
+void refract_render(refract_context* context, pixel_t* pixels, int stride, double real, double imag, double zoom);
 void refract_free(refract_context* context);
