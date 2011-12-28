@@ -41,9 +41,6 @@ public class FractalViewer extends FrameLayout {
 		
 		float dp = context.getResources().getDisplayMetrics().density;
 		
-		rendererView = new RendererView(context);
-		rendererView.setLayoutParams(new FrameLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
-		
 		LinearLayout statusHolder = new LinearLayout(context);
 		statusHolder.setLayoutParams(new FrameLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
 		statusHolder.setGravity(Gravity.BOTTOM);
@@ -52,7 +49,11 @@ public class FractalViewer extends FrameLayout {
 		
 		statusPanel = new StatusPanel(context);
 		statusPanel.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
-		statusHolder.setPadding((int)(5 * dp), (int)(5 * dp), (int)(5 * dp), (int)(5 * dp));
+		statusPanel.setPadding((int)(5 * dp), (int)(5 * dp), (int)(5 * dp), (int)(5 * dp));
+		
+		rendererView = new RendererView(context);
+		rendererView.setLayoutParams(new FrameLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
+		rendererView.setStatusPanel(statusPanel);
 		
 		statusHolder.addView(statusPanel);
 		

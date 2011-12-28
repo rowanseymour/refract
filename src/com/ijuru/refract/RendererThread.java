@@ -27,19 +27,14 @@ import android.graphics.Canvas;
 public class RendererThread extends Thread {
 	
 	private RendererView view;
-	private boolean running = false;
 
 	public RendererThread(RendererView view) {
 		this.view = view;
 	}
 
-	public void setRunning(boolean run) {
-		running = run;
-	}
-
 	@Override
 	public void run() {
-		while (running) {
+		while (!isInterrupted()) {
 			Canvas c = null;
 			try {
 				c = view.getHolder().lockCanvas();

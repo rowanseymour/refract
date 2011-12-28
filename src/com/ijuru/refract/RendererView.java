@@ -33,56 +33,60 @@ import android.view.SurfaceView;
 /**
  * View which displays the fractal rendering
  */
-public class RendererView extends SurfaceView {
+public class RendererView extends SurfaceView implements SurfaceHolder.Callback {
 	
 	private Bitmap bitmap;
 	private SurfaceHolder holder;
 	private Renderer renderer;
-	private RendererThread rendererThread;
+	private RendererThread rendererThread = new RendererThread(this);
+	private StatusPanel statusPanel;
+	private double zoom;
 	
 	public RendererView(Context context) {
 		super(context);
 		
-		rendererThread = new RendererThread(this);
 		holder = getHolder();
-		holder.addCallback(new SurfaceHolder.Callback() {
-			
-			@Override
-			public void surfaceCreated(SurfaceHolder holder) {		
-				bitmap = Bitmap.createBitmap(getWidth(), getHeight(), Config.ARGB_8888);
-				renderer = new NativeRenderer();
-				renderer.allocate(getWidth(), getHeight());
-				
-				rendererThread.setRunning(true);
-				rendererThread.start();
-				
-				Log.i("refract", "Render surface created [" + getWidth() + ", " + getHeight() + "]");
-			}
+		holder.addCallback(this);
+	}
+	
+	@Override
+	public void surfaceCreated(SurfaceHolder holder) {
+		Log.i("refract", "Render surface created [" + getWidth() + ", " + getHeight() + "]");
+	}
 
-			@Override
-			public void surfaceDestroyed(SurfaceHolder holder) {
-				boolean retry = true;
-				rendererThread.setRunning(false);
-				while (retry) {
-					try {
-						rendererThread.join();
-						retry = false;
-					} catch (InterruptedException e) {
-					}
-				}
-				renderer.free();
-				
-				Log.i("refract", "Render surface destroyed");
+	@Override
+	public void surfaceDestroyed(SurfaceHolder holder) {
+		boolean retry = true;
+		rendererThread.interrupt();
+		
+		while (retry) {
+			try {
+				rendererThread.join();
+				retry = false;
+			} catch (InterruptedException e) {
 			}
+		}
+		
+		renderer.free();
+		
+		Log.i("refract", "Render surface destroyed");
+	}
 
-			@Override
-			public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-				renderer.free();
-				renderer.allocate(width, height);
-				
-				Log.i("refract", "Render surface resized [" + width + ", " + height + "]");
-			}
-		});
+	@Override
+	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+		bitmap = Bitmap.createBitmap(width, height, Config.ARGB_8888);
+		
+		if (renderer == null)
+			renderer = new NativeRenderer();
+		else
+			renderer.free();
+		
+		renderer.allocate(width, height);
+		
+		if (!rendererThread.isAlive())
+			rendererThread.start();
+		
+		Log.i("refract", "Render surface resized [" + width + ", " + height + "]");
 	}
 
 	@Override
@@ -90,5 +94,13 @@ public class RendererView extends SurfaceView {
 		renderer.render(bitmap, 0, 0, 200);
 		
 		canvas.drawBitmap(bitmap, 0, 0, null);
+	}
+
+	/**
+	 * Sets the status panel
+	 * @param statusPanel the status panel
+	 */
+	public void setStatusPanel(StatusPanel statusPanel) {
+		this.statusPanel = statusPanel;
 	}
 }
