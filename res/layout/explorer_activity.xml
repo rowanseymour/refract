@@ -17,10 +17,9 @@
         android:orientation="vertical"
         android:padding="5dp">
         
-        <com.ijuru.refract.StatusView
+        <com.ijuru.refract.StatusPanel
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
-	        android:layout_alignParentBottom="true"
 	        android:background="#55000000"
 	        android:padding="5dp"
 	        android:stretchColumns="1,3" 

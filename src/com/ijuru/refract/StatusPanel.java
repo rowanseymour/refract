@@ -21,6 +21,7 @@ package com.ijuru.refract;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.View;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -28,11 +29,16 @@ import android.widget.TextView;
 /**
  * View component to display status information about the current rendering
  */
-public class StatusView extends TableLayout {
+public class StatusPanel extends TableLayout {
 
 	private TextView txtReal, txtImag, txtZoom, txtPerf;
 	
-	public StatusView(Context context, AttributeSet attrs) {
+	/**
+	 * Creates a status panel
+	 * @param context the context
+	 * @param attrs the attributes
+	 */
+	public StatusPanel(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		
 		txtReal = new TextView(context);
@@ -57,16 +63,31 @@ public class StatusView extends TableLayout {
 		addView(row2);
 	}
 	
+	/**
+	 * Sets the render coordinates
+	 * @param real the real component
+	 * @param imag the imaginary component
+	 */
 	public void setCoords(double real, double imag) {
 		txtReal.setText("" + real);
 		txtImag.setText("" + imag);
 	}
 	
+	/**
+	 * Sets the zoom factor
+	 * @param zoom the zoom factor
+	 */
 	public void setZoom(double zoom) {
 		txtZoom.setText("" + zoom);
 	}
 	
-	private static TextView createLabel(Context context, String text) {
+	/**
+	 * Creates a text label
+	 * @param context the context
+	 * @param text the text of the label
+	 * @return the label component
+	 */
+	private static View createLabel(Context context, String text) {
 		TextView label = new TextView(context);
 		label.setTextColor(0xFFFFFFFF);
 		label.setText(text);
