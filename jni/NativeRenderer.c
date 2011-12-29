@@ -60,7 +60,7 @@ JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_allocate(J
 /**
  * Updates (i.e. renders a frame) the refract context for the given FractalRenderer
  */
-JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_render(JNIEnv* env, jobject obj, jobject bitmap, jdouble real, jdouble imag, jdouble zoom) {
+JNIEXPORT jint JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_render(JNIEnv* env, jobject obj, jobject bitmap, jdouble real, jdouble imag, jdouble zoom) {
 	refract_context* context = get_context(env, obj);
 
 	AndroidBitmapInfo info;
@@ -71,12 +71,14 @@ JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_render(JNI
 
 	if ((ret = AndroidBitmap_lockPixels(env, bitmap, (void**)&pixels)) < 0) {
 		LOG_E("AndroidBitmap_lockPixels() failed: error=%d", ret);
-		return;
+		return -1;
 	}
 
-	refract_render(context, pixels, info.stride, real, imag, zoom);
+	refract_render(context, pixels, info.stride, (float_t)real, (float_t)imag, (float_t)zoom);
 
 	AndroidBitmap_unlockPixels(env, bitmap);
+
+	return context->last_max_iters;
 }
 
 /**

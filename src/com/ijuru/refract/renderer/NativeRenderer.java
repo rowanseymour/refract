@@ -38,7 +38,7 @@ public class NativeRenderer implements Renderer {
 	 * @see com.ijuru.refract.renderer.Renderer#render(android.graphics.Bitmap, double, double, double)
 	 */
 	@Override
-	public native void render(Bitmap bitmap, double real, double imag, double zoom);
+	public native int render(Bitmap bitmap, double real, double imag, double zoom);
 	
 	/**
 	 * @see com.ijuru.refract.renderer.Renderer#free()

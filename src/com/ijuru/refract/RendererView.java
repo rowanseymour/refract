@@ -96,7 +96,7 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	 */
 	public void update() {
 		// Render into off screen bitmap
-		renderer.render(bitmap, 0, 0, 200);
+		int iters = renderer.render(bitmap, 0, 0, 200);
 		
 		// Lock canvas to draw to it
 		Canvas c = null;
@@ -111,10 +111,11 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 			}
 		}
 		
+		// Update status
 		StatusPanel status = viewer.getStatusPanel();
 		status.setZoom(zoom);
 		long avgFrameTime = rendererThread.calcAverageFrameTime();
-		status.setPerfInfo(10, avgFrameTime > 0 ? 1000.0 / avgFrameTime : 0);
+		status.setPerfInfo(iters, avgFrameTime > 0 ? 1000.0 / avgFrameTime : 0);
 	}
 
 	/**

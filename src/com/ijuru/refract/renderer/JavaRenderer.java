@@ -31,7 +31,8 @@ public class JavaRenderer implements Renderer {
 	}
 
 	@Override
-	public void render(Bitmap bitmap, double real, double imag, double zoom) {
+	public int render(Bitmap bitmap, double real, double imag, double zoom) {
+		return -1;
 	}
 
 	@Override

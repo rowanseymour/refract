@@ -39,8 +39,9 @@ public interface Renderer {
 	 * @param real the real coordinate
 	 * @param imag the imaginary coordinate
 	 * @param zoom the zoom factor
+	 * @return the number of iterations used
 	 */
-	public void render(Bitmap bitmap, double real, double imag, double zoom);
+	public int render(Bitmap bitmap, double real, double imag, double zoom);
 
 	/**
 	 * Frees resources
