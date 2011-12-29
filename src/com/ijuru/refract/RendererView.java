@@ -120,7 +120,7 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 		
 		// Update performance status info
 		long avgFrameTime = rendererThread.calcAverageFrameTime();
-		viewer.getStatusPanel().setPerfInfo(iters, avgFrameTime > 0 ? 1000.0 / avgFrameTime : 0);
+		viewer.getStatusPanel().setPerformanceInfo(iters, avgFrameTime > 0 ? 1000.0 / avgFrameTime : 0);
 	}
 
 	/**
