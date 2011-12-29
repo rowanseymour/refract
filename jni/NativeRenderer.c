@@ -78,7 +78,7 @@ JNIEXPORT jint JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_render(JNI
 
 	AndroidBitmap_unlockPixels(env, bitmap);
 
-	return context->last_max_iters;
+	return context->cache_max_iters;
 }
 
 /**

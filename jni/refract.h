@@ -35,16 +35,22 @@ typedef uint32_t iterc_t;
 typedef float float_t;
 
 typedef struct {
+	int func;
+	float_t real;
+	float_t imag;
+	float_t zoom;
+
+} refract_params;
+
+typedef struct {
 	uint32_t width;
 	uint32_t height;
-	int last_func;
-	float_t last_real;
-	float_t last_imag;
-	float_t last_zoom;
-	int last_max_iters;
-	iterc_t* iter_cache;
-	float_t* real_cache;
-	float_t* imag_cache;
+
+	refract_params cache_params;
+	int cache_max_iters;
+	iterc_t* cache_iters;
+	float_t* cache_reals;
+	float_t* cache_imags;
 
 } refract_context;
 
