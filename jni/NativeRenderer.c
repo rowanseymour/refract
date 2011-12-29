@@ -21,6 +21,7 @@
 #include <android/bitmap.h>
 
 #include "refract.h"
+#include "palette.h"
 
 // Logging macros
 #define LOG_TAG    "librefract"
@@ -60,12 +61,23 @@ JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_allocate(J
 /**
  * Sets the palette
  */
-JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setPalette(JNIEnv* env, jobject obj, jintArray colors, jintArray anchors) {
+JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setPalette(JNIEnv* env, jobject obj, jintArray colors, jfloatArray anchors) {
+	refract_context* context = get_context(env, obj);
+
+	// Free existing palette
+	if (context->palette) {
+		refract_palette_free(context->palette);
+		context->palette = NULL;
+	}
+
 	jint* colorvals = (*env)->GetIntArrayElements(env, colors, NULL);
-	jint* anchorvals = (*env)->GetIntArrayElements(env, anchors, NULL);
+	jfloat* anchorvals = (*env)->GetFloatArrayElements(env, anchors, NULL);
+	int points = (*env)->GetArrayLength(env, colors);
+
+	context->palette = refract_palette_init((pixel_t*)colorvals, (float*)anchorvals, points, 256);
 
 	(*env)->ReleaseIntArrayElements(env, colors, colorvals, 0);
-	(*env)->ReleaseIntArrayElements(env, anchors, anchorvals, 0);
+	(*env)->ReleaseFloatArrayElements(env, anchors, anchorvals, 0);
 }
 
 /**

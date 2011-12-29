@@ -17,8 +17,11 @@
  * along with Refract. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#define RGB(r,g,b)		((pixel_t)(((uint8_t)(r)|((uint16_t)(g)<<8))|(((uint32_t)(uint8_t)(b))<<16)))
-#define RGBA(r,g,b,a)	((pixel_t)(((uint8_t)(r)|((uint16_t)(g)<<8))|(((uint32_t)(uint8_t)(b))<<16)|(((uint32_t)(uint8_t)(a))<<24)))
+#define RGB(r,g,b)		((pixel_t)(((uint8_t)(r)|((uint16_t)(g)<<8))|(((uint32_t)(uint8_t)(b))<<16)|0xFF000000))
+#define GET_R(rgb)		((rgb) & 0x000000FF)
+#define GET_G(rgb)		((rgb >> 8) & 0x000000FF)
+#define GET_B(rgb)		((rgb >> 16) & 0x000000FF)
+
 #define BLACK 			0xFF000000
 #define WHITE			0xFFFFFFFF
 #define RED				0xFF0000FF
@@ -27,5 +30,5 @@
 
 #define SET_COLOR		BLACK
 
-refract_palette* refract_palette_init(pixel_t* colors, float* anchors, int size);
+refract_palette* refract_palette_init(pixel_t* colors, float* anchors, int points, int size);
 void refract_palette_free(refract_palette* palette);

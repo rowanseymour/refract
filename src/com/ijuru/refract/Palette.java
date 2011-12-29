@@ -17,38 +17,44 @@
  * along with Refract. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.ijuru.refract.renderer;
-
-import android.graphics.Bitmap;
+package com.ijuru.refract;
 
 /**
- * Native implementation of a fractal renderer
+ * Palette presets
  */
-public class NativeRenderer implements Renderer {
+public class Palette {
 	
-	private long context;
+	private int[] colors;
+	private float[] anchors;
 	
-	/**
-	 * @see com.ijuru.refract.renderer.Renderer#allocate(int, int)
-	 */
-	@Override
-	public native void allocate(int width, int height);
-	
-	/**
-	 * @see com.ijuru.refract.renderer.Renderer#setPalette(int[], float[])
-	 */
-	@Override
-	public native void setPalette(int[] colors, float[] anchors);
-
-	/**
-	 * @see com.ijuru.refract.renderer.Renderer#render(android.graphics.Bitmap, double, double, double)
-	 */
-	@Override
-	public native int render(Bitmap bitmap, double real, double imag, double zoom);
+	public static Palette SUNSET = new Palette(
+			new int[] { 0xFF320064, 0xFF0000FF, 0xFF00FFFF },
+			new float[] { 0.0f, 0.3f, 1.0f}
+	);
 	
 	/**
-	 * @see com.ijuru.refract.renderer.Renderer#free()
+	 * Creates a new palette
+	 * @param colors the color points
+	 * @param anchors the point positions 0.0...1.0
 	 */
-	@Override
-	public native void free();
+	private Palette(int[] colors, float[] anchors) {
+		this.colors = colors;
+		this.anchors = anchors;
+	}
+	
+	/**
+	 * Gets the colors
+	 * @return the colors
+	 */
+	public int[] getColors() {
+		return colors;
+	}
+	
+	/**
+	 * Gets the anchor point positions
+	 * @return the positions
+	 */
+	public float[] getAnchors() {
+		return anchors;
+	}
 }

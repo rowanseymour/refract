@@ -32,6 +32,13 @@ public interface Renderer {
 	 * @param height the height in pixels
 	 */
 	public void allocate(int width, int height);
+	
+	/**
+	 * Sets the palette for renders
+	 * @param colors the array of color values
+	 * @param anchors the array of anchor positions
+	 */
+	public void setPalette(int[] colors, float[] anchors);
 
 	/**
 	 * Renders a fractal to the given bitmap
