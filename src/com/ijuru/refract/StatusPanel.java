@@ -19,6 +19,7 @@
 
 package com.ijuru.refract;
 
+import android.app.Activity;
 import android.content.Context;
 import android.view.View;
 import android.widget.TableLayout;
@@ -74,16 +75,16 @@ public class StatusPanel extends TableLayout {
 	 * @param imag the imaginary component
 	 */
 	public void setCoords(double real, double imag) {
-		txtReal.setText("" + real);
-		txtImag.setText("" + imag);
+		updateField(txtReal, "" + real);
+		updateField(txtImag, "" + imag);
 	}
 	
 	/**
 	 * Sets the zoom factor
 	 * @param zoom the zoom factor
 	 */
-	public void setZoom(double zoom) {
-		txtZoom.setText("" + zoom);
+	public void setZoom(final double zoom) {
+		updateField(txtZoom, "" + zoom);
 	}
 	
 	/**
@@ -95,7 +96,21 @@ public class StatusPanel extends TableLayout {
 	private static View createLabel(Context context, String text) {
 		TextView label = new TextView(context);
 		label.setTextColor(0xFFFFFFFF);
-		label.setText(text);
+		label.setText(text + " ");
 		return label;
+	}
+	
+	/**
+	 * Updates the value of a field (using the UI thread)
+	 * @param field the field
+	 * @param text the text value
+	 */
+	private void updateField(final TextView field, final String text) {
+		((Activity)getContext()).runOnUiThread(new Runnable() {	
+			@Override
+			public void run() {
+				field.setText(text);
+			}
+		});
 	}
 }

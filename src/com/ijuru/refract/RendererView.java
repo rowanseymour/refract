@@ -55,6 +55,23 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	}
 
 	@Override
+	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+		bitmap = Bitmap.createBitmap(width, height, Config.ARGB_8888);
+		
+		if (renderer == null)
+			renderer = new NativeRenderer();
+		else
+			renderer.free();
+		
+		renderer.allocate(width, height);
+		
+		if (!rendererThread.isAlive())
+			rendererThread.start();
+		
+		Log.i("refract", "Render surface resized [" + width + ", " + height + "]");
+	}
+	
+	@Override
 	public void surfaceDestroyed(SurfaceHolder holder) {
 		boolean retry = true;
 		rendererThread.interrupt();
@@ -73,27 +90,12 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	}
 
 	@Override
-	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-		bitmap = Bitmap.createBitmap(width, height, Config.ARGB_8888);
-		
-		if (renderer == null)
-			renderer = new NativeRenderer();
-		else
-			renderer.free();
-		
-		renderer.allocate(width, height);
-		
-		if (!rendererThread.isAlive())
-			rendererThread.start();
-		
-		Log.i("refract", "Render surface resized [" + width + ", " + height + "]");
-	}
-
-	@Override
 	protected void onDraw(Canvas canvas) {
 		renderer.render(bitmap, 0, 0, 200);
 		
 		canvas.drawBitmap(bitmap, 0, 0, null);
+		
+		statusPanel.setZoom(zoom);
 	}
 
 	/**
