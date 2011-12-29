@@ -36,21 +36,21 @@ import android.view.SurfaceView;
 public class RendererView extends SurfaceView implements SurfaceHolder.Callback {
 	
 	private Bitmap bitmap;
-	private SurfaceHolder holder;
 	private Renderer renderer;
-	private RendererThread rendererThread = new RendererThread(this);
+	private RendererThread rendererThread;
 	private StatusPanel statusPanel;
 	private double zoom;
 	
 	public RendererView(Context context) {
 		super(context);
 		
-		holder = getHolder();
-		holder.addCallback(this);
+		getHolder().addCallback(this);
 	}
 	
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
+		rendererThread = new RendererThread(this);
+		
 		Log.i("refract", "Render surface created [" + getWidth() + ", " + getHeight() + "]");
 	}
 
@@ -88,14 +88,36 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 		
 		Log.i("refract", "Render surface destroyed");
 	}
-
-	@Override
-	protected void onDraw(Canvas canvas) {
+	
+	/**
+	 * Updates the renderer
+	 */
+	public void update() {
+		// Render into off screen bitmap
 		renderer.render(bitmap, 0, 0, 200);
 		
-		canvas.drawBitmap(bitmap, 0, 0, null);
+		// Lock canvas to draw to it
+		Canvas c = null;
+		try {
+			c = getHolder().lockCanvas();
+			synchronized (getHolder()) {
+				onDraw(c);
+			}
+		} finally {
+			if (c != null) {
+				getHolder().unlockCanvasAndPost(c);
+			}
+		}
 		
 		statusPanel.setZoom(zoom);
+	}
+
+	/**
+	 * @see android.view.View#onDraw(Canvas)
+	 */
+	@Override
+	protected void onDraw(Canvas canvas) {
+		canvas.drawBitmap(bitmap, 0, 0, null);
 	}
 
 	/**

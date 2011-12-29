@@ -19,8 +19,6 @@
 
 package com.ijuru.refract;
 
-import android.graphics.Canvas;
-
 /**
  * Thread to update fractal renderering
  */
@@ -35,17 +33,7 @@ public class RendererThread extends Thread {
 	@Override
 	public void run() {
 		while (!isInterrupted()) {
-			Canvas c = null;
-			try {
-				c = view.getHolder().lockCanvas();
-				synchronized (view.getHolder()) {
-					view.onDraw(c);
-				}
-			} finally {
-				if (c != null) {
-					view.getHolder().unlockCanvasAndPost(c);
-				}
-			}
+			view.update();
 		}
 	}
 }
