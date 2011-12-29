@@ -27,6 +27,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Bitmap.Config;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -39,7 +40,13 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	private Renderer renderer;
 	private RendererThread rendererThread;
 	private FractalViewer viewer;
-	private double zoom;
+	
+	// Rendering parameters
+	private double real, imag, zoom = 200;
+	
+	// For dragging
+	private double oldMouseX, oldMouseY;
+	private double oldReal, oldImag;
 	
 	public RendererView(Context context, FractalViewer viewer) {
 		super(context);
@@ -96,7 +103,7 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	 */
 	public void update() {
 		// Render into off screen bitmap
-		int iters = renderer.render(bitmap, 0, 0, 200);
+		int iters = renderer.render(bitmap, real, imag, zoom);
 		
 		// Lock canvas to draw to it
 		Canvas c = null;
@@ -124,5 +131,28 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	@Override
 	protected void onDraw(Canvas canvas) {
 		canvas.drawBitmap(bitmap, 0, 0, null);
+	}
+
+	/**
+	 * @see android.view.View#onTouchEvent(android.view.MotionEvent)
+	 */
+	@Override
+	public boolean onTouchEvent(MotionEvent event) {
+		
+		int action = event.getAction();
+		switch (action) {
+		case (MotionEvent.ACTION_DOWN): // Touch screen pressed
+			oldReal = real;
+			oldImag = imag;
+			oldMouseX = event.getX();
+			oldMouseY = event.getY();
+			break;
+		case (MotionEvent.ACTION_MOVE): // Dragged finger
+			real = oldReal + (oldMouseX - event.getX()) / zoom;
+			imag = oldImag - (oldMouseY - event.getY()) / zoom;
+			break;
+		}
+		
+		return true;
 	}
 }
