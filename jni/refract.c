@@ -88,7 +88,11 @@ void refract_render(refract_context* context, pixel_t* pixels, int stride, doubl
 				++niters;
 			}
 
-			line[x] = niters == 10 ? BLACK : WHITE;
+			if (niters == 10)
+				line[x] = BLACK;
+			else {
+				line[x] = (niters % 2 == 0) ? RED : WHITE;
+			}
 		}
 
 		// go to next line

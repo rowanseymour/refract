@@ -86,5 +86,5 @@ JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_free(JNIEn
 	refract_context* context = get_context(env, obj);
 	refract_free(context);
 
-	LOG_I("Freed FractalRenderer internal resources");
+	LOG_I("Freed renderer internal resources");
 }
