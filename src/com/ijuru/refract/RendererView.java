@@ -28,6 +28,7 @@ import android.graphics.Canvas;
 import android.graphics.Bitmap.Config;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -44,9 +45,12 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	// Rendering parameters
 	private double real, imag, zoom = 200;
 	
-	// For dragging
+	// For dragging / panning
 	private double oldMouseX, oldMouseY;
 	private double oldReal, oldImag;
+	
+	// For pinch zooming
+	private ScaleGestureDetector scaleDetector;
 	
 	public RendererView(Context context, FractalViewer viewer) {
 		super(context);
@@ -54,6 +58,11 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 		this.viewer = viewer;
 		
 		getHolder().addCallback(this);
+		
+		scaleDetector = new ScaleGestureDetector(context, new ZoomListener());
+		
+		viewer.getStatusPanel().setCoords(real, imag);
+		viewer.getStatusPanel().setZoom(zoom);
 	}
 	
 	@Override
@@ -137,9 +146,9 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	 */
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
+		scaleDetector.onTouchEvent(event);
 		
-		int action = event.getAction();
-		switch (action) {
+		switch (event.getAction()) {
 		case (MotionEvent.ACTION_DOWN): // Touch screen pressed
 			oldReal = real;
 			oldImag = imag;
@@ -147,8 +156,10 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 			oldMouseY = event.getY();
 			break;
 		case (MotionEvent.ACTION_MOVE): // Dragged finger
-			real = oldReal + (oldMouseX - event.getX()) / zoom;
-			imag = oldImag - (oldMouseY - event.getY()) / zoom;
+			if (!scaleDetector.isInProgress()) {
+				real = oldReal + (oldMouseX - event.getX()) / zoom;
+				imag = oldImag - (oldMouseY - event.getY()) / zoom;
+			}
 			break;
 		}
 		
@@ -156,5 +167,23 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 		viewer.getStatusPanel().setCoords(real, imag);
 		
 		return true;
+	}
+	
+	/**
+	 * Listener for pinch-zoom gestures
+	 */
+	private class ZoomListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
+		/**
+		 * @see ScaleGestureDetector.SimpleOnScaleGestureListener#onScale(ScaleGestureDetector)
+		 */
+		@Override
+		public boolean onScale(ScaleGestureDetector detector) {
+			zoom *= detector.getScaleFactor();
+			
+			// Update status info
+			viewer.getStatusPanel().setZoom(zoom);
+			
+			return true;
+		}
 	}
 }

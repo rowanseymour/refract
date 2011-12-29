@@ -64,9 +64,6 @@ public class StatusPanel extends TableLayout {
 		
 		addView(row1);
 		addView(row2);
-		
-		setCoords(0.0, 0.0);
-		setZoom(0.0);
 	}
 	
 	/**
