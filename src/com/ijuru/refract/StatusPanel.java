@@ -75,8 +75,8 @@ public class StatusPanel extends TableLayout {
 	 * @param imag the imaginary component
 	 */
 	public void setCoords(double real, double imag) {
-		updateField(txtReal, "" + real);
-		updateField(txtImag, "" + imag);
+		updateField(txtReal, String.format("%.5g", real));
+		updateField(txtImag, String.format("%.5gi", imag));
 	}
 	
 	/**
@@ -84,7 +84,7 @@ public class StatusPanel extends TableLayout {
 	 * @param zoom the zoom factor
 	 */
 	public void setZoom(double zoom) {
-		updateField(txtZoom, "" + zoom);
+		updateField(txtZoom, String.format("%.5g", zoom));
 	}
 	
 	/**

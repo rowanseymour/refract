@@ -118,11 +118,9 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 			}
 		}
 		
-		// Update status
-		StatusPanel status = viewer.getStatusPanel();
-		status.setZoom(zoom);
+		// Update performance status info
 		long avgFrameTime = rendererThread.calcAverageFrameTime();
-		status.setPerfInfo(iters, avgFrameTime > 0 ? 1000.0 / avgFrameTime : 0);
+		viewer.getStatusPanel().setPerfInfo(iters, avgFrameTime > 0 ? 1000.0 / avgFrameTime : 0);
 	}
 
 	/**
@@ -152,6 +150,9 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 			imag = oldImag - (oldMouseY - event.getY()) / zoom;
 			break;
 		}
+		
+		// Update status info
+		viewer.getStatusPanel().setCoords(real, imag);
 		
 		return true;
 	}
