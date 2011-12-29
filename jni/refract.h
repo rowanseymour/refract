@@ -22,14 +22,6 @@
 #include <stdlib.h>
 #include <math.h>
 
-#define RGB(r,g,b)		((pixel_t)(((uint8_t)(r)|((uint16_t)(g)<<8))|(((uint32_t)(uint8_t)(b))<<16)))
-#define RGBA(r,g,b,a)	((pixel_t)(((uint8_t)(r)|((uint16_t)(g)<<8))|(((uint32_t)(uint8_t)(b))<<16)|(((uint32_t)(uint8_t)(a))<<24)))
-#define BLACK 			0xFF000000
-#define WHITE			0xFFFFFFFF
-#define RED				0xFF0000FF
-#define GREEN			0xFF00FF00
-#define BLUE			0xFFFF0000
-
 typedef uint32_t pixel_t;
 typedef uint32_t iterc_t;
 typedef float float_t;
@@ -43,6 +35,12 @@ typedef struct {
 } refract_params;
 
 typedef struct {
+	int size;
+	pixel_t* colors;
+
+} refract_palette;
+
+typedef struct {
 	uint32_t width;
 	uint32_t height;
 
@@ -51,6 +49,8 @@ typedef struct {
 	iterc_t* cache_iters;
 	float_t* cache_reals;
 	float_t* cache_imags;
+
+	refract_palette* palette;
 
 } refract_context;
 

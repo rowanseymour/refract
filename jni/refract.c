@@ -19,6 +19,10 @@
 
 #include "refract.h"
 #include "iterate.h"
+#include "palette.h"
+
+const pixel_t default_palette_colors[] = { 0xFF0000FF, 0xFF0088FF, 0xFF00FFFF, 0xFF00FF88, 0xFF00FF00, 0xFFFFFF00, 0xFFFF0000, 0xFFFF00FF };
+refract_palette default_palette = { 8, &default_palette_colors };
 
 /**
  * Allocates a context
@@ -27,7 +31,7 @@ refract_context* refract_init(uint32_t width, uint32_t height) {
 	// Allocate context
 	refract_context* context = (refract_context*)malloc(sizeof (refract_context));
 	if (!context)
-		return 0;
+		return NULL;
 
 	// Initialize context
 	memset(context, 0, sizeof (refract_context));
@@ -42,7 +46,7 @@ refract_context* refract_init(uint32_t width, uint32_t height) {
 	// Check buffers were allocated
 	if (!(context->cache_iters && context->cache_reals && context->cache_imags)) {
 		refract_free(context);
-		return 0;
+		return NULL;
 	}
 
 	// Zeroize cache buffers
@@ -63,18 +67,16 @@ void refract_render(refract_context* context, pixel_t* pixels, int stride, float
 	// Number of iters to be considered in the set
 	int max_iters = context->cache_max_iters;
 
+	refract_palette* palette = context->palette ? context->palette : &default_palette;
+
 	// Render cached iteration values into pixels
 	for (int y = 0, index = 0; y < context->height; ++y) {
 		pixel_t* line = (pixel_t*)pixels;
 
 		for (int x = 0; x < context->width; ++x, ++index) {
-			iterc_t niters = context->cache_iters[index];
+			iterc_t iters = context->cache_iters[index];
 
-			if (niters == max_iters)
-				line[x] = BLACK;
-			else {
-				line[x] = (niters % 2 == 0) ? RED : BLUE;
-			}
+			line[x] = (iters == max_iters) ? SET_COLOR : palette->colors[iters % palette->size];
 		}
 
 		// go to next line
@@ -86,6 +88,9 @@ void refract_render(refract_context* context, pixel_t* pixels, int stride, float
  * Frees a context
  */
 void refract_free(refract_context* context) {
+	// Free palette
+	refract_palette_free(context->palette);
+
 	// Free cache buffers
 	if (context->cache_iters)
 		free(context->cache_iters);

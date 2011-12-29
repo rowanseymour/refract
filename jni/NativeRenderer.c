@@ -58,6 +58,17 @@ JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_allocate(J
 }
 
 /**
+ * Sets the palette
+ */
+JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setPalette(JNIEnv* env, jobject obj, jintArray colors, jintArray anchors) {
+	jint* colorvals = (*env)->GetIntArrayElements(env, colors, NULL);
+	jint* anchorvals = (*env)->GetIntArrayElements(env, anchors, NULL);
+
+	(*env)->ReleaseIntArrayElements(env, colors, colorvals, 0);
+	(*env)->ReleaseIntArrayElements(env, anchors, anchorvals, 0);
+}
+
+/**
  * Updates (i.e. renders a frame) the refract context for the given FractalRenderer
  */
 JNIEXPORT jint JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_render(JNIEnv* env, jobject obj, jobject bitmap, jdouble real, jdouble imag, jdouble zoom) {
