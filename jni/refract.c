@@ -18,6 +18,7 @@
  */
 
 #include "refract.h"
+#include "iterate.h"
 
 /**
  * Allocates a context
@@ -35,8 +36,8 @@ refract_context* refract_init(uint32_t width, uint32_t height) {
 
 	// Allocate cache buffers
 	context->iter_cache = malloc(sizeof (iterc_t) * width * height);
-	context->real_cache = malloc(sizeof (double) * width * height);
-	context->imag_cache = malloc(sizeof (double) * width * height);
+	context->real_cache = malloc(sizeof (float_t) * width * height);
+	context->imag_cache = malloc(sizeof (float_t) * width * height);
 
 	// Check buffers were allocated
 	if (!(context->iter_cache && context->real_cache && context->imag_cache)) {
@@ -46,8 +47,8 @@ refract_context* refract_init(uint32_t width, uint32_t height) {
 
 	// Zeroize cache buffers
 	memset(context->iter_cache, 0, sizeof (iterc_t) * width * height);
-	memset(context->real_cache, 0, sizeof (double) * width * height);
-	memset(context->imag_cache, 0, sizeof (double) * width * height);
+	memset(context->real_cache, 0, sizeof (float_t) * width * height);
+	memset(context->imag_cache, 0, sizeof (float_t) * width * height);
 
 	return context;
 }
@@ -55,43 +56,24 @@ refract_context* refract_init(uint32_t width, uint32_t height) {
 /**
  * Renders a context to the given pixel buffer
  */
-void refract_render(refract_context* context, pixel_t* pixels, int stride, double real, double imag, double zoom) {
-	int half_cx = context->width / 2;
-	int half_cy = context->height / 2;
+void refract_render(refract_context* context, pixel_t* pixels, int stride, float_t real, float_t imag, float_t zoom) {
+	// Iterate fractal rendering
+	refract_iterate(context, FUNC_MANDELBROT, real, imag, zoom);
 
+	// Number of iters to be considered in the set
+	int max_iters = context->last_max_iters;
+
+	// Render iteration values into pixels
 	for (int y = 0, index = 0; y < context->height; ++y) {
-
 		pixel_t* line = (pixel_t*)pixels;
 
 		for (int x = 0; x < context->width; ++x, ++index) {
-			double zr, zi;
-			int niters;
+			iterc_t niters = context->iter_cache[index];
 
-			// Convert from pixel space to complex space
-			double cr = (x - half_cx) / zoom + real;
-			double ci = (y - half_cy) / zoom - imag;
-
-			zr = cr;
-			zi = ci;
-			niters = 0;
-
-			// Precalculate squares
-			double zr2 = zr * zr;
-			double zi2 = zi * zi;
-
-			// Iterate z = z^2 + c
-			while ((zr2 + zi2 < 4) && niters < 10) {
-				zi = 2 * zr * zi + ci;
-				zr = zr2 - zi2 + cr;
-				zr2 = zr * zr;
-				zi2 = zi * zi;
-				++niters;
-			}
-
-			if (niters == 10)
+			if (niters == max_iters)
 				line[x] = BLACK;
 			else {
-				line[x] = (niters % 2 == 0) ? RED : WHITE;
+				line[x] = (niters % 2 == 0) ? RED : BLUE;
 			}
 		}
 
