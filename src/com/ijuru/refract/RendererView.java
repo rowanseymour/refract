@@ -38,11 +38,13 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	private Bitmap bitmap;
 	private Renderer renderer;
 	private RendererThread rendererThread;
-	private StatusPanel statusPanel;
+	private FractalViewer viewer;
 	private double zoom;
 	
-	public RendererView(Context context) {
+	public RendererView(Context context, FractalViewer viewer) {
 		super(context);
+		
+		this.viewer = viewer;
 		
 		getHolder().addCallback(this);
 	}
@@ -109,7 +111,10 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 			}
 		}
 		
-		statusPanel.setZoom(zoom);
+		StatusPanel status = viewer.getStatusPanel();
+		status.setZoom(zoom);
+		long avgFrameTime = rendererThread.calcAverageFrameTime();
+		status.setPerfInfo(10, avgFrameTime > 0 ? 1000.0 / avgFrameTime : 0);
 	}
 
 	/**
@@ -118,13 +123,5 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	@Override
 	protected void onDraw(Canvas canvas) {
 		canvas.drawBitmap(bitmap, 0, 0, null);
-	}
-
-	/**
-	 * Sets the status panel
-	 * @param statusPanel the status panel
-	 */
-	public void setStatusPanel(StatusPanel statusPanel) {
-		this.statusPanel = statusPanel;
 	}
 }

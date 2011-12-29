@@ -20,11 +20,16 @@
 package com.ijuru.refract;
 
 /**
- * Thread to update fractal renderering
+ * Thread to update fractal rendering
  */
 public class RendererThread extends Thread {
 	
 	private RendererView view;
+	
+	private static final int STAT_FRAMES = 10;
+	private long[] frameTimes = new long[STAT_FRAMES];
+	private int updateNumber = 0;
+	private long lastUpdateTime = 0;
 
 	public RendererThread(RendererView view) {
 		this.view = view;
@@ -32,8 +37,30 @@ public class RendererThread extends Thread {
 
 	@Override
 	public void run() {
-		while (!isInterrupted()) {
+		while (!isInterrupted()) {				
 			view.update();
+			
+			// Record frame render time
+			long updateTime = System.currentTimeMillis();
+			long frameTime = (updateNumber > 0) ? updateTime - lastUpdateTime : 0;
+			frameTimes[updateNumber % STAT_FRAMES] = frameTime;
+			lastUpdateTime = updateTime;
+			++updateNumber;
 		}
+	}
+	
+	/**
+	 * Gets the averaged frame time 
+	 * @return the frame time in ms
+	 */
+	public long calcAverageFrameTime() {
+		int numFrames = Math.min(updateNumber, STAT_FRAMES);
+		if (numFrames == 0)
+			return 0;
+		
+		long total = 0;
+		for (long frameTime : frameTimes)
+			total += frameTime;
+		return total / numFrames;
 	}
 }

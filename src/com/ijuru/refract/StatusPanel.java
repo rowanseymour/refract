@@ -83,8 +83,17 @@ public class StatusPanel extends TableLayout {
 	 * Sets the zoom factor
 	 * @param zoom the zoom factor
 	 */
-	public void setZoom(final double zoom) {
+	public void setZoom(double zoom) {
 		updateField(txtZoom, "" + zoom);
+	}
+	
+	/**
+	 * Sets the performance info
+	 * @param iters the number of iterations
+	 * @param fps the frames per second
+	 */
+	public void setPerfInfo(int iters, double fps) {
+		updateField(txtPerf, String.format("%d iters at %.1g fps", iters, fps));
 	}
 	
 	/**

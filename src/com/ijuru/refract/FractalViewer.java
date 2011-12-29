@@ -51,13 +51,20 @@ public class FractalViewer extends FrameLayout {
 		statusPanel.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
 		statusPanel.setPadding((int)(5 * dp), (int)(5 * dp), (int)(5 * dp), (int)(5 * dp));
 		
-		rendererView = new RendererView(context);
+		rendererView = new RendererView(context, this);
 		rendererView.setLayoutParams(new FrameLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
-		rendererView.setStatusPanel(statusPanel);
 		
 		statusHolder.addView(statusPanel);
 		
 		addView(rendererView);
 		addView(statusHolder);
+	}
+	
+	/**
+	 * Gets the status panel
+	 * @return the status panel
+	 */
+	public StatusPanel getStatusPanel() {
+		return statusPanel;
 	}
 }
