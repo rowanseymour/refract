@@ -20,11 +20,15 @@
 #include "refract.h"
 #include "palette.h"
 
-refract_palette* refract_palette_init(pixel_t* colors, float* anchors, int points, int size) {
+/**
+ * Initializes and allocates a palette
+ */
+refract_palette* refract_palette_init(color_t* colors, float* anchors, int points, int size) {
 	refract_palette* palette = malloc(sizeof (refract_palette));
 
 	palette->size = size;
-	palette->colors = malloc(sizeof (pixel_t) * size);
+	palette->colors = malloc(sizeof (color_t) * size);
+	//memset(palette->colors, 0, sizeof (color_t) * size);
 
 	int index = -1;
 
@@ -35,10 +39,10 @@ refract_palette* refract_palette_init(pixel_t* colors, float* anchors, int point
 			++index;
 
 		if (index < 0) {
-			palette->colors[i] = colors[0];
+			palette->colors[i] = RGB_TO_ABGR(colors[0]);
 		}
 		else if (index >= points - 1) {
-			palette->colors[i] = colors[points - 1];
+			palette->colors[i] = RGB_TO_ABGR(colors[points - 1]);
 		}
 		else {
 			float segment_min = anchors[index];
@@ -47,11 +51,11 @@ refract_palette* refract_palette_init(pixel_t* colors, float* anchors, int point
 			float weight2 = (ipos - segment_min) / segment_len;
 			float weight1 = 1.0f - weight2;
 
-			int r = (int)(weight1 * GET_R(colors[index]) + weight2 * GET_R(colors[index + 1]));
-			int g = (int)(weight1 * GET_G(colors[index]) + weight2 * GET_G(colors[index + 1]));
-			int b = (int)(weight1 * GET_B(colors[index]) + weight2 * GET_B(colors[index + 1]));
+			int r = (int)(weight1 * ARGB_GETR(colors[index]) + weight2 * ARGB_GETR(colors[index + 1]));
+			int g = (int)(weight1 * ARGB_GETG(colors[index]) + weight2 * ARGB_GETG(colors[index + 1]));
+			int b = (int)(weight1 * ARGB_GETB(colors[index]) + weight2 * ARGB_GETB(colors[index + 1]));
 
-			palette->colors[i] = RGB(r, g, b);
+			palette->colors[i] = ABGR_PACK(r, g, b, 255);
 		}
 	}
 

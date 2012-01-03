@@ -20,7 +20,7 @@
 package com.ijuru.refract;
 
 /**
- * Palette presets
+ * Palette presets. These use RGB codes for colors rather than the ABGR used by the JNI code.
  */
 public class Palette {
 	
@@ -28,8 +28,13 @@ public class Palette {
 	private float[] anchors;
 	
 	public static Palette SUNSET = new Palette(
-			new int[] { 0xFF320064, 0xFF0000FF, 0xFF00FFFF },
-			new float[] { 0.0f, 0.3f, 1.0f}
+			new int[] { 0x640032, 0xFF0000, 0xFFFF00 },
+			new float[] { 0.0f, 0.3f, 1.0f }
+	);
+	
+	public static Palette HUBBLE = new Palette(
+		new int[] { 0x0D1C40, 0x46787A, 0xFFFF00 },
+		new float[] { 0.0f, 0.4f, 1.0f }
 	);
 	
 	/**

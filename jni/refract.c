@@ -21,9 +21,6 @@
 #include "iterate.h"
 #include "palette.h"
 
-const pixel_t default_palette_colors[] = { 0xFF0000FF, 0xFF0088FF, 0xFF00FFFF, 0xFF00FF88, 0xFF00FF00, 0xFFFFFF00, 0xFFFF0000, 0xFFFF00FF };
-refract_palette default_palette = { 8, &default_palette_colors };
-
 /**
  * Allocates a context
  */
@@ -60,27 +57,27 @@ refract_context* refract_init(uint32_t width, uint32_t height) {
 /**
  * Renders a context to the given pixel buffer
  */
-void refract_render(refract_context* context, pixel_t* pixels, int stride, float_t real, float_t imag, float_t zoom) {
+void refract_render(refract_context* context, color_t* pixels, int stride, float_t real, float_t imag, float_t zoom) {
 	// Iterate fractal rendering
 	refract_iterate(context, FUNC_MANDELBROT, real, imag, zoom);
 
 	// Number of iters to be considered in the set
 	int max_iters = context->cache_max_iters;
 
-	refract_palette* palette = context->palette ? context->palette : &default_palette;
+	refract_palette* palette = context->palette;
 
 	// Render cached iteration values into pixels
 	for (int y = 0, index = 0; y < context->height; ++y) {
-		pixel_t* line = (pixel_t*)pixels;
+		color_t* line = (color_t*)pixels;
 
 		for (int x = 0; x < context->width; ++x, ++index) {
 			iterc_t iters = context->cache_iters[index];
 
-			line[x] = (iters == max_iters) ? SET_COLOR : palette->colors[iters % palette->size];
+			line[x] = (iters == max_iters) ? BLACK : palette->colors[iters % palette->size];
 		}
 
 		// go to next line
-		pixels = (pixel_t*)((char*)pixels + stride);
+		pixels = (color_t*)((char*)pixels + stride);
 	}
 }
 

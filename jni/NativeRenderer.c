@@ -31,6 +31,8 @@
 // Set to 1 to enable debug log traces
 #define DEBUG 0
 
+#define PALETTE_SIZE	256
+
 /**
  * Gets the context field of a FractalRenderer object
  */
@@ -74,10 +76,16 @@ JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setPalette
 	jfloat* anchorvals = (*env)->GetFloatArrayElements(env, anchors, NULL);
 	int points = (*env)->GetArrayLength(env, colors);
 
-	context->palette = refract_palette_init((pixel_t*)colorvals, (float*)anchorvals, points, 256);
+	context->palette = refract_palette_init((color_t*)colorvals, (float*)anchorvals, points, PALETTE_SIZE);
 
 	(*env)->ReleaseIntArrayElements(env, colors, colorvals, 0);
 	(*env)->ReleaseFloatArrayElements(env, anchors, anchorvals, 0);
+
+	LOG_I("Updated renderer palette");
+
+	for (int p = 0; p < PALETTE_SIZE; ++p) {
+		LOG_I("Palette[%d]=%08x", p, context->palette->colors[p]);
+	}
 }
 
 /**
@@ -89,7 +97,7 @@ JNIEXPORT jint JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_render(JNI
 	AndroidBitmapInfo info;
 	AndroidBitmap_getInfo(env, bitmap, &info);
 
-	pixel_t* pixels;
+	color_t* pixels;
 	int ret;
 
 	if ((ret = AndroidBitmap_lockPixels(env, bitmap, (void**)&pixels)) < 0) {
