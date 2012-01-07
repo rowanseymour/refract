@@ -39,4 +39,18 @@ public class Utils {
 			return null;
 		}
 	}
+	
+	/**
+	 * Parses a string into an integer
+	 * @param val the string
+	 * @return the integer or null if not a valid integer
+	 */
+	public static Integer parseInteger(String val) {
+		try {
+			return Integer.parseInt(val);
+		}
+		catch (NumberFormatException ex) {
+			return null;
+		}
+	}
 }

@@ -21,11 +21,14 @@ package com.ijuru.refract;
 
 import com.ijuru.refract.renderer.NativeRenderer;
 import com.ijuru.refract.renderer.Renderer;
+import com.ijuru.refract.utils.Utils;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Bitmap.Config;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -91,7 +94,11 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 			renderer = null;
 			return;
 		}
-			
+		
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+		Integer itersPerFrame = Utils.parseInteger(prefs.getString("itersperframe", "5"));
+		renderer.setItersPerFrame(itersPerFrame);
+		
 		setPalette(palette);
 			
 		if (!rendererThread.isAlive())
