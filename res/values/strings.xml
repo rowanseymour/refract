@@ -9,5 +9,9 @@
 	<string-array name="palettes">
 		<item>Sunset</item>
 		<item>Hubble</item>
+		<item>Rainbow</item>
+		<item>Chrome</item>
+		<item>Evening</item>
+		<item>Electric</item>
 	</string-array>
 </resources>
