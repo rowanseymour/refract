@@ -40,6 +40,7 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	
 	private Bitmap bitmap;
 	private Renderer renderer;
+	private Palette palette = Palette.SUNSET;
 	private RendererThread rendererThread;
 	private FractalViewer viewer;
 	
@@ -91,7 +92,7 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 			return;
 		}
 			
-		renderer.setPalette(Palette.SUNSET);
+		setPalette(palette);
 			
 		if (!rendererThread.isAlive())
 			rendererThread.start();
@@ -112,8 +113,10 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 			}
 		}
 		
-		if (renderer != null)
+		if (renderer != null) {
 			renderer.free();
+			renderer = null;
+		}
 		
 		Log.i("refract", "Render surface destroyed");
 	}
@@ -198,6 +201,16 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 			
 			return true;
 		}
+	}
+	
+	/**
+	 * Sets the palette used by this view
+	 * @param palette the palette
+	 */
+	public void setPalette(Palette palette) {
+		this.palette = palette;
+		
+		renderer.setPalette(palette);
 	}
 
 	/**

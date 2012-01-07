@@ -24,6 +24,7 @@ import com.ijuru.refract.utils.Utils;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -64,6 +65,9 @@ public class ExplorerActivity extends Activity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
+		case R.id.menupreferences:
+			startActivity(new Intent(getApplicationContext(), PreferencesActivity.class));
+	    	break;
 	    case R.id.menuabout:
 	    	onMenuAbout();
 	    	break;
