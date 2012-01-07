@@ -43,7 +43,6 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	
 	private Bitmap bitmap;
 	private Renderer renderer;
-	private Palette palette = Palette.SUNSET;
 	private RendererThread rendererThread;
 	private FractalViewer viewer;
 	
@@ -96,10 +95,10 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 		}
 		
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+		Palette palette = Palette.getByName(prefs.getString("palette", "sunset").toLowerCase());
 		Integer itersPerFrame = Utils.parseInteger(prefs.getString("itersperframe", "5"));
+		renderer.setPalette(palette);
 		renderer.setItersPerFrame(itersPerFrame);
-		
-		setPalette(palette);
 			
 		if (!rendererThread.isAlive())
 			rendererThread.start();
@@ -208,16 +207,6 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 			
 			return true;
 		}
-	}
-	
-	/**
-	 * Sets the palette used by this view
-	 * @param palette the palette
-	 */
-	public void setPalette(Palette palette) {
-		this.palette = palette;
-		
-		renderer.setPalette(palette);
 	}
 
 	/**

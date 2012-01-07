@@ -19,23 +19,29 @@
 
 package com.ijuru.refract;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
- * Palette presets. These use RGB codes for colors rather than the ABGR used by the JNI code.
+ * Palette used to render a fractal as a bitmap. These use RGB codes for colors rather than the ABGR used by the JNI code.
  */
 public class Palette {
 	
 	private int[] colors;
 	private float[] anchors;
 	
-	public static Palette SUNSET = new Palette(
+	private static Map<String, Palette> presets = new HashMap<String, Palette>();
+	
+	static {
+		presets.put("sunset", new Palette(
 			new int[] { 0x640032, 0xFF0000, 0xFFFF00 },
 			new float[] { 0.0f, 0.3f, 1.0f }
-	);
-	
-	public static Palette HUBBLE = new Palette(
-		new int[] { 0x0D1C40, 0x46787A, 0xFFFF00 },
-		new float[] { 0.0f, 0.4f, 1.0f }
-	);
+		));
+		presets.put("hubble", new Palette(
+			new int[] { 0x0D1C40, 0x46787A, 0xFFFF00 },
+			new float[] { 0.0f, 0.4f, 1.0f }
+		));
+	}
 	
 	/**
 	 * Creates a new palette
@@ -45,6 +51,15 @@ public class Palette {
 	private Palette(int[] colors, float[] anchors) {
 		this.colors = colors;
 		this.anchors = anchors;
+	}
+	
+	/**
+	 * Gets the preset palette with the given name
+	 * @param name the name
+	 * @return the palette
+	 */
+	public static Palette getByName(String name) {
+		return presets.get(name);
 	}
 	
 	/**

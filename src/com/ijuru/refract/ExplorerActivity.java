@@ -19,7 +19,6 @@
 
 package com.ijuru.refract;
 
-import com.ijuru.refract.R;
 import com.ijuru.refract.utils.Utils;
 
 import android.app.Activity;
@@ -84,7 +83,8 @@ public class ExplorerActivity extends Activity {
 		String fps = String.format("%.2g", avgFrameTime > 0 ? 1000.0 / avgFrameTime : 0.0);
 		
 		String title = getString(R.string.app_name) + " " + Utils.getVersionName(this);
-		String message = "Thank you for downloading Refractoid\n" +
+		String message = 
+				"Thank you for downloading " + getString(R.string.app_name) + "\n" +
 				"\n" +
 				"Overall FPS: " + fps;
 		

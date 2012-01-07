@@ -5,4 +5,11 @@
     	android:title="@string/str_itersperframe"
     	android:defaultValue="@integer/def_itersperframe"
 	/>
+    <ListPreference
+        android:key="palette" 
+        android:title="@string/str_palette" 
+        android:defaultValue="sunset" 
+        android:entryValues="@array/palettes" 
+        android:entries="@array/palettes"
+    />
 </PreferenceScreen>
