@@ -27,6 +27,7 @@ public class RendererThread extends Thread {
 	private RendererView view;
 	
 	private static final int STAT_FRAMES = 10;
+	private long lastFrameTime = 0;
 	private long[] frameTimes = new long[STAT_FRAMES];
 	private int updateNumber = 0;
 	private long beginTime = 0;
@@ -45,16 +46,24 @@ public class RendererThread extends Thread {
 			
 			// Record frame render time
 			long updateTime = System.currentTimeMillis();
-			long frameTime = (updateNumber > 0) ? updateTime - lastUpdateTime : 0;
-			frameTimes[updateNumber % STAT_FRAMES] = frameTime;
+			lastFrameTime =  updateTime - ((updateNumber > 0) ? lastUpdateTime : beginTime);
+			frameTimes[updateNumber % STAT_FRAMES] = lastFrameTime;
 			lastUpdateTime = updateTime;
 			++updateNumber;
 		}
 	}
 	
 	/**
+	 * Gets the last frame time
+	 * @return the last frame time (ms)
+	 */
+	public long getLastFrameTime() {
+		return lastFrameTime;
+	}
+	
+	/**
 	 * Calculates the smoothed frame time 
-	 * @return the frame time in ms
+	 * @return the frame time (ms)
 	 */
 	public long calcSmoothedFrameTime() {
 		int numFrames = Math.min(updateNumber, STAT_FRAMES);
@@ -69,7 +78,7 @@ public class RendererThread extends Thread {
 	
 	/**
 	 * Calculates the overall average frame time
-	 * @return the frame time in ms
+	 * @return the frame time (ms)
 	 */
 	public long calcAverageFrameTime() {
 		long time = System.currentTimeMillis() - beginTime;
