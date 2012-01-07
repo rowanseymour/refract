@@ -17,12 +17,9 @@
  * along with Refract. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#define DEF_MIN_ITERATIONS	10		// The default min/initial iterations value
-#define DEF_INC_ITERATIONS	5		// The default iterations increment value
-
 #define FUNC_MANDELBROT		2		// z^2 + c
 #define FUNC_MANDELBROT_3	3		// z^3 + c
 #define FUNC_MANDELBROT_4	4		// z^4 + c
 
-void refract_iterate(refract_context* context, int func, float_t real, float_t imag, float_t zoom);
-void refract_iterate_m2(refract_context* context, float_t real, float_t imag, float_t zoom, int max_iters, int use_cache);
+void refract_iterate(refract_context* context, uint8_t func, float_t real, float_t imag, float_t zoom);
+void refract_iterate_m2(refract_context* context, float_t real, float_t imag, float_t zoom, uint16_t max_iters, int use_cache);

@@ -20,13 +20,13 @@
 #include "refract.h"
 #include "iterate.h"
 
-void refract_iterate(refract_context* context, int func, float_t real, float_t imag, float_t zoom) {
+void refract_iterate(refract_context* context, uint8_t func, float_t real, float_t imag, float_t zoom) {
 	// Have parameters changed thus invalidating the cache?
 	refract_params* params = &context->cache_params;
 	int use_cache = (func == params->func && real == params->real && imag == params->imag && zoom == params->zoom);
 
 	// Increment or reset max-iters depending on whether we'll be using the cache
-	int max_iters = use_cache ? (context->cache_max_iters + DEF_INC_ITERATIONS) : DEF_MIN_ITERATIONS;
+	uint16_t max_iters = use_cache ? (context->cache_max_iters + context->iters_per_frame) : context->iters_per_frame;
 
 	switch (func) {
 	case FUNC_MANDELBROT:
@@ -42,14 +42,14 @@ void refract_iterate(refract_context* context, int func, float_t real, float_t i
 	context->cache_max_iters = max_iters;
 }
 
-void refract_iterate_m2(refract_context* context, float_t real, float_t imag, float_t zoom, int max_iters, int use_cache) {
-	int half_cx = context->width / 2;
-	int half_cy = context->height / 2;
+void refract_iterate_m2(refract_context* context, float_t real, float_t imag, float_t zoom, uint16_t max_iters, int use_cache) {
+	uint16_t half_cx = context->width / 2;
+	uint16_t half_cy = context->height / 2;
 
 	for (int y = 0, index = 0; y < context->height; ++y) {
 		for (int x = 0; x < context->width; ++x, ++index) {
 			float_t zr, zi;
-			int iters;
+			uint16_t iters;
 
 			// Convert from pixel space to complex space
 			float_t cr = (x - half_cx) / zoom + real;

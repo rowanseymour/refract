@@ -27,6 +27,7 @@
 
 // Logging macros
 #define LOG_TAG    "librefract"
+#define LOG_D(...)  __android_log_print(ANDROID_LOG_DEBUG,LOG_TAG,__VA_ARGS__)
 #define LOG_I(...)  __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
 #define LOG_E(...)  __android_log_print(ANDROID_LOG_ERROR,LOG_TAG,__VA_ARGS__)
 
@@ -55,7 +56,7 @@ JNIEXPORT jboolean JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_alloca
 		jfieldID fid_context = (*env)->GetFieldID(env, this_class, "context", "J");
 		(*env)->SetLongField(env, obj, fid_context, (jlong)(intptr_t)context);
 
-		LOG_I("Allocated renderer internal resources");
+		LOG_D("Allocated renderer internal resources");
 		return JNI_TRUE;
 	}
 	else {
@@ -75,7 +76,7 @@ JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setPalette
 		refract_palette_free(context->palette);
 		context->palette = NULL;
 
-		LOG_I("Freed renderer palette");
+		LOG_D("Freed renderer palette");
 	}
 
 	// Get palette object fields
@@ -98,7 +99,17 @@ JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setPalette
 	(*env)->ReleaseIntArrayElements(env, *colors, colorvals, 0);
 	(*env)->ReleaseFloatArrayElements(env, *anchors, anchorvals, 0);
 
-	LOG_I("Updated renderer palette");
+	LOG_D("Updated renderer palette");
+}
+
+/**
+ * Sets the palette
+ */
+JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setItersPerFrame(JNIEnv* env, jobject obj, jint iters) {
+	refract_context* context = get_context(env, obj);
+	context->iters_per_frame = (uint16_t)iters;
+
+	LOG_D("Updated renderer iterations per frame");
 }
 
 /**
@@ -132,5 +143,5 @@ JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_free(JNIEn
 	refract_context* context = get_context(env, obj);
 	refract_free(context);
 
-	LOG_I("Freed renderer internal resources");
+	LOG_D("Freed renderer internal resources");
 }

@@ -41,6 +41,12 @@ public class NativeRenderer implements Renderer {
 	 */
 	@Override
 	public native void setPalette(Palette palette);
+	
+	/**
+	 * @see com.ijuru.refract.renderer.Renderer#setItersPerFrame(int)
+	 */
+	@Override
+	public native void setItersPerFrame(int iters);
 
 	/**
 	 * @see com.ijuru.refract.renderer.Renderer#render(android.graphics.Bitmap, double, double, double)

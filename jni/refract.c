@@ -34,6 +34,7 @@ refract_context* refract_init(uint32_t width, uint32_t height) {
 	memset(context, 0, sizeof (refract_context));
 	context->width = width;
 	context->height = height;
+	context->iters_per_frame = DEF_ITERSPERFRAME;
 
 	// Allocate cache buffers
 	context->cache_iters = malloc(sizeof (iterc_t) * width * height);
@@ -62,7 +63,7 @@ void refract_render(refract_context* context, color_t* pixels, int stride, float
 	refract_iterate(context, FUNC_MANDELBROT, real, imag, zoom);
 
 	// Number of iters to be considered in the set
-	int max_iters = context->cache_max_iters;
+	uint16_t max_iters = context->cache_max_iters;
 
 	refract_palette* palette = context->palette;
 

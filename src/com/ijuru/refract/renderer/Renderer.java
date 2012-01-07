@@ -36,6 +36,12 @@ public interface Renderer {
 	public boolean allocate(int width, int height);
 	
 	/**
+	 * Sets the number of iterations per frame
+	 * @param iters the number of iterations
+	 */
+	public void setItersPerFrame(int iters);
+	
+	/**
 	 * Sets the palette for renders
 	 * @param palette the palette
 	 */

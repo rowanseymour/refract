@@ -22,11 +22,13 @@
 
 #include "color.h"
 
+#define DEF_ITERSPERFRAME	5		// The default iterations per frame value
+
 typedef uint32_t iterc_t;
 typedef float float_t;
 
 typedef struct {
-	int func;
+	uint8_t func;
 	float_t real;
 	float_t imag;
 	float_t zoom;
@@ -34,7 +36,7 @@ typedef struct {
 } refract_params;
 
 typedef struct {
-	int size;
+	uint16_t size;
 	color_t* colors;
 
 } refract_palette;
@@ -42,9 +44,10 @@ typedef struct {
 typedef struct {
 	uint32_t width;
 	uint32_t height;
+	uint8_t iters_per_frame;
 
 	refract_params cache_params;
-	int cache_max_iters;
+	uint16_t cache_max_iters;
 	iterc_t* cache_iters;
 	float_t* cache_reals;
 	float_t* cache_imags;
