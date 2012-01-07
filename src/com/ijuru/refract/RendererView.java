@@ -56,6 +56,9 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	public RendererView(Context context, FractalViewer viewer) {
 		super(context);
 		
+		// Give it an id so it can be found
+		setId(R.id.rendererview);
+		
 		this.viewer = viewer;
 		
 		getHolder().addCallback(this);
@@ -136,7 +139,7 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 		}
 		
 		// Update performance status info
-		long avgFrameTime = rendererThread.calcAverageFrameTime();
+		long avgFrameTime = rendererThread.calcSmoothedFrameTime();
 		viewer.getStatusPanel().setPerformanceInfo(iters, avgFrameTime > 0 ? 1000.0 / avgFrameTime : 0);
 	}
 
@@ -193,5 +196,13 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 			
 			return true;
 		}
+	}
+
+	/**
+	 * Gets the renderer thread
+	 * @return the renderer thread
+	 */
+	public RendererThread getRendererThread() {
+		return rendererThread;
 	}
 }

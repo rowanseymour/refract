@@ -29,6 +29,7 @@ public class RendererThread extends Thread {
 	private static final int STAT_FRAMES = 10;
 	private long[] frameTimes = new long[STAT_FRAMES];
 	private int updateNumber = 0;
+	private long beginTime = 0;
 	private long lastUpdateTime = 0;
 
 	public RendererThread(RendererView view) {
@@ -37,6 +38,8 @@ public class RendererThread extends Thread {
 
 	@Override
 	public void run() {
+		beginTime = System.currentTimeMillis();
+		
 		while (!isInterrupted()) {				
 			view.update();
 			
@@ -50,10 +53,10 @@ public class RendererThread extends Thread {
 	}
 	
 	/**
-	 * Gets the averaged frame time 
+	 * Calculates the smoothed frame time 
 	 * @return the frame time in ms
 	 */
-	public long calcAverageFrameTime() {
+	public long calcSmoothedFrameTime() {
 		int numFrames = Math.min(updateNumber, STAT_FRAMES);
 		if (numFrames == 0)
 			return 0;
@@ -62,5 +65,14 @@ public class RendererThread extends Thread {
 		for (long frameTime : frameTimes)
 			total += frameTime;
 		return total / numFrames;
+	}
+	
+	/**
+	 * Calculates the overall average frame time
+	 * @return the frame time in ms
+	 */
+	public long calcAverageFrameTime() {
+		long time = System.currentTimeMillis() - beginTime;
+		return updateNumber > 0 ? time / updateNumber : 0;
 	}
 }
