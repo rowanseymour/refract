@@ -23,7 +23,7 @@
 /**
  * Initializes and allocates a palette
  */
-refract_palette* refract_palette_init(color_t* colors, float* anchors, int points, int size) {
+refract_palette* refract_palette_init(color_t* colors, float* anchors, uint16_t points, uint32_t size) {
 	refract_palette* palette = malloc(sizeof (refract_palette));
 
 	palette->size = size;

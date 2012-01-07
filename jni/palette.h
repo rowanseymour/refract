@@ -17,5 +17,5 @@
  * along with Refract. If not, see <http://www.gnu.org/licenses/>.
  */
 
-refract_palette* refract_palette_init(color_t* colors, float* anchors, int points, int size);
+refract_palette* refract_palette_init(color_t* colors, float* anchors, uint16_t points, uint32_t size);
 void refract_palette_free(refract_palette* palette);

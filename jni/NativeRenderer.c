@@ -34,7 +34,7 @@
 // Set to 1 to enable debug log traces
 #define DEBUG 0
 
-#define PALETTE_SIZE	256
+#define PALETTE_SIZE	128
 
 /**
  * Gets the context field of a FractalRenderer object
@@ -92,7 +92,7 @@ JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setPalette
 	// Get array elements
 	jint* colorvals = (*env)->GetIntArrayElements(env, *colors, NULL);
 	jfloat* anchorvals = (*env)->GetFloatArrayElements(env, *anchors, NULL);
-	int points = (*env)->GetArrayLength(env, *colors);
+	uint16_t points = (*env)->GetArrayLength(env, *colors);
 
 	context->palette = refract_palette_init((color_t*)colorvals, (float*)anchorvals, points, PALETTE_SIZE);
 
