@@ -63,29 +63,38 @@ JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_allocate(J
 /**
  * Sets the palette
  */
-JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setPalette(JNIEnv* env, jobject obj, jintArray colors, jfloatArray anchors) {
+JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setPalette(JNIEnv* env, jobject obj, jobject palette) {
 	refract_context* context = get_context(env, obj);
 
 	// Free existing palette
 	if (context->palette) {
 		refract_palette_free(context->palette);
 		context->palette = NULL;
+
+		LOG_I("Freed renderer palette");
 	}
 
-	jint* colorvals = (*env)->GetIntArrayElements(env, colors, NULL);
-	jfloat* anchorvals = (*env)->GetFloatArrayElements(env, anchors, NULL);
-	int points = (*env)->GetArrayLength(env, colors);
+	// Get palette object fields
+	jclass palette_class = (*env)->GetObjectClass(env, palette);
+	jfieldID fid_colors = (*env)->GetFieldID(env, palette_class, "colors", "[I");
+	jfieldID fid_anchors = (*env)->GetFieldID(env, palette_class, "anchors", "[F");
+	jobject obj_colors = (*env)->GetObjectField(env, palette, fid_colors);
+	jobject obj_anchors = (*env)->GetObjectField(env, palette, fid_anchors);
+
+	jintArray* colors = (jintArray*)&obj_colors;
+	jfloatArray* anchors = (jfloatArray*)&obj_anchors;
+
+	// Get array elements
+	jint* colorvals = (*env)->GetIntArrayElements(env, *colors, NULL);
+	jfloat* anchorvals = (*env)->GetFloatArrayElements(env, *anchors, NULL);
+	int points = (*env)->GetArrayLength(env, *colors);
 
 	context->palette = refract_palette_init((color_t*)colorvals, (float*)anchorvals, points, PALETTE_SIZE);
 
-	(*env)->ReleaseIntArrayElements(env, colors, colorvals, 0);
-	(*env)->ReleaseFloatArrayElements(env, anchors, anchorvals, 0);
+	(*env)->ReleaseIntArrayElements(env, *colors, colorvals, 0);
+	(*env)->ReleaseFloatArrayElements(env, *anchors, anchorvals, 0);
 
 	LOG_I("Updated renderer palette");
-
-	for (int p = 0; p < PALETTE_SIZE; ++p) {
-		LOG_I("Palette[%d]=%08x", p, context->palette->colors[p]);
-	}
 }
 
 /**

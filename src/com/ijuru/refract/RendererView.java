@@ -82,7 +82,7 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 			renderer.free();
 		
 		renderer.allocate(width, height);
-		renderer.setPalette(Palette.SUNSET.getColors(), Palette.SUNSET.getAnchors());
+		renderer.setPalette(Palette.SUNSET);
 		
 		if (!rendererThread.isAlive())
 			rendererThread.start();

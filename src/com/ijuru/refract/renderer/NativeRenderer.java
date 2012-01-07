@@ -19,6 +19,8 @@
 
 package com.ijuru.refract.renderer;
 
+import com.ijuru.refract.Palette;
+
 import android.graphics.Bitmap;
 
 /**
@@ -35,10 +37,10 @@ public class NativeRenderer implements Renderer {
 	public native void allocate(int width, int height);
 	
 	/**
-	 * @see com.ijuru.refract.renderer.Renderer#setPalette(int[], float[])
+	 * @see com.ijuru.refract.renderer.Renderer#setPalette(Palette)
 	 */
 	@Override
-	public native void setPalette(int[] colors, float[] anchors);
+	public native void setPalette(Palette palette);
 
 	/**
 	 * @see com.ijuru.refract.renderer.Renderer#render(android.graphics.Bitmap, double, double, double)

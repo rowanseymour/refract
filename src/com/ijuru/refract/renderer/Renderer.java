@@ -19,6 +19,8 @@
 
 package com.ijuru.refract.renderer;
 
+import com.ijuru.refract.Palette;
+
 import android.graphics.Bitmap;
 
 /**
@@ -35,10 +37,9 @@ public interface Renderer {
 	
 	/**
 	 * Sets the palette for renders
-	 * @param colors the array of color values
-	 * @param anchors the array of anchor positions
+	 * @param palette the palette
 	 */
-	public void setPalette(int[] colors, float[] anchors);
+	public void setPalette(Palette palette);
 
 	/**
 	 * Renders a fractal to the given bitmap
