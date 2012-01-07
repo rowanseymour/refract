@@ -43,6 +43,7 @@ typedef uint32_t 			color_t;
  * Conversion macros
  */
 
+#define RGB_TO_ARGB(c)		((c) | 0xFF000000)
 #define RGB_TO_ABGR(c)		(((c) & 0x0000FF00) | (ARGB_GETB(c) << 16) | ARGB_GETR(c) | 0xFF000000)
 #define ARGB_TO_ABGR(c)		(((c) & 0xFF00FF00) | (ARGB_GETB(c) << 16) | ARGB_GETR(c))
 #define ABGR_TO_ARGB(c)		(((c) & 0xFF00FF00) | (ARGB_GETR(c) << 16) | ARGB_GETB(c))
