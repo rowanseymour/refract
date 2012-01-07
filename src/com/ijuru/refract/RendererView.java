@@ -59,9 +59,6 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	public RendererView(Context context, FractalViewer viewer) {
 		super(context);
 		
-		// Give it an id so it can be found
-		setId(R.id.rendererview);
-		
 		this.viewer = viewer;
 		
 		getHolder().addCallback(this);
@@ -76,7 +73,7 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	public void surfaceCreated(SurfaceHolder holder) {
 		rendererThread = new RendererThread(this);
 		
-		Log.i("refract", "Render surface created [" + getWidth() + ", " + getHeight() + "]");
+		Log.d("refract", "Render surface created [" + getWidth() + ", " + getHeight() + "]");
 	}
 
 	@Override
@@ -103,7 +100,7 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 		if (!rendererThread.isAlive())
 			rendererThread.start();
 		
-		Log.i("refract", "Render surface resized [" + width + ", " + height + "]");
+		Log.d("refract", "Render surface resized [" + width + ", " + height + "]");
 	}
 	
 	@Override
@@ -124,7 +121,7 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 			renderer = null;
 		}
 		
-		Log.i("refract", "Render surface destroyed");
+		Log.d("refract", "Render surface destroyed");
 	}
 	
 	/**

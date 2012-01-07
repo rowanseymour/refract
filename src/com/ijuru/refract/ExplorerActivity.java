@@ -78,15 +78,11 @@ public class ExplorerActivity extends Activity {
 	 * Displays the about dialog
 	 */
 	private void onMenuAbout() {
-		RendererView rendererView = (RendererView)findViewById(R.id.rendererview);
-		long avgFrameTime = rendererView.getRendererThread().calcAverageFrameTime();
-		String fps = String.format("%.2g", avgFrameTime > 0 ? 1000.0 / avgFrameTime : 0.0);
-		
 		String title = getString(R.string.app_name) + " " + Utils.getVersionName(this);
 		String message = 
 				"Thank you for downloading " + getString(R.string.app_name) + "\n" +
 				"\n" +
-				"Overall FPS: " + fps;
+				"Enjoy exploring the world of Mandelbrot!";
 		
 		new AlertDialog.Builder(this).setTitle(title).setMessage(message)
 			.setPositiveButton(android.R.string.ok, null).show();
