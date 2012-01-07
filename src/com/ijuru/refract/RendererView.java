@@ -31,6 +31,7 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.widget.Toast;
 
 /**
  * View which displays the fractal rendering
@@ -81,9 +82,14 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 		else
 			renderer.free();
 		
-		renderer.allocate(width, height);
+		if (!renderer.allocate(width, height)) {
+			Toast.makeText(getContext(), "Unable to allocate resources", Toast.LENGTH_LONG).show();
+			renderer = null;
+			return;
+		}
+			
 		renderer.setPalette(Palette.SUNSET);
-		
+			
 		if (!rendererThread.isAlive())
 			rendererThread.start();
 		
@@ -103,7 +109,8 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 			}
 		}
 		
-		renderer.free();
+		if (renderer != null)
+			renderer.free();
 		
 		Log.i("refract", "Render surface destroyed");
 	}
@@ -138,7 +145,8 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	 */
 	@Override
 	protected void onDraw(Canvas canvas) {
-		canvas.drawBitmap(bitmap, 0, 0, null);
+		if (renderer != null)
+			canvas.drawBitmap(bitmap, 0, 0, null);
 	}
 
 	/**

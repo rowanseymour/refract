@@ -17,8 +17,6 @@
  * along with Refract. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <jni.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 

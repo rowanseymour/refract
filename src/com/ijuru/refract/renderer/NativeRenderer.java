@@ -34,7 +34,7 @@ public class NativeRenderer implements Renderer {
 	 * @see com.ijuru.refract.renderer.Renderer#allocate(int, int)
 	 */
 	@Override
-	public native void allocate(int width, int height);
+	public native boolean allocate(int width, int height);
 	
 	/**
 	 * @see com.ijuru.refract.renderer.Renderer#setPalette(Palette)

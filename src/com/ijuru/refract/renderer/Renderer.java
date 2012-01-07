@@ -33,7 +33,7 @@ public interface Renderer {
 	 * @param width the width in pixels
 	 * @param height the height in pixels
 	 */
-	public void allocate(int width, int height);
+	public boolean allocate(int width, int height);
 	
 	/**
 	 * Sets the palette for renders

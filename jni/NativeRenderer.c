@@ -17,6 +17,8 @@
  * along with Refract. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <jni.h>
+#include <stdio.h>
 #include <android/log.h>
 #include <android/bitmap.h>
 
@@ -45,7 +47,7 @@ static refract_context* get_context(JNIEnv* env, jobject obj) {
 /**
  * Allocates the context for the given renderer
  */
-JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_allocate(JNIEnv* env, jobject obj, jint width, jint height) {
+JNIEXPORT jboolean JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_allocate(JNIEnv* env, jobject obj, jint width, jint height) {
 	refract_context* context = refract_init(width, height);
 	jclass this_class = (*env)->GetObjectClass(env, obj);
 
@@ -54,9 +56,11 @@ JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_allocate(J
 		(*env)->SetLongField(env, obj, fid_context, (jlong)(intptr_t)context);
 
 		LOG_I("Allocated renderer internal resources");
+		return JNI_TRUE;
 	}
 	else {
 		LOG_E("Unable to allocate renderer internal resources");
+		return JNI_FALSE;
 	}
 }
 
