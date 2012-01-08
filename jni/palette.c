@@ -18,7 +18,6 @@
  */
 
 #include "refract.h"
-#include "palette.h"
 
 /**
  * Initializes and allocates a palette

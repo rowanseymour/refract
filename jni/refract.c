@@ -19,7 +19,6 @@
 
 #include "refract.h"
 #include "iterate.h"
-#include "palette.h"
 
 /**
  * Allocates a context

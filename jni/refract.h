@@ -21,6 +21,7 @@
 #include <math.h>
 
 #include "color.h"
+#include "palette.h"
 
 #define DEF_ITERSPERFRAME	5		// The default iterations per frame value
 
@@ -34,12 +35,6 @@ typedef struct {
 	float_t zoom;
 
 } refract_params;
-
-typedef struct {
-	uint16_t size;
-	color_t* colors;
-
-} refract_palette;
 
 typedef struct {
 	uint32_t width;
