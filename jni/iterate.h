@@ -22,4 +22,4 @@
 #define FUNC_MANDELBROT_4	4		// z^4 + c
 
 void refract_iterate(refract_context* context, uint8_t func, complex_t offset, float_t zoom);
-void refract_iterate_m2(refract_context* context, complex_t offset, float_t zoom, iterc_t max_iters, int use_cache);
+void refract_iterate_m2(refract_context* context, complex_t offset, float_t zoom, iterc_t max_iters, bool use_cache);

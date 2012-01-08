@@ -56,11 +56,11 @@ JNIEXPORT jboolean JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_alloca
 		(*env)->SetLongField(env, obj, fid_context, (jlong)(intptr_t)context);
 
 		LOG_D("Allocated renderer internal resources");
-		return JNI_TRUE;
+		return true;
 	}
 	else {
 		LOG_E("Unable to allocate renderer internal resources");
-		return JNI_FALSE;
+		return false;
 	}
 }
 

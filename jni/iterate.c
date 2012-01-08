@@ -23,7 +23,7 @@
 void refract_iterate(refract_context* context, uint8_t func, complex_t offset, float_t zoom) {
 	// Have parameters changed thus invalidating the cache?
 	refract_params* params = &context->cache_params;
-	int use_cache = (func == params->func && offset.re == params->offset.re && offset.im == params->offset.im && zoom == params->zoom);
+	bool use_cache = (func == params->func && offset.re == params->offset.re && offset.im == params->offset.im && zoom == params->zoom);
 
 	// Increment or reset max-iters depending on whether we'll be using the cache
 	iterc_t max_iters = use_cache ? (context->cache_max_iters + context->iters_per_frame) : context->iters_per_frame;
@@ -42,7 +42,7 @@ void refract_iterate(refract_context* context, uint8_t func, complex_t offset, f
 	context->cache_max_iters = max_iters;
 }
 
-void refract_iterate_m2(refract_context* context, complex_t offset, float_t zoom, iterc_t max_iters, int use_cache) {
+void refract_iterate_m2(refract_context* context, complex_t offset, float_t zoom, iterc_t max_iters, bool use_cache) {
 	uint16_t half_cx = context->width / 2;
 	uint16_t half_cy = context->height / 2;
 
