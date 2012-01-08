@@ -23,7 +23,7 @@
 /**
  * Allocates a context
  */
-refract_context* refract_init(uint32_t width, uint32_t height) {
+refract_context* refract_init(uint16_t width, uint16_t height) {
 	// Allocate context
 	refract_context* context = (refract_context*)malloc(sizeof (refract_context));
 	if (!context)

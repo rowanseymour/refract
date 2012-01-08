@@ -47,12 +47,12 @@ typedef struct {
 } refract_params;
 
 typedef struct {
-	uint32_t width;
-	uint32_t height;
-	uint8_t iters_per_frame;
+	uint16_t width;
+	uint16_t height;
+	iterc_t iters_per_frame;
 
 	refract_params cache_params;
-	uint16_t cache_max_iters;
+	iterc_t cache_max_iters;
 	iterc_t* cache_iters;
 	float_t* cache_reals;
 	float_t* cache_imags;
@@ -61,6 +61,6 @@ typedef struct {
 
 } refract_context;
 
-refract_context* refract_init(uint32_t width, uint32_t height);
+refract_context* refract_init(uint16_t width, uint16_t height);
 void refract_render(refract_context* context, color_t* pixels, int stride, float_t real, float_t imag, float_t zoom);
 void refract_free(refract_context* context);

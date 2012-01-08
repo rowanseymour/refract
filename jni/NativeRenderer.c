@@ -48,7 +48,7 @@ static refract_context* get_context(JNIEnv* env, jobject obj) {
  * Allocates the context for the given renderer
  */
 JNIEXPORT jboolean JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_allocate(JNIEnv* env, jobject obj, jint width, jint height) {
-	refract_context* context = refract_init(width, height);
+	refract_context* context = refract_init((uint16_t)width, (uint16_t)height);
 	jclass this_class = (*env)->GetObjectClass(env, obj);
 
 	if (context) {
