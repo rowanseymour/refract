@@ -25,9 +25,19 @@
 
 #define DEF_ITERSPERFRAME	5		// The default iterations per frame value
 
-typedef uint32_t iterc_t;
+/**
+ * Used for counts of iterations
+ */
+typedef uint16_t iterc_t;
+
+/**
+ * Used for real and imaginary floating point values
+ */
 typedef float float_t;
 
+/**
+ * Parameters of a fractal render
+ */
 typedef struct {
 	uint8_t func;
 	float_t real;
