@@ -22,7 +22,7 @@
 #include <android/log.h>
 #include <android/bitmap.h>
 
-#include "refract.h"
+#include "inc/refract.h"
 
 // Logging macros
 #define LOG_TAG    "librefract"

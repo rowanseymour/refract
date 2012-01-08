@@ -17,8 +17,7 @@
  * along with Refract. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "refract.h"
-#include "iterate.h"
+#include "inc/refract.h"
 
 void refract_iterate(refract_context* context, uint8_t func, complex_t offset, float_t zoom) {
 	// Have parameters changed thus invalidating the cache?

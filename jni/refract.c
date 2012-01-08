@@ -17,8 +17,7 @@
  * along with Refract. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "refract.h"
-#include "iterate.h"
+#include "inc/refract.h"
 
 /**
  * Allocates a context

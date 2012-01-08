@@ -69,6 +69,8 @@ typedef struct {
 
 } refract_context;
 
+#include "iterate.h"
+
 refract_context* refract_init(uint16_t width, uint16_t height);
 void refract_render(refract_context* context, color_t* pixels, int stride, complex_t offset, float_t zoom);
 void refract_free(refract_context* context);
