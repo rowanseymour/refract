@@ -128,7 +128,9 @@ JNIEXPORT jint JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_render(JNI
 		return -1;
 	}
 
-	refract_render(context, pixels, info.stride, (float_t)real, (float_t)imag, (float_t)zoom);
+	complex_t offset = { (float_t)real, (float_t)imag };
+
+	refract_render(context, pixels, info.stride, offset, (float_t)zoom);
 
 	AndroidBitmap_unlockPixels(env, bitmap);
 
