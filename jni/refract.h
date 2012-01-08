@@ -62,9 +62,8 @@ typedef struct {
 
 	refract_params cache_params;
 	iterc_t cache_max_iters;
-	iterc_t* cache_iters;
-	float_t* cache_reals;
-	float_t* cache_imags;
+	iterc_t* iter_cache;
+	complex_t* z_cache;
 
 	refract_palette* palette;
 

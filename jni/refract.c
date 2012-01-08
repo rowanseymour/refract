@@ -36,20 +36,18 @@ refract_context* refract_init(uint16_t width, uint16_t height) {
 	context->iters_per_frame = DEF_ITERSPERFRAME;
 
 	// Allocate cache buffers
-	context->cache_iters = malloc(sizeof (iterc_t) * width * height);
-	context->cache_reals = malloc(sizeof (float_t) * width * height);
-	context->cache_imags = malloc(sizeof (float_t) * width * height);
+	context->iter_cache = malloc(sizeof (iterc_t) * width * height);
+	context->z_cache = malloc(sizeof (complex_t) * width * height);
 
 	// Check buffers were allocated
-	if (!(context->cache_iters && context->cache_reals && context->cache_imags)) {
+	if (!(context->iter_cache && context->z_cache)) {
 		refract_free(context);
 		return NULL;
 	}
 
 	// Zeroize cache buffers
-	memset(context->cache_iters, 0, sizeof (iterc_t) * width * height);
-	memset(context->cache_reals, 0, sizeof (float_t) * width * height);
-	memset(context->cache_imags, 0, sizeof (float_t) * width * height);
+	memset(context->iter_cache, 0, sizeof (iterc_t) * width * height);
+	memset(context->z_cache, 0, sizeof (complex_t) * width * height);
 
 	return context;
 }
@@ -64,6 +62,7 @@ void refract_render(refract_context* context, color_t* pixels, int stride, compl
 	// Number of iters to be considered in the set
 	iterc_t max_iters = context->cache_max_iters;
 
+	iterc_t* iters = context->iter_cache;
 	refract_palette* palette = context->palette;
 
 	// Render cached iteration values into pixels
@@ -71,9 +70,9 @@ void refract_render(refract_context* context, color_t* pixels, int stride, compl
 		color_t* line = (color_t*)pixels;
 
 		for (int x = 0; x < context->width; ++x, ++index) {
-			iterc_t iters = context->cache_iters[index];
+			iterc_t iterc = iters[index];
 
-			line[x] = (iters == max_iters) ? BLACK : palette->colors[iters % palette->size];
+			line[x] = (iterc == max_iters) ? BLACK : palette->colors[iterc % palette->size];
 		}
 
 		// go to next line
@@ -89,12 +88,10 @@ void refract_free(refract_context* context) {
 	refract_palette_free(context->palette);
 
 	// Free cache buffers
-	if (context->cache_iters)
-		free(context->cache_iters);
-	if (context->cache_reals)
-		free(context->cache_reals);
-	if (context->cache_imags)
-		free(context->cache_imags);
+	if (context->iter_cache)
+		free(context->iter_cache);
+	if (context->z_cache)
+		free(context->z_cache);
 
 	// Free context itself
 	free(context);
