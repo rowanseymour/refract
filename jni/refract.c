@@ -59,23 +59,24 @@ void refract_render(refract_context* context, color_t* pixels, int stride, compl
 	refract_iterate(context, FUNC_MANDELBROT, offset, zoom);
 
 	// Number of iters to be considered in the set
-	iterc_t max_iters = context->cache_max_iters;
+	const iterc_t max_iters = context->cache_max_iters;
 
-	iterc_t* iters = context->iter_cache;
-	refract_palette* palette = context->palette;
+	// Gather up frequently used items
+	const iterc_t* restrict iters = context->iter_cache;
+	const color_t* restrict colors = context->palette->colors;
+	const uint16_t palsize = context->palette->size;
 
 	// Render cached iteration values into pixels
-	for (int y = 0, index = 0; y < context->height; ++y) {
-		color_t* line = (color_t*)pixels;
+	color_t* restrict line = pixels;
 
+	for (int y = 0, index = 0; y < context->height; ++y) {
 		for (int x = 0; x < context->width; ++x, ++index) {
 			iterc_t iterc = iters[index];
-
-			line[x] = (iterc == max_iters) ? BLACK : palette->colors[iterc % palette->size];
+			line[x] = (iterc == max_iters) ? BLACK : colors[iterc % palsize];
 		}
 
 		// go to next line
-		pixels = (color_t*)((char*)pixels + stride);
+		line = (color_t*)((char*)line + stride);
 	}
 }
 

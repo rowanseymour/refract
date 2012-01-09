@@ -43,44 +43,55 @@ void refract_iterate(refract_context* context, uint8_t func, complex_t offset, f
 }
 
 void refract_iterate_m2(refract_context* context, complex_t offset, float_t zoom, iterc_t max_iters, bool use_cache) {
-	uint16_t half_cx = context->width / 2;
-	uint16_t half_cy = context->height / 2;
+	// Calculate screen dimensions
+	const uint16_t half_cx = context->width / 2;
+	const uint16_t half_cy = context->height / 2;
+	const float_t offset_x = offset.re;
+	const float_t offset_y = offset.im;
+
+	// Allow optimized access to memory locations
+	complex_t* restrict z_cache = context->z_cache;
+	iterc_t* restrict iter_cache = context->iter_cache;
 
 	for (int y = 0, index = 0; y < context->height; ++y) {
 		for (int x = 0; x < context->width; ++x, ++index) {
-			complex_t z, c;
+			float_t zr, zi;
 			iterc_t iters;
 
 			// Convert from pixel space to complex space
-			c.re = (x - half_cx) / zoom + offset.re;
-			c.im = (y - half_cy) / zoom - offset.im;
+			float_t cr = (x - half_cx) / zoom + offset_x;
+			float_t ci = (y - half_cy) / zoom - offset_y;
 
 			if (use_cache) {
 				// Load iteration data from cache if doing refinement
-				z = context->z_cache[index];
-				iters = context->iter_cache[index];
+				complex_t z = z_cache[index];
+				zr = z.re;
+				zi = z.im;
+				iters = iter_cache[index];
 			}
 			else {
-				z = c;
+				zr = cr;
+				zi = ci;
 				iters = 0;
 			}
 
 			// Pre-calculate squares
-			float_t zr2 = z.re * z.re;
-			float_t zi2 = z.im * z.im;
+			float_t zr2 = zr * zr;
+			float_t zi2 = zi * zi;
 
 			// Iterate z = z^2 + c
 			while ((zr2 + zi2 < 4) && iters < max_iters) {
-				z.im = 2 * z.re * z.im + c.im;
-				z.re = zr2 - zi2 + c.re;
-				zr2 = z.re * z.re;
-				zi2 = z.im * z.im;
+				zi = 2 * zr * zi + ci;
+				zr = zr2 - zi2 + cr;
+				zr2 = zr * zr;
+				zi2 = zi * zi;
 				++iters;
 			}
 
 			// Store iteration data in cache for possible refinement in next frame
-			context->z_cache[index] = z;
-			context->iter_cache[index] = iters;
+			complex_t z = { zr, zi };
+			z_cache[index] = z;
+			iter_cache[index] = iters;
 		}
 	}
 }
