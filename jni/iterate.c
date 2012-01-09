@@ -48,6 +48,7 @@ void refract_iterate_m2(refract_context* context, complex_t offset, float_t zoom
 	const uint16_t half_cy = context->height / 2;
 	const float_t offset_x = offset.re;
 	const float_t offset_y = offset.im;
+	const float_t inv_zoom = 1 / zoom;
 
 	// Allow optimized access to memory locations
 	complex_t* restrict z_cache = context->z_cache;
@@ -59,8 +60,8 @@ void refract_iterate_m2(refract_context* context, complex_t offset, float_t zoom
 			iterc_t iters;
 
 			// Convert from pixel space to complex space
-			float_t cr = (x - half_cx) / zoom + offset_x;
-			float_t ci = (y - half_cy) / zoom - offset_y;
+			float_t cr = (x - half_cx) * inv_zoom + offset_x;
+			float_t ci = (y - half_cy) * inv_zoom - offset_y;
 
 			if (use_cache) {
 				// Load iteration data from cache if doing refinement
@@ -76,15 +77,15 @@ void refract_iterate_m2(refract_context* context, complex_t offset, float_t zoom
 			}
 
 			// Pre-calculate squares
-			float_t zr2 = zr * zr;
-			float_t zi2 = zi * zi;
+			float_t zr_2 = zr * zr;
+			float_t zi_2 = zi * zi;
 
 			// Iterate z = z^2 + c
-			while ((zr2 + zi2 < 4) && iters < max_iters) {
+			while ((zr_2 + zi_2 < 4) && iters < max_iters) {
 				zi = 2 * zr * zi + ci;
-				zr = zr2 - zi2 + cr;
-				zr2 = zr * zr;
-				zi2 = zi * zi;
+				zr = zr_2 - zi_2 + cr;
+				zr_2 = zr * zr;
+				zi_2 = zi * zi;
 				++iters;
 			}
 
