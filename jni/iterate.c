@@ -19,16 +19,16 @@
 
 #include "inc/refract.h"
 
-void refract_iterate(refract_context* context, uint8_t func, complex_t offset, float_t zoom) {
+void refract_iterate(refract_context* context, func_t func, complex_t offset, float_t zoom) {
 	// Have parameters changed thus invalidating the cache?
-	refract_params* params = &context->cache_params;
+	params_t* params = &context->cache_params;
 	bool use_cache = (func == params->func && offset.re == params->offset.re && offset.im == params->offset.im && zoom == params->zoom);
 
 	// Increment or reset max-iters depending on whether we'll be using the cache
 	iterc_t max_iters = use_cache ? (context->cache_max_iters + context->iters_per_frame) : context->iters_per_frame;
 
 	switch (func) {
-	case FUNC_MANDELBROT:
+	case MANDELBROT:
 		refract_iterate_m2(context, offset, zoom, max_iters, use_cache);
 		break;
 	}

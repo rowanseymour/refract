@@ -22,8 +22,8 @@
 /**
  * Initializes and allocates a palette
  */
-refract_palette* refract_palette_init(color_t* colors, float* anchors, uint16_t points, uint32_t size) {
-	refract_palette* palette = malloc(sizeof (refract_palette));
+palette_t* refract_palette_init(color_t* colors, float* anchors, uint16_t points, uint32_t size) {
+	palette_t* palette = malloc(sizeof (palette_t));
 
 	palette->size = size;
 	palette->colors = malloc(sizeof (color_t) * size);
@@ -61,7 +61,7 @@ refract_palette* refract_palette_init(color_t* colors, float* anchors, uint16_t 
 	return palette;
 }
 
-void refract_palette_free(refract_palette* palette) {
+void refract_palette_free(palette_t* palette) {
 	if (palette->colors)
 		free(palette->colors);
 

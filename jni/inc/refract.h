@@ -22,7 +22,6 @@
 #include <math.h>
 
 #include "color.h"
-#include "palette.h"
 
 #define DEF_ITERSPERFRAME	5		// The default iterations per frame value
 
@@ -46,31 +45,65 @@ typedef struct {
 } complex_t;
 
 /**
+ * Enumeration of set functions
+ */
+typedef enum {
+	MANDELBROT, 	// z^2 + c
+	MANDELBROT_3, 	// z^3 + c
+	MANDELBROT_4	// z^4 + c
+} func_t;
+
+/**
  * Parameters of a fractal render
  */
 typedef struct {
-	uint8_t func;
+	func_t func;
 	complex_t offset;
 	float_t zoom;
 
-} refract_params;
+} params_t;
 
+/**
+ * Palette
+ */
+typedef struct {
+	uint16_t size;
+	color_t* colors;
+
+} palette_t;
+
+/**
+ * Rendering context
+ */
 typedef struct {
 	uint16_t width;
 	uint16_t height;
 	iterc_t iters_per_frame;
 
-	refract_params cache_params;
+	params_t cache_params;
 	iterc_t cache_max_iters;
 	iterc_t* iter_cache;
 	complex_t* z_cache;
 
-	refract_palette* palette;
+	palette_t* palette;
 
 } refract_context;
 
-#include "iterate.h"
-
+/**
+ * Context functions
+ */
 refract_context* refract_init(uint16_t width, uint16_t height);
 void refract_render(refract_context* context, color_t* pixels, int stride, complex_t offset, float_t zoom);
 void refract_free(refract_context* context);
+
+/**
+ * Iteration functions
+ */
+void refract_iterate(refract_context* context, func_t func, complex_t offset, float_t zoom);
+void refract_iterate_m2(refract_context* context, complex_t offset, float_t zoom, iterc_t max_iters, bool use_cache);
+
+/**
+ * Palette functions
+ */
+palette_t* refract_palette_init(color_t* colors, float* anchors, uint16_t points, uint32_t size);
+void refract_palette_free(palette_t* palette);
