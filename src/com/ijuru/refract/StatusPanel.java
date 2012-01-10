@@ -90,7 +90,7 @@ public class StatusPanel extends TableLayout {
 	 * @param fps the frames per second
 	 */
 	public void setPerformanceInfo(int iters, double fps) {
-		updateField(txtPerf, String.format("%d iters at %.1g fps", iters, fps));
+		updateField(txtPerf, String.format("%d iters at %.1f fps", iters, fps));
 	}
 	
 	/**
