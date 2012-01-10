@@ -27,7 +27,7 @@ import android.widget.LinearLayout;
 /**
  * Root component of the fractal renderer
  */
-public class FractalViewer extends FrameLayout {
+public class ExplorerView extends FrameLayout {
 
 	private RendererView rendererView;
 	private StatusPanel statusPanel;
@@ -36,7 +36,7 @@ public class FractalViewer extends FrameLayout {
 	 * Creates a fractal viewer
 	 * @param context the context
 	 */
-	public FractalViewer(Context context) {
+	public ExplorerView(Context context) {
 		super(context);
 		
 		float dp = context.getResources().getDisplayMetrics().density;

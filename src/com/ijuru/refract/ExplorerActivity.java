@@ -45,7 +45,7 @@ public class ExplorerActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        setContentView(new FractalViewer(this));
+        setContentView(new ExplorerView(this));
     }
 
 	/**

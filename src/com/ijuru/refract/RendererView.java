@@ -44,7 +44,7 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	private Bitmap bitmap;
 	private Renderer renderer;
 	private RendererThread rendererThread;
-	private FractalViewer viewer;
+	private ExplorerView viewer;
 	
 	// Rendering parameters
 	private double real, imag, zoom = 200;
@@ -56,7 +56,7 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	// For pinch zooming
 	private ScaleGestureDetector scaleDetector;
 	
-	public RendererView(Context context, FractalViewer viewer) {
+	public RendererView(Context context, ExplorerView viewer) {
 		super(context);
 		
 		this.viewer = viewer;
