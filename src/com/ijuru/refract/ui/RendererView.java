@@ -17,8 +17,10 @@
  * along with Refract. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.ijuru.refract;
+package com.ijuru.refract.ui;
 
+import com.ijuru.refract.Palette;
+import com.ijuru.refract.RendererThread;
 import com.ijuru.refract.renderer.NativeRenderer;
 import com.ijuru.refract.renderer.Renderer;
 import com.ijuru.refract.utils.Utils;

@@ -19,6 +19,8 @@
 
 package com.ijuru.refract;
 
+import com.ijuru.refract.ui.RendererView;
+
 import android.util.Log;
 
 /**

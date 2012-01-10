@@ -17,7 +17,7 @@
  * along with Refract. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.ijuru.refract;
+package com.ijuru.refract.ui;
 
 import android.content.Context;
 import android.view.Gravity;

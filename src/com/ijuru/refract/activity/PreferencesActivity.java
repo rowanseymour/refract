@@ -17,8 +17,9 @@
  * along with Refract. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.ijuru.refract;
+package com.ijuru.refract.activity;
 
+import com.ijuru.refract.R;
 import com.ijuru.refract.utils.Utils;
 
 import android.content.res.Resources;
