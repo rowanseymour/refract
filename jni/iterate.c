@@ -49,6 +49,7 @@ void refract_iterate_m2(refract_context* context, complex_t offset, float_t zoom
 	const float_t offset_x = offset.re;
 	const float_t offset_y = offset.im;
 	const float_t inv_zoom = 1 / zoom;
+	const iterc_t cache_max_iters = context->cache_max_iters;
 
 	// Allow optimized access to memory locations
 	complex_t* restrict z_cache = context->z_cache;
@@ -56,24 +57,30 @@ void refract_iterate_m2(refract_context* context, complex_t offset, float_t zoom
 
 	for (int y = 0, index = 0; y < context->height; ++y) {
 		for (int x = 0; x < context->width; ++x, ++index) {
-			float_t zr, zi;
 			iterc_t iters;
+			float_t zr, zi;
+
+			// Only refine locations that reached maximum iterations previously
+			if (use_cache) {
+				iters = iter_cache[index];
+				if (iters != cache_max_iters)
+					continue;
+
+				// Load z value from cache
+				complex_t z = z_cache[index];
+				zr = z.re;
+				zi = z.im;
+			}
 
 			// Convert from pixel space to complex space
 			float_t cr = (x - half_cx) * inv_zoom + offset_x;
 			float_t ci = (y - half_cy) * inv_zoom - offset_y;
 
-			if (use_cache) {
-				// Load iteration data from cache if doing refinement
-				complex_t z = z_cache[index];
-				zr = z.re;
-				zi = z.im;
-				iters = iter_cache[index];
-			}
-			else {
+			// If not doing refinement then initialize values
+			if (!use_cache) {
+				iters = 0;
 				zr = cr;
 				zi = ci;
-				iters = 0;
 			}
 
 			// Pre-calculate squares
