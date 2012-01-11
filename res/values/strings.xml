@@ -6,12 +6,4 @@
     <string name="str_palette">Palette</string>
     <string name="str_preferences">Preferences</string>
 	<string name="err_numberrange">Must be between %1$d and %2$d</string>
-	<string-array name="palettes">
-		<item>Sunset</item>
-		<item>Hubble</item>
-		<item>Rainbow</item>
-		<item>Chrome</item>
-		<item>Evening</item>
-		<item>Electric</item>
-	</string-array>
 </resources>

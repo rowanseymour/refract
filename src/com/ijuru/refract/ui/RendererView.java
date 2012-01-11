@@ -94,7 +94,7 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 		}
 		
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
-		Palette palette = Palette.getByName(prefs.getString("palette", "sunset").toLowerCase());
+		Palette palette = Palette.getPresetByName(prefs.getString("palette", "sunset").toLowerCase());
 		Integer itersPerFrame = Utils.parseInteger(prefs.getString("itersperframe", "5"));
 		renderer.setPalette(palette);
 		renderer.setItersPerFrame(itersPerFrame);

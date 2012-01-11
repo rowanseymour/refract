@@ -25,7 +25,6 @@ import com.ijuru.refract.utils.Utils;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
-import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.Preference.OnPreferenceChangeListener;
@@ -37,7 +36,7 @@ import android.widget.Toast;
 public class PreferencesActivity extends PreferenceActivity implements OnPreferenceChangeListener {
 
 	private EditTextPreference itersPerFramePref;
-	private ListPreference palettePref;
+	//private PalettePreference palettePref;
 	
 	/**
 	 * @see android.preference.PreferenceActivity#onCreate(android.os.Bundle)
@@ -50,12 +49,8 @@ public class PreferencesActivity extends PreferenceActivity implements OnPrefere
 		itersPerFramePref = (EditTextPreference)getPreferenceScreen().findPreference("itersperframe");
 		itersPerFramePref.setOnPreferenceChangeListener(this);
 		itersPerFramePref.setSummary(itersPerFramePref.getText());
-		
-		palettePref = (ListPreference)getPreferenceScreen().findPreference("palette");
-		palettePref.setOnPreferenceChangeListener(this);
-		palettePref.setSummary(palettePref.getValue());
 	}
-	
+
 	/**
 	 * @see android.preference.Preference.OnPreferenceChangeListener#onPreferenceChange(Preference, Object)
 	 */
