@@ -19,6 +19,7 @@
 
 package com.ijuru.refract.renderer;
 
+import com.ijuru.refract.Function;
 import com.ijuru.refract.Palette;
 
 import android.graphics.Bitmap;
@@ -30,33 +31,13 @@ public class NativeRenderer implements Renderer {
 	
 	private long context;
 	
-	/**
-	 * @see com.ijuru.refract.renderer.Renderer#allocate(int, int)
-	 */
-	@Override
-	public native boolean allocate(int width, int height);
-	
-	/**
-	 * @see com.ijuru.refract.renderer.Renderer#setPalette(Palette)
-	 */
-	@Override
-	public native void setPalette(Palette palette);
-	
-	/**
-	 * @see com.ijuru.refract.renderer.Renderer#setItersPerFrame(int)
-	 */
-	@Override
-	public native void setItersPerFrame(int iters);
-
-	/**
-	 * @see com.ijuru.refract.renderer.Renderer#render(android.graphics.Bitmap, double, double, double)
-	 */
-	@Override
-	public native int render(Bitmap bitmap, double real, double imag, double zoom);
-	
-	/**
-	 * @see com.ijuru.refract.renderer.Renderer#free()
-	 */
-	@Override
-	public native void free();
+	@Override public native boolean allocate(int width, int height);
+	@Override public native void setFunction(Function function);
+	@Override public native void setOffset(double real, double imag);
+	@Override public native double getZoom();
+	@Override public native void setZoom(double zoom);
+	@Override public native void setPalette(Palette palette);
+	@Override public native int iterate(int iters);
+	@Override public native boolean render(Bitmap bitmap);
+	@Override public native void free();
 }

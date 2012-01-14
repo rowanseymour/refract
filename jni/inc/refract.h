@@ -23,8 +23,6 @@
 
 #include "color.h"
 
-#define DEF_ITERSPERFRAME	5		// The default iterations per frame value
-
 /**
  * Counts of iterations
  */
@@ -50,7 +48,7 @@ typedef struct {
 typedef enum {
 	MANDELBROT, 	// z^2 + c
 	MANDELBROT_3, 	// z^3 + c
-	MANDELBROT_4	// z^4 + c
+	MANDELBROT_4 	// z^4 + c
 } func_t;
 
 /**
@@ -78,14 +76,13 @@ typedef struct {
 typedef struct {
 	uint16_t width;
 	uint16_t height;
-	iterc_t iters_per_frame;
+	params_t params;
+	palette_t* palette;
 
-	params_t cache_params;
+	bool cache_valid;
 	iterc_t cache_max_iters;
 	iterc_t* iter_cache;
 	complex_t* z_cache;
-
-	palette_t* palette;
 
 } refract_context;
 
@@ -93,14 +90,17 @@ typedef struct {
  * Context functions
  */
 refract_context* refract_init(uint16_t width, uint16_t height);
-void refract_render(refract_context* context, color_t* pixels, int stride, complex_t offset, float_t zoom);
+void refract_iterate(refract_context* context, iterc_t iters, params_t params, bool use_cache);
+void refract_render(refract_context* context, color_t* pixels, int stride);
 void refract_free(refract_context* context);
 
 /**
  * Iteration functions
  */
-void refract_iterate(refract_context* context, func_t func, complex_t offset, float_t zoom);
 void refract_iterate_m2(refract_context* context, complex_t offset, float_t zoom, iterc_t max_iters, bool use_cache);
+void refract_iterate_m3(refract_context* context, complex_t offset, float_t zoom, iterc_t max_iters, bool use_cache);
+void refract_iterate_m4(refract_context* context, complex_t offset, float_t zoom, iterc_t max_iters, bool use_cache);
+
 
 /**
  * Palette functions

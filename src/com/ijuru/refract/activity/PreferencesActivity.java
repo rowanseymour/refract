@@ -25,6 +25,7 @@ import com.ijuru.refract.utils.Utils;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
+import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.Preference.OnPreferenceChangeListener;
@@ -35,8 +36,8 @@ import android.widget.Toast;
  */
 public class PreferencesActivity extends PreferenceActivity implements OnPreferenceChangeListener {
 
+	private ListPreference iterFuncPref;
 	private EditTextPreference itersPerFramePref;
-	//private PalettePreference palettePref;
 	
 	/**
 	 * @see android.preference.PreferenceActivity#onCreate(android.os.Bundle)
@@ -46,9 +47,14 @@ public class PreferencesActivity extends PreferenceActivity implements OnPrefere
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.xml.preferences);
 		
+		iterFuncPref = (ListPreference)getPreferenceScreen().findPreference("iterfunc");
+		iterFuncPref.setOnPreferenceChangeListener(this);
+		
 		itersPerFramePref = (EditTextPreference)getPreferenceScreen().findPreference("itersperframe");
 		itersPerFramePref.setOnPreferenceChangeListener(this);
-		itersPerFramePref.setSummary(itersPerFramePref.getText());
+		
+		updatePreferenceSummary(iterFuncPref, iterFuncPref.getValue());
+		updatePreferenceSummary(itersPerFramePref, itersPerFramePref.getText());
 	}
 
 	/**
@@ -63,8 +69,26 @@ public class PreferencesActivity extends PreferenceActivity implements OnPrefere
 				return false;
 		}
 		
-		preference.setSummary(value.toString());
+		updatePreferenceSummary(preference, value);
 		return true;
+	}
+	
+	/**
+	 * Updates the summary of the given preference based on the given value (not necessarily the value itself)
+	 * @param preference the preference
+	 * @param value the value
+	 */
+	private void updatePreferenceSummary(Preference preference, Object value) {
+		if (preference instanceof ListPreference) {
+			ListPreference listPref = (ListPreference)preference;
+			CharSequence[] entries = listPref.getEntries();
+			int index = listPref.findIndexOfValue(value.toString());
+			if (index >= 0)
+				listPref.setSummary(entries[index]);
+		}
+		else {
+			preference.setSummary(value.toString());
+		}
 	}
 	
 	/**

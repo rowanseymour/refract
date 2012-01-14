@@ -1,11 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Refract</string>
-    <string name="str_about">About</string>
-    <string name="str_coloring">Coloring</string>
-    <string name="str_itersperframe">Iterations per frame</string>
-    <string name="str_palette">Palette</string>
-    <string name="str_preferences">Preferences</string>
-    <string name="str_iterating">Iterating</string>
+	<string name="app_name">Refract</string>
+	<string name="str_about">About</string>
+	<string name="str_coloring">Coloring</string>
+	<string name="str_function">Function</string>
+	<string name="str_itersperframe">Iterations per frame</string>
+	<string name="str_palette">Palette</string>
+	<string name="str_preferences">Preferences</string>
+	<string name="str_iterating">Iterating</string>
 	<string name="err_numberrange">Must be between %1$d and %2$d</string>
+	<string-array name="arr_iterfunclabels">
+		<item>z = z\u00B2 + c</item>
+		<item>z = z\u00B3 + c</item>
+		<item>z = z\u2074 + c</item>
+	</string-array>
+	<string-array name="arr_iterfunckeys">
+		<item>mandelbrot</item>
+		<item>mandelbrot_3</item>
+		<item>mandelbrot_4</item>
+	</string-array>
 </resources>

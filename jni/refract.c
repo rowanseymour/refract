@@ -32,7 +32,10 @@ refract_context* refract_init(uint16_t width, uint16_t height) {
 	memset(context, 0, sizeof (refract_context));
 	context->width = width;
 	context->height = height;
-	context->iters_per_frame = DEF_ITERSPERFRAME;
+	context->params.func = MANDELBROT;
+	context->params.offset.re = 0;
+	context->params.offset.im = 0;
+	context->params.zoom = width / 2;
 
 	// Allocate cache buffers
 	context->iter_cache = malloc(sizeof (iterc_t) * width * height);
@@ -52,12 +55,32 @@ refract_context* refract_init(uint16_t width, uint16_t height) {
 }
 
 /**
+ * Performs iterations
+ */
+void refract_iterate(refract_context* context, iterc_t iters, params_t params, bool use_cache) {
+	// Increment or reset max-iters depending on whether we'll be using the cache
+	iterc_t max_iters = use_cache ? (context->cache_max_iters + iters) : iters;
+
+	switch (params.func) {
+	case MANDELBROT:
+		refract_iterate_m2(context, params.offset, params.zoom, max_iters, use_cache);
+		break;
+	case MANDELBROT_3:
+		refract_iterate_m3(context, params.offset, params.zoom, max_iters, use_cache);
+		break;
+	case MANDELBROT_4:
+		refract_iterate_m4(context, params.offset, params.zoom, max_iters, use_cache);
+		break;
+	}
+
+	// Update cache status
+	context->cache_max_iters = max_iters;
+}
+
+/**
  * Renders a context to the given pixel buffer
  */
-void refract_render(refract_context* context, color_t* pixels, int stride, complex_t offset, float_t zoom) {
-	// Iterate fractal rendering
-	refract_iterate(context, MANDELBROT, offset, zoom);
-
+void refract_render(refract_context* context, color_t* pixels, int stride) {
 	// Number of iters to be considered in the set
 	const iterc_t max_iters = context->cache_max_iters;
 

@@ -19,6 +19,7 @@
 
 package com.ijuru.refract.renderer;
 
+import com.ijuru.refract.Function;
 import com.ijuru.refract.Palette;
 
 import android.graphics.Bitmap;
@@ -36,26 +37,49 @@ public interface Renderer {
 	public boolean allocate(int width, int height);
 	
 	/**
-	 * Sets the number of iterations per frame
-	 * @param iters the number of iterations
+	 * Sets the function
+	 * @param function the function
 	 */
-	public void setItersPerFrame(int iters);
+	public void setFunction(Function function);
+	
+	/**
+	 * Sets the offset in complex space
+	 * @param real the real component
+	 * @param imag the imaginary component
+	 */
+	public void setOffset(double real, double imag);
+	
+	/**
+	 * Gets the zoom factor in complex space
+	 * @return the zoom factor
+	 */
+	public double getZoom();
+	
+	/**
+	 * Sets the zoom factor in complex space
+	 * @param zoom the zoom factor
+	 */
+	public void setZoom(double zoom);
 	
 	/**
 	 * Sets the palette for renders
 	 * @param palette the palette
 	 */
 	public void setPalette(Palette palette);
+	
+	/**
+	 * Sets the number of iterations per frame
+	 * @param iters the number of iterations
+	 * @return the accumulative number of iterations used
+	 */
+	public int iterate(int iters);
 
 	/**
 	 * Renders a fractal to the given bitmap
 	 * @param bitmap the bitmap to render to
-	 * @param real the real coordinate
-	 * @param imag the imaginary coordinate
-	 * @param zoom the zoom factor
-	 * @return the number of iterations used
+	 * @return true if successful
 	 */
-	public int render(Bitmap bitmap, double real, double imag, double zoom);
+	public boolean render(Bitmap bitmap);
 
 	/**
 	 * Frees resources

@@ -1,18 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
-	<PreferenceCategory android:title="@string/str_coloring">  
-		<com.ijuru.refract.ui.PalettePreference
-	        android:key="palette" 
-	        android:title="@string/str_palette"
-	        android:defaultValue="sunset"
-	    />
-	</PreferenceCategory>
+<PreferenceScreen 
+    xmlns:android="http://schemas.android.com/apk/res/android" 
+    xmlns:refract="http://schemas.android.com/apk/res/com.ijuru.refract"
+    >
 	<PreferenceCategory android:title="@string/str_iterating">  
+		<ListPreference 
+		    android:key="iterfunc"
+		    android:title="@string/str_function"
+		    android:defaultValue="mandelbrot"
+		    android:entries="@array/arr_iterfunclabels"
+		    android:entryValues="@array/arr_iterfunckeys"
+		/>
 		<EditTextPreference 
 	    	android:key="itersperframe" 
 	    	android:title="@string/str_itersperframe"
 	    	android:defaultValue="@integer/def_itersperframe"
 	    	android:numeric="integer"
 		/>
+	</PreferenceCategory>
+	<PreferenceCategory android:title="@string/str_coloring">  
+		<com.ijuru.refract.ui.PalettePreference
+	        android:key="palette" 
+	        android:title="@string/str_palette"
+	        android:defaultValue="sunset"
+	    />
 	</PreferenceCategory>
 </PreferenceScreen>

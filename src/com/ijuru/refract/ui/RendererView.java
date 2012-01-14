@@ -19,6 +19,7 @@
 
 package com.ijuru.refract.ui;
 
+import com.ijuru.refract.Function;
 import com.ijuru.refract.Palette;
 import com.ijuru.refract.RendererThread;
 import com.ijuru.refract.renderer.NativeRenderer;
@@ -50,6 +51,7 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	
 	// Rendering parameters
 	private double real, imag, zoom = 200;
+	private int itersPerFrame = 5;
 	
 	// For dragging / panning
 	private double oldMouseX, oldMouseY;
@@ -93,11 +95,14 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 			return;
 		}
 		
+		// Get rendering parameters from preferences
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+		Function iterFunc = Function.parseString(prefs.getString("iterfunc", "mandelbrot"));
+		itersPerFrame = Utils.parseInteger(prefs.getString("itersperframe", "5"));
 		Palette palette = Palette.getPresetByName(prefs.getString("palette", "sunset").toLowerCase());
-		Integer itersPerFrame = Utils.parseInteger(prefs.getString("itersperframe", "5"));
+		
+		renderer.setFunction(iterFunc);
 		renderer.setPalette(palette);
-		renderer.setItersPerFrame(itersPerFrame);
 			
 		if (!rendererThread.isAlive())
 			rendererThread.start();
@@ -131,7 +136,8 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	 */
 	public void update() {
 		// Render into off screen bitmap
-		int iters = renderer.render(bitmap, real, imag, zoom);
+		int iters = renderer.iterate(itersPerFrame);
+		renderer.render(bitmap);
 		
 		// Lock canvas to draw to it
 		Canvas c = null;
@@ -180,6 +186,10 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 			if (!scaleDetector.isInProgress()) {
 				real = oldReal + (oldMouseX - event.getX()) / zoom;
 				imag = oldImag - (oldMouseY - event.getY()) / zoom;
+				
+				// Update renderer
+				if (renderer != null)
+					renderer.setOffset(real, imag);
 			}
 			break;
 		}
@@ -200,6 +210,10 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 		@Override
 		public boolean onScale(ScaleGestureDetector detector) {
 			zoom *= detector.getScaleFactor();
+			
+			// Update renderer
+			if (renderer != null)
+				renderer.setZoom(zoom);
 			
 			// Update status info
 			viewer.getStatusPanel().setZoom(zoom);
