@@ -50,7 +50,7 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	private ExplorerView viewer;
 	
 	// Rendering parameters
-	private double real, imag, zoom = 200;
+	private double real, imag;
 	private int itersPerFrame = 5;
 	
 	// For dragging / panning
@@ -70,7 +70,6 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 		scaleDetector = new ScaleGestureDetector(context, new ZoomListener());
 		
 		viewer.getStatusPanel().setCoords(real, imag);
-		viewer.getStatusPanel().setZoom(zoom);
 	}
 	
 	@Override
@@ -175,6 +174,9 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	public boolean onTouchEvent(MotionEvent event) {
 		scaleDetector.onTouchEvent(event);
 		
+		if (renderer == null)
+			return false;
+		
 		switch (event.getAction()) {
 		case (MotionEvent.ACTION_DOWN): // Touch screen pressed
 			oldReal = real;
@@ -184,12 +186,10 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 			break;
 		case (MotionEvent.ACTION_MOVE): // Dragged finger
 			if (!scaleDetector.isInProgress()) {
+				double zoom = renderer.getZoom();
 				real = oldReal + (oldMouseX - event.getX()) / zoom;
 				imag = oldImag - (oldMouseY - event.getY()) / zoom;
-				
-				// Update renderer
-				if (renderer != null)
-					renderer.setOffset(real, imag);
+				renderer.setOffset(real, imag);
 			}
 			break;
 		}
@@ -209,14 +209,14 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 		 */
 		@Override
 		public boolean onScale(ScaleGestureDetector detector) {
-			zoom *= detector.getScaleFactor();
+			if (renderer == null)
+				return false;
 			
-			// Update renderer
-			if (renderer != null)
-				renderer.setZoom(zoom);
+			double newZoom = renderer.getZoom() * detector.getScaleFactor();
+			renderer.setZoom(newZoom);
 			
 			// Update status info
-			viewer.getStatusPanel().setZoom(zoom);
+			viewer.getStatusPanel().setZoom(newZoom);
 			
 			return true;
 		}
