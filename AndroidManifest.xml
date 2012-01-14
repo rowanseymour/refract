@@ -14,6 +14,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".activity.SettingsActivity" android:label="@string/str_settings"></activity>
+        <activity android:name=".activity.SetAsWallpaperActivity" android:label="@string/str_setaswallpaper"></activity>
     </application>
 
 </manifest>

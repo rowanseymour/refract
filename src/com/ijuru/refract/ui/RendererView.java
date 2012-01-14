@@ -105,6 +105,8 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 		itersPerFrame = Utils.parseInteger(prefs.getString("itersperframe", "5"));
 		Palette palette = Palette.getPresetByName(prefs.getString("palette", "sunset").toLowerCase());
 		
+		reset();
+		
 		renderer.setFunction(iterFunc);
 		renderer.setPalette(palette, 128);
 			

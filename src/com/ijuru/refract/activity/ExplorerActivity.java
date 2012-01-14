@@ -48,16 +48,19 @@ public class ExplorerActivity extends Activity implements RendererView.RendererL
         System.loadLibrary("refract");
     }
 	
+	/**
+	 * @see com.ijuru.refract.activity.ExplorerActivity#onCreate(Bundle)
+	 */
 	@Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        
-        setContentView(R.layout.explorer);
-        
-        rendererView = (RendererView)findViewById(R.id.rendererView);
-        statusPanel = (StatusPanel)findViewById(R.id.statusPanel);
-        
-        rendererView.setRendererListener(this);
+		super.onCreate(savedInstanceState);
+		
+		setContentView(R.layout.explorer);
+		
+		rendererView = (RendererView)findViewById(R.id.rendererView);
+		statusPanel = (StatusPanel)findViewById(R.id.statusPanel);
+		
+		rendererView.setRendererListener(this);
     }
 
 	/**
@@ -83,13 +86,20 @@ public class ExplorerActivity extends Activity implements RendererView.RendererL
 			startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
 	    	break;
 		case R.id.menusetas:
-			// TODO
+			onMenuSetAs();
 	    	break;
 	    case R.id.menuabout:
 	    	onMenuAbout();
 	    	break;
 		}
 		return true;
+	}
+	
+	/**
+	 * Displays the 'set as' dialog
+	 */
+	private void onMenuSetAs() {
+		startActivity(new Intent(getApplicationContext(), SetAsWallpaperActivity.class));
 	}
 	
 	/**

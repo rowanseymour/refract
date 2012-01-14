@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+	<!--<com.ijuru.refract.ui.RendererView
+	    android:id="@+id/rendererView"
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent"
+	/>-->
+	
+	<LinearLayout 
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent"
+	    android:gravity="bottom"
+	    android:orientation="horizontal"
+	    android:padding="5dp"
+	    android:weightSum="1">
+	    
+		<Button
+			android:text="@android:string/ok" 
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_weight="0.5"
+			android:onClick="onOK" 
+		/>
+		<Button
+			android:text="@android:string/cancel"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_weight="0.5"
+			android:onClick="onCancel" 
+		/>
+	</LinearLayout>
+
+</FrameLayout>

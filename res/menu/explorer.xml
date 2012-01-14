@@ -10,11 +10,10 @@
 		android:title="@string/str_settings" 
 		android:icon="@drawable/ic_menu_settings"
 	/>
-	<item 
+	<item
 		android:id="@+id/menusetas" 
 		android:title="@string/str_setas" 
 		android:icon="@drawable/ic_menu_setas"
-		android:enabled="false"
 	/>
 	<item 
 		android:id="@+id/menuabout" 
