@@ -26,6 +26,8 @@ public class Complex {
 	public double re;
 	public double im;
 	
+	public static final Complex ORIGIN = new Complex(0.0, 0.0);
+	
 	/**
 	 * Constructs a new complex number
 	 * @param re the real component

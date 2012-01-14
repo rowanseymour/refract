@@ -77,7 +77,7 @@ public class ExplorerActivity extends Activity implements RendererView.RendererL
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menureset:
-			//rendererView.reset();
+			rendererView.reset();
 	    	break;
 		case R.id.menusettings:
 			startActivity(new Intent(getApplicationContext(), SettingsActivity.class));

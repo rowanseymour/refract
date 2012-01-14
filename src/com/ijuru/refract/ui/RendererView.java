@@ -231,6 +231,23 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	}
 	
 	/**
+	 * Resets this view so that it is centered on the origin
+	 */
+	public void reset() {
+		if (renderer != null) {
+			double zoom = renderer.getWidth() / 2;
+			renderer.setOffset(Complex.ORIGIN);
+			renderer.setZoom(zoom);
+			
+			// Update listener
+			if (listener != null) {
+				listener.onOffsetChanged(RendererView.this, Complex.ORIGIN);
+				listener.onZoomChanged(RendererView.this, zoom);
+			}
+		}
+	}
+	
+	/**
 	 * Sets the renderer listener
 	 * @param listener the listener
 	 */
