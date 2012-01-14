@@ -19,8 +19,10 @@
 
 package com.ijuru.refract.activity;
 
+import com.ijuru.refract.Complex;
 import com.ijuru.refract.R;
-import com.ijuru.refract.ui.ExplorerView;
+import com.ijuru.refract.ui.RendererView;
+import com.ijuru.refract.ui.StatusPanel;
 import com.ijuru.refract.utils.Utils;
 
 import android.app.Activity;
@@ -34,7 +36,10 @@ import android.view.MenuItem;
 /**
  * Activity for exploring fractals
  */
-public class ExplorerActivity extends Activity {
+public class ExplorerActivity extends Activity implements RendererView.RendererListener{
+	
+	private RendererView rendererView;
+	private StatusPanel statusPanel;
 	
 	/**
 	 * Load the native code
@@ -47,7 +52,12 @@ public class ExplorerActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        setContentView(new ExplorerView(this));
+        setContentView(R.layout.explorer);
+        
+        rendererView = (RendererView)findViewById(R.id.rendererView);
+        statusPanel = (StatusPanel)findViewById(R.id.statusPanel);
+        
+        rendererView.setRendererListener(this);
     }
 
 	/**
@@ -67,7 +77,7 @@ public class ExplorerActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menureset:
-			// TODO
+			//rendererView.reset();
 	    	break;
 		case R.id.menusettings:
 			startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
@@ -94,5 +104,31 @@ public class ExplorerActivity extends Activity {
 		
 		new AlertDialog.Builder(this).setTitle(title).setMessage(message)
 			.setPositiveButton(android.R.string.ok, null).show();
+	}
+
+	/**
+	 * @see com.ijuru.refract.ui.RendererView.RendererListener#onOffsetChanged(RendererView, Complex)
+	 */
+	@Override
+	public void onOffsetChanged(RendererView view, Complex offset) {
+		statusPanel.setCoords(offset.re, offset.im);
+	}
+
+	/**
+	 * @see com.ijuru.refract.ui.RendererView.RendererListener#onZoomChanged(RendererView, double)
+	 */
+	@Override
+	public void onZoomChanged(RendererView view, double zoom) {
+		statusPanel.setZoom(zoom);
+	}
+
+	/**
+	 * @see com.ijuru.refract.ui.RendererView.RendererListener#onUpdate(RendererView, int)
+	 */
+	@Override
+	public void onUpdate(RendererView view, int iters) {
+		long avgFrameTime = view.getRendererThread().calcSmoothedFrameTime();
+		
+		statusPanel.setPerformanceInfo(iters, avgFrameTime > 0 ? 1000.0 / avgFrameTime : 0);
 	}
 }

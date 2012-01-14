@@ -33,6 +33,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Bitmap.Config;
 import android.preference.PreferenceManager;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -48,7 +49,7 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	private Bitmap bitmap;
 	private Renderer renderer;
 	private RendererThread rendererThread;
-	private ExplorerView viewer;
+	private RendererListener listener;
 	
 	// Rendering parameters
 	private int itersPerFrame;
@@ -59,14 +60,21 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	// For pinch zooming
 	private ScaleGestureDetector scaleDetector;
 	
-	public RendererView(Context context, ExplorerView viewer) {
-		super(context);
-		
-		this.viewer = viewer;
+	public RendererView(Context context, AttributeSet attrs) {
+		super(context, attrs);
 		
 		getHolder().addCallback(this);
 		
 		scaleDetector = new ScaleGestureDetector(context, new ZoomListener());
+	}
+	
+	/**
+	 * Listener interface
+	 */
+	public interface RendererListener {
+		public void onOffsetChanged(RendererView view, Complex offset);
+		public void onZoomChanged(RendererView view, double zoom);
+		public void onUpdate(RendererView view, int iters);
 	}
 	
 	@Override
@@ -149,9 +157,8 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 			}
 		}
 		
-		// Update performance status info
-		long avgFrameTime = rendererThread.calcSmoothedFrameTime();
-		viewer.getStatusPanel().setPerformanceInfo(iters, avgFrameTime > 0 ? 1000.0 / avgFrameTime : 0);
+		if (listener != null)
+			listener.onUpdate(RendererView.this, iters);
 		
 		//Log.v("refract", "Render surface updated [" + rendererThread.getLastFrameTime() + "ms]");
 	}
@@ -190,8 +197,9 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 				oldMouseX = event.getX();
 				oldMouseY = event.getY();
 				
-				// Update status info
-				viewer.getStatusPanel().setCoords(offset.re, offset.im);
+				// Update listener
+				if (listener != null)
+					listener.onOffsetChanged(RendererView.this, offset);
 			}
 			break;
 		}
@@ -214,11 +222,20 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 			double newZoom = renderer.getZoom() * detector.getScaleFactor();
 			renderer.setZoom(newZoom);
 			
-			// Update status info
-			viewer.getStatusPanel().setZoom(newZoom);
+			// Update listener
+			if (listener != null)
+				listener.onZoomChanged(RendererView.this, newZoom);
 			
 			return true;
 		}
+	}
+	
+	/**
+	 * Sets the renderer listener
+	 * @param listener the listener
+	 */
+	public void setRendererListener(RendererListener listener) {
+		this.listener = listener;
 	}
 
 	/**
