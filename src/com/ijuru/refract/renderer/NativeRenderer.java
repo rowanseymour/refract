@@ -33,6 +33,11 @@ public class NativeRenderer implements Renderer {
 	private long context;
 	
 	@Override public native boolean allocate(int width, int height);
+	@Override public native int iterate(int iters);
+	@Override public native boolean render(Bitmap bitmap);
+	@Override public native void free();
+	@Override public native int getWidth();
+	@Override public native int getHeight();
 	@Override public native Function getFunction();
 	@Override public native void setFunction(Function function);
 	@Override public native Complex getOffset();
@@ -40,7 +45,4 @@ public class NativeRenderer implements Renderer {
 	@Override public native double getZoom();
 	@Override public native void setZoom(double zoom);
 	@Override public native void setPalette(Palette palette);
-	@Override public native int iterate(int iters);
-	@Override public native boolean render(Bitmap bitmap);
-	@Override public native void free();
 }

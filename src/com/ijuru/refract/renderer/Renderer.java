@@ -38,6 +38,37 @@ public interface Renderer {
 	public boolean allocate(int width, int height);
 	
 	/**
+	 * Sets the number of iterations per frame
+	 * @param iters the number of iterations
+	 * @return the accumulative number of iterations used
+	 */
+	public int iterate(int iters);
+
+	/**
+	 * Renders a fractal to the given bitmap
+	 * @param bitmap the bitmap to render to
+	 * @return true if successful
+	 */
+	public boolean render(Bitmap bitmap);
+
+	/**
+	 * Frees resources
+	 */
+	public void free();
+	
+	/**
+	 * Gets the width
+	 * @return the width
+	 */
+	public int getWidth();
+	
+	/**
+	 * Gets the height
+	 * @return the height
+	 */
+	public int getHeight();
+	
+	/**
 	 * Gets the function
 	 * @return the function
 	 */
@@ -78,23 +109,4 @@ public interface Renderer {
 	 * @param palette the palette
 	 */
 	public void setPalette(Palette palette);
-	
-	/**
-	 * Sets the number of iterations per frame
-	 * @param iters the number of iterations
-	 * @return the accumulative number of iterations used
-	 */
-	public int iterate(int iters);
-
-	/**
-	 * Renders a fractal to the given bitmap
-	 * @param bitmap the bitmap to render to
-	 * @return true if successful
-	 */
-	public boolean render(Bitmap bitmap);
-
-	/**
-	 * Frees resources
-	 */
-	public void free();
 }

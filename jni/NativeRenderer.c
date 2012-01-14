@@ -112,12 +112,27 @@ JNIEXPORT jboolean JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_alloca
 }
 
 /**
+ * Gets the width
+ */
+JNIEXPORT jint JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_getWidth(JNIEnv* env, jobject renderer) {
+	refract_context* context = get_context(env, renderer);
+	return (jint)context->width;
+}
+
+/**
+ * Gets the height
+ */
+JNIEXPORT jint JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_getHeight(JNIEnv* env, jobject renderer) {
+	refract_context* context = get_context(env, renderer);
+	return (jint)context->height;
+}
+
+/**
  * Gets the iteration function
  */
 JNIEXPORT jobject JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_getFunction(JNIEnv* env, jobject renderer) {
 	refract_context* context = get_context(env, renderer);
 	jobject values_obj = (*env)->CallStaticObjectMethod(env, function_class, function_values_mid);
-	//jobjectArray* values = (jobjectArray*)&values_obj;
 	return (*env)->GetObjectArrayElement(env, values_obj, (int)context->params.func);
 }
 
