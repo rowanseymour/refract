@@ -19,6 +19,7 @@
 
 package com.ijuru.refract.renderer;
 
+import com.ijuru.refract.Complex;
 import com.ijuru.refract.Function;
 import com.ijuru.refract.Palette;
 
@@ -33,7 +34,8 @@ public class NativeRenderer implements Renderer {
 	
 	@Override public native boolean allocate(int width, int height);
 	@Override public native void setFunction(Function function);
-	@Override public native void setOffset(double real, double imag);
+	@Override public native Complex getOffset();
+	@Override public native void setOffset(Complex offset);
 	@Override public native double getZoom();
 	@Override public native void setZoom(double zoom);
 	@Override public native void setPalette(Palette palette);

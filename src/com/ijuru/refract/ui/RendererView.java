@@ -19,6 +19,7 @@
 
 package com.ijuru.refract.ui;
 
+import com.ijuru.refract.Complex;
 import com.ijuru.refract.Function;
 import com.ijuru.refract.Palette;
 import com.ijuru.refract.RendererThread;
@@ -50,13 +51,11 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	private ExplorerView viewer;
 	
 	// Rendering parameters
-	private double real, imag;
-	private int itersPerFrame = 5;
+	private int itersPerFrame;
 	
 	// For dragging / panning
 	private double oldMouseX, oldMouseY;
-	private double oldReal, oldImag;
-	
+
 	// For pinch zooming
 	private ScaleGestureDetector scaleDetector;
 	
@@ -68,8 +67,6 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 		getHolder().addCallback(this);
 		
 		scaleDetector = new ScaleGestureDetector(context, new ZoomListener());
-		
-		viewer.getStatusPanel().setCoords(real, imag);
 	}
 	
 	@Override
@@ -134,8 +131,9 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	 * Updates the renderer
 	 */
 	public void update() {
-		// Render into off screen bitmap
 		int iters = renderer.iterate(itersPerFrame);
+		
+		// Render into off screen bitmap
 		renderer.render(bitmap);
 		
 		// Lock canvas to draw to it
@@ -179,23 +177,24 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 		
 		switch (event.getAction()) {
 		case (MotionEvent.ACTION_DOWN): // Touch screen pressed
-			oldReal = real;
-			oldImag = imag;
 			oldMouseX = event.getX();
 			oldMouseY = event.getY();
 			break;
 		case (MotionEvent.ACTION_MOVE): // Dragged finger
 			if (!scaleDetector.isInProgress()) {
 				double zoom = renderer.getZoom();
-				real = oldReal + (oldMouseX - event.getX()) / zoom;
-				imag = oldImag - (oldMouseY - event.getY()) / zoom;
-				renderer.setOffset(real, imag);
+				Complex offset = renderer.getOffset();
+				offset.re += (oldMouseX - event.getX()) / zoom;
+				offset.im -= (oldMouseY - event.getY()) / zoom;
+				renderer.setOffset(offset);
+				oldMouseX = event.getX();
+				oldMouseY = event.getY();
+				
+				// Update status info
+				viewer.getStatusPanel().setCoords(offset.re, offset.im);
 			}
 			break;
 		}
-		
-		// Update status info
-		viewer.getStatusPanel().setCoords(real, imag);
 		
 		return true;
 	}

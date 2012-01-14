@@ -33,50 +33,55 @@
 // Set to 1 to enable debug log traces
 #define DEBUG 1
 
-#define PALETTE_SIZE	128
+#define PALETTE_SIZE 128
 
-/*jclass renderer_class;*/
+#define NATIVERENDERER_CLASS	"com/ijuru/refract/renderer/NativeRenderer"
+#define COMPLEX_CLASS			"com/ijuru/refract/Complex"
+
+jclass renderer_class, complex_class;
+jfieldID renderer_context_fid, complex_re_fid, complex_im_fid;
+jmethodID complex_cid;
 
 /**
  * Called by JVM as library is being loaded
  */
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* jvm, void* reserved)
  {
-	/*JNIEnv* env;
-	if ((*jvm)->GetEnv(jvm, (void**)&env, JNI_VERSION_1_4)) {
-		return JNI_ERR;
-	}
-
-	jclass cls = (*env)->FindClass(env, "com/ijuru/refract/NativeRenderer");
-	if (cls == NULL)
+	JNIEnv* env;
+	if ((*jvm)->GetEnv(jvm, (void**)&env, JNI_VERSION_1_4))
 		return JNI_ERR;
 
-	renderer_class = (*env)->NewWeakGlobalRef(env, cls);
-	if (renderer_class == NULL)
-		return JNI_ERR;*/
+	jclass cls = (*env)->FindClass(env, NATIVERENDERER_CLASS);
+	renderer_class = (*env)->NewGlobalRef(env, cls);
+	renderer_context_fid = (*env)->GetFieldID(env, renderer_class, "context", "J");
+
+	cls = (*env)->FindClass(env, COMPLEX_CLASS);
+	complex_class = (*env)->NewGlobalRef(env, cls);
+	complex_cid = (*env)->GetMethodID(env, complex_class, "<init>", "(DD)V");
+	complex_re_fid = (*env)->GetFieldID(env, complex_class, "re", "D");
+	complex_im_fid = (*env)->GetFieldID(env, complex_class, "im", "D");
 
 	return JNI_VERSION_1_4;
- }
-
-/**
- * Gets the context field of a Renderer object
- */
-static refract_context* get_context(JNIEnv* env, jobject renderer) {
-	jclass this_class = (*env)->GetObjectClass(env, renderer);
-	jfieldID fid_context = (*env)->GetFieldID(env, this_class, "context", "J");
-	return (refract_context*)(intptr_t)((*env)->GetLongField(env, renderer, fid_context));
 }
 
 /**
  * Called by JVM as library is being unloaded
  */
 JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* jvm, void* reserved) {
-	//JNIEnv *env;
-	//if ((*jvm)->GetEnv(jvm, (void**)&env, JNI_VERSION_1_4))
-		//return;
+	JNIEnv *env;
+	if ((*jvm)->GetEnv(jvm, (void**)&env, JNI_VERSION_1_4))
+		return;
 
-	//(*env)->DeleteWeakGlobalRef(env, renderer_class);
- }
+	(*env)->DeleteGlobalRef(env, renderer_class);
+	(*env)->DeleteGlobalRef(env, complex_class);
+}
+
+/**
+ * Gets the context field of a Renderer object
+ */
+static refract_context* get_context(JNIEnv* env, jobject renderer) {
+	return (refract_context*)(intptr_t)((*env)->GetLongField(env, renderer, renderer_context_fid));
+}
 
 /**
  * Allocates the context for the given renderer
@@ -113,10 +118,20 @@ JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setFunctio
 }
 
 /**
- * Sets the iteration function
+ * Gets the offset in complex space
  */
-JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setOffset(JNIEnv* env, jobject renderer, jdouble re, jdouble im) {
+JNIEXPORT jobject JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_getOffset(JNIEnv* env, jobject renderer) {
 	refract_context* context = get_context(env, renderer);
+	return (*env)->NewObject(env, complex_class, complex_cid, (jdouble)context->params.offset.re, (jdouble)context->params.offset.im);
+}
+
+/**
+ * Sets the offset in complex space
+ */
+JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setOffset(JNIEnv* env, jobject renderer, jobject offset) {
+	refract_context* context = get_context(env, renderer);
+	float_t re = (float_t)((*env)->GetDoubleField(env, offset, complex_re_fid));
+	float_t im = (float_t)((*env)->GetDoubleField(env, offset, complex_im_fid));
 	context->params.offset.re = (float_t)re;
 	context->params.offset.im = (float_t)im;
 	context->cache_valid = false;

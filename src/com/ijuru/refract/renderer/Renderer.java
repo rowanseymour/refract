@@ -19,6 +19,7 @@
 
 package com.ijuru.refract.renderer;
 
+import com.ijuru.refract.Complex;
 import com.ijuru.refract.Function;
 import com.ijuru.refract.Palette;
 
@@ -43,11 +44,16 @@ public interface Renderer {
 	public void setFunction(Function function);
 	
 	/**
-	 * Sets the offset in complex space
-	 * @param real the real component
-	 * @param imag the imaginary component
+	 * Gets the offset in complex space
+	 * @return the offset
 	 */
-	public void setOffset(double real, double imag);
+	public Complex getOffset();
+	
+	/**
+	 * Sets the offset in complex space
+	 * @param offset the offset
+	 */
+	public void setOffset(Complex offset);
 	
 	/**
 	 * Gets the zoom factor in complex space
