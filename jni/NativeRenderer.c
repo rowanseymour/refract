@@ -36,11 +36,13 @@
 #define PALETTE_SIZE 128
 
 #define NATIVERENDERER_CLASS	"com/ijuru/refract/renderer/NativeRenderer"
+#define FUNCTION_CLASS			"com/ijuru/refract/Function"
 #define COMPLEX_CLASS			"com/ijuru/refract/Complex"
 
-jclass renderer_class, complex_class;
+// Cached Java entities
+jclass renderer_class, complex_class, function_class;
 jfieldID renderer_context_fid, complex_re_fid, complex_im_fid;
-jmethodID complex_cid;
+jmethodID function_ordinal_mid, function_values_mid, complex_cid;
 
 /**
  * Called by JVM as library is being loaded
@@ -54,6 +56,11 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* jvm, void* reserved)
 	jclass cls = (*env)->FindClass(env, NATIVERENDERER_CLASS);
 	renderer_class = (*env)->NewGlobalRef(env, cls);
 	renderer_context_fid = (*env)->GetFieldID(env, renderer_class, "context", "J");
+
+	cls = (*env)->FindClass(env, FUNCTION_CLASS);
+	function_class = (*env)->NewGlobalRef(env, cls);
+	function_ordinal_mid = (*env)->GetMethodID(env, function_class, "ordinal", "()I");
+	function_values_mid = (*env)->GetStaticMethodID(env, function_class, "values", "()[L" FUNCTION_CLASS ";");
 
 	cls = (*env)->FindClass(env, COMPLEX_CLASS);
 	complex_class = (*env)->NewGlobalRef(env, cls);
@@ -73,6 +80,7 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* jvm, void* reserved) {
 		return;
 
 	(*env)->DeleteGlobalRef(env, renderer_class);
+	(*env)->DeleteGlobalRef(env, function_class);
 	(*env)->DeleteGlobalRef(env, complex_class);
 }
 
@@ -104,14 +112,21 @@ JNIEXPORT jboolean JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_alloca
 }
 
 /**
+ * Gets the iteration function
+ */
+JNIEXPORT jobject JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_getFunction(JNIEnv* env, jobject renderer) {
+	refract_context* context = get_context(env, renderer);
+	jobject values_obj = (*env)->CallStaticObjectMethod(env, function_class, function_values_mid);
+	//jobjectArray* values = (jobjectArray*)&values_obj;
+	return (*env)->GetObjectArrayElement(env, values_obj, (int)context->params.func);
+}
+
+/**
  * Sets the iteration function
  */
 JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setFunction(JNIEnv* env, jobject renderer, jobject function) {
 	refract_context* context = get_context(env, renderer);
-
-	jclass enum_class = (*env)->GetObjectClass(env, function);
-	jmethodID ordinal_method = (*env)->GetMethodID(env, enum_class, "ordinal", "()I");
-	func_t func = (func_t)(*env)->CallIntMethod(env, function, ordinal_method);
+	func_t func = (func_t)(*env)->CallIntMethod(env, function, function_ordinal_mid);
 
 	context->params.func = func;
 	context->cache_valid = false;
@@ -132,6 +147,7 @@ JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setOffset(
 	refract_context* context = get_context(env, renderer);
 	float_t re = (float_t)((*env)->GetDoubleField(env, offset, complex_re_fid));
 	float_t im = (float_t)((*env)->GetDoubleField(env, offset, complex_im_fid));
+
 	context->params.offset.re = (float_t)re;
 	context->params.offset.im = (float_t)im;
 	context->cache_valid = false;
@@ -150,6 +166,7 @@ JNIEXPORT jdouble JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_getZoom
  */
 JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setZoom(JNIEnv* env, jobject renderer, jdouble zoom) {
 	refract_context* context = get_context(env, renderer);
+
 	context->params.zoom = (float_t)zoom;
 	context->cache_valid = false;
 }

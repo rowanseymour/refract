@@ -38,6 +38,12 @@ public interface Renderer {
 	public boolean allocate(int width, int height);
 	
 	/**
+	 * Gets the function
+	 * @return the function
+	 */
+	public Function getFunction();
+	
+	/**
 	 * Sets the function
 	 * @param function the function
 	 */

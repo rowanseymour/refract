@@ -33,6 +33,7 @@ public class NativeRenderer implements Renderer {
 	private long context;
 	
 	@Override public native boolean allocate(int width, int height);
+	@Override public native Function getFunction();
 	@Override public native void setFunction(Function function);
 	@Override public native Complex getOffset();
 	@Override public native void setOffset(Complex offset);
