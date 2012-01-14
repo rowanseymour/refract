@@ -24,5 +24,11 @@
 	        android:title="@string/str_palette"
 	        android:defaultValue="sunset"
 	    />
+		<EditTextPreference 
+	    	android:key="palettesize" 
+	    	android:title="@string/str_palettesize"
+	    	android:defaultValue="@integer/def_palettesize"
+	    	android:numeric="integer"
+		/>
 	</PreferenceCategory>
 </PreferenceScreen>

@@ -106,7 +106,7 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 		Palette palette = Palette.getPresetByName(prefs.getString("palette", "sunset").toLowerCase());
 		
 		renderer.setFunction(iterFunc);
-		renderer.setPalette(palette);
+		renderer.setPalette(palette, 128);
 			
 		if (!rendererThread.isAlive())
 			rendererThread.start();

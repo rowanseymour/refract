@@ -6,6 +6,7 @@
 	<string name="str_function">Function</string>
 	<string name="str_itersperframe">Iterations per frame</string>
 	<string name="str_palette">Palette</string>
+	<string name="str_palettesize">Palette size</string>
 	<string name="str_iterating">Iterating</string>
 	<string name="str_reset">Reset</string>
 	<string name="str_setas">Set as</string>

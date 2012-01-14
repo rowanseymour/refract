@@ -36,7 +36,7 @@ import android.view.MenuItem;
 /**
  * Activity for exploring fractals
  */
-public class ExplorerActivity extends Activity implements RendererView.RendererListener{
+public class ExplorerActivity extends Activity implements RendererView.RendererListener {
 	
 	private RendererView rendererView;
 	private StatusPanel statusPanel;

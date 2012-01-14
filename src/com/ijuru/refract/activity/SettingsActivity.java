@@ -37,7 +37,7 @@ import android.widget.Toast;
 public class SettingsActivity extends PreferenceActivity implements OnPreferenceChangeListener {
 
 	private ListPreference iterFuncPref;
-	private EditTextPreference itersPerFramePref;
+	private EditTextPreference itersPerFramePref, paletteSizePref;
 	
 	/**
 	 * @see android.preference.PreferenceActivity#onCreate(android.os.Bundle)
@@ -53,8 +53,12 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 		itersPerFramePref = (EditTextPreference)getPreferenceScreen().findPreference("itersperframe");
 		itersPerFramePref.setOnPreferenceChangeListener(this);
 		
+		paletteSizePref = (EditTextPreference)getPreferenceScreen().findPreference("palettesize");
+		paletteSizePref.setOnPreferenceChangeListener(this);
+		
 		updatePreferenceSummary(iterFuncPref, iterFuncPref.getValue());
 		updatePreferenceSummary(itersPerFramePref, itersPerFramePref.getText());
+		updatePreferenceSummary(paletteSizePref, paletteSizePref.getText());
 	}
 
 	/**
@@ -64,8 +68,12 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 	public boolean onPreferenceChange(Preference preference, Object value) {
 		Resources res = getResources();
 		
-		if (itersPerFramePref == preference) {
+		if (preference == itersPerFramePref) {
 			if (!validateRange(value, res.getInteger(R.integer.min_itersperframe), res.getInteger(R.integer.max_itersperframe)))
+				return false;
+		} 
+		else if (preference == paletteSizePref) {
+			if (!validateRange(value, res.getInteger(R.integer.min_palettesize), res.getInteger(R.integer.max_palettesize)))
 				return false;
 		}
 		

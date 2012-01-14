@@ -107,6 +107,7 @@ public interface Renderer {
 	/**
 	 * Sets the palette for renders
 	 * @param palette the palette
+	 * @param size the size
 	 */
-	public void setPalette(Palette palette);
+	public void setPalette(Palette palette, int size);
 }

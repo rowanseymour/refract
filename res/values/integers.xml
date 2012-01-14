@@ -3,4 +3,7 @@
     <integer name="min_itersperframe">1</integer>
     <integer name="def_itersperframe">5</integer>
     <integer name="max_itersperframe">50</integer>
+    <integer name="min_palettesize">16</integer>
+    <integer name="def_palettesize">128</integer>
+    <integer name="max_palettesize">1024</integer>
 </resources>

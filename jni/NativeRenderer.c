@@ -33,8 +33,6 @@
 // Set to 1 to enable debug log traces
 #define DEBUG 1
 
-#define PALETTE_SIZE 128
-
 #define NATIVERENDERER_CLASS	"com/ijuru/refract/renderer/NativeRenderer"
 #define FUNCTION_CLASS			"com/ijuru/refract/Function"
 #define COMPLEX_CLASS			"com/ijuru/refract/Complex"
@@ -189,7 +187,7 @@ JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setZoom(JN
 /**
  * Sets the palette
  */
-JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setPalette(JNIEnv* env, jobject renderer, jobject palette) {
+JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setPalette(JNIEnv* env, jobject renderer, jobject palette, jint size) {
 	refract_context* context = get_context(env, renderer);
 
 	// Free existing palette
@@ -215,7 +213,7 @@ JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setPalette
 	jfloat* anchorvals = (*env)->GetFloatArrayElements(env, *anchors, NULL);
 	uint16_t points = (*env)->GetArrayLength(env, *colors);
 
-	context->palette = refract_palette_init((color_t*)colorvals, (float*)anchorvals, points, PALETTE_SIZE);
+	context->palette = refract_palette_init((color_t*)colorvals, (float*)anchorvals, points, size);
 
 	(*env)->ReleaseIntArrayElements(env, *colors, colorvals, 0);
 	(*env)->ReleaseFloatArrayElements(env, *anchors, anchorvals, 0);
