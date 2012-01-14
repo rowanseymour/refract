@@ -39,6 +39,24 @@ public class Complex {
 	}
 	
 	/**
+	 * Adds a complex number to this one
+	 * @param c the complex number
+	 * @return the result
+	 */
+	public Complex add(Complex c) {
+		return new Complex(this.re + c.re, this.im + c.im);
+	}
+	
+	/**
+	 * Subtracts a complex number from this one
+	 * @param c the complex number
+	 * @return the result
+	 */
+	public Complex sub(Complex c) {
+		return new Complex(this.re - c.re, this.im - c.im);
+	}
+	
+	/**
 	 * Calculates the absolute value (i.e. magnitude)
 	 * @return the absolute value
 	 */
