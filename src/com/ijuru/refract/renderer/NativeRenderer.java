@@ -45,4 +45,6 @@ public class NativeRenderer implements Renderer {
 	@Override public native double getZoom();
 	@Override public native void setZoom(double zoom);
 	@Override public native void setPalette(Palette palette, int size);
+	@Override public native int getPaletteOffset();
+	@Override public native void setPaletteOffset(int offset);
 }

@@ -191,12 +191,7 @@ JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setPalette
 	refract_context* context = get_context(env, renderer);
 
 	// Free existing palette
-	if (context->palette) {
-		refract_palette_free(context->palette);
-		context->palette = NULL;
-
-		LOG_D("Freed renderer palette");
-	}
+	refract_palette_free(&context->palette);
 
 	// Get palette object fields
 	jclass palette_class = (*env)->GetObjectClass(env, palette);
@@ -211,14 +206,30 @@ JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setPalette
 	// Get array elements
 	jint* colorvals = (*env)->GetIntArrayElements(env, *colors, NULL);
 	jfloat* anchorvals = (*env)->GetFloatArrayElements(env, *anchors, NULL);
-	uint16_t points = (*env)->GetArrayLength(env, *colors);
+	int points = (*env)->GetArrayLength(env, *colors);
 
-	context->palette = refract_palette_init((color_t*)colorvals, (float*)anchorvals, points, size);
+	refract_palette_init(&context->palette, (color_t*)colorvals, (float*)anchorvals, points, size);
 
 	(*env)->ReleaseIntArrayElements(env, *colors, colorvals, 0);
 	(*env)->ReleaseFloatArrayElements(env, *anchors, anchorvals, 0);
 
 	LOG_D("Updated renderer palette");
+}
+
+/**
+ * Gets the palette offset
+ */
+JNIEXPORT jint JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_getPaletteOffset(JNIEnv* env, jobject renderer) {
+	refract_context* context = get_context(env, renderer);
+	return (jint)context->palette.offset;
+}
+
+/**
+ * Sets the palette offset
+ */
+JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setPaletteOffset(JNIEnv* env, jobject renderer, jint offset) {
+	refract_context* context = get_context(env, renderer);
+	context->palette.offset = (int)offset;
 }
 
 /**

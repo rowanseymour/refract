@@ -24,8 +24,8 @@
  */
 void refract_iterate_m2(refract_context* context, complex_t offset, float_t zoom, iterc_t max_iters, bool use_cache) {
 	// Calculate screen dimensions
-	const uint16_t half_cx = context->width / 2;
-	const uint16_t half_cy = context->height / 2;
+	const int half_cx = context->width / 2;
+	const int half_cy = context->height / 2;
 	const float_t offset_x = offset.re;
 	const float_t offset_y = offset.im;
 	const float_t inv_zoom = 1 / zoom;
@@ -89,8 +89,8 @@ void refract_iterate_m2(refract_context* context, complex_t offset, float_t zoom
  */
 void refract_iterate_m3(refract_context* context, complex_t offset, float_t zoom, iterc_t max_iters, bool use_cache) {
 	// Calculate screen dimensions
-	const uint16_t half_cx = context->width / 2;
-	const uint16_t half_cy = context->height / 2;
+	const int half_cx = context->width / 2;
+	const int half_cy = context->height / 2;
 	const float_t offset_x = offset.re;
 	const float_t offset_y = offset.im;
 	const float_t inv_zoom = 1 / zoom;
@@ -154,8 +154,8 @@ void refract_iterate_m3(refract_context* context, complex_t offset, float_t zoom
  */
 void refract_iterate_m4(refract_context* context, complex_t offset, float_t zoom, iterc_t max_iters, bool use_cache) {
 	// Calculate screen dimensions
-	const uint16_t half_cx = context->width / 2;
-	const uint16_t half_cy = context->height / 2;
+	const int half_cx = context->width / 2;
+	const int half_cy = context->height / 2;
 	const float_t offset_x = offset.re;
 	const float_t offset_y = offset.im;
 	const float_t inv_zoom = 1 / zoom;

@@ -20,14 +20,15 @@
 #include "inc/refract.h"
 
 /**
- * Initializes and allocates a palette
+ * Initializes a palette
  */
-palette_t* refract_palette_init(color_t* colors, float* anchors, uint16_t points, uint32_t size) {
-	palette_t* palette = malloc(sizeof (palette_t));
-
+bool refract_palette_init(palette_t* palette, color_t* colors, float* anchors, int points, int size) {
 	palette->size = size;
+	palette->offset = 0;
 	palette->colors = malloc(sizeof (color_t) * size);
-	//memset(palette->colors, 0, sizeof (color_t) * size);
+
+	if (!colors)
+		return false;
 
 	int index = -1;
 
@@ -58,12 +59,12 @@ palette_t* refract_palette_init(color_t* colors, float* anchors, uint16_t points
 		}
 	}
 
-	return palette;
+	return true;
 }
 
 void refract_palette_free(palette_t* palette) {
 	if (palette->colors)
 		free(palette->colors);
 
-	free(palette);
+	palette->colors = NULL;
 }

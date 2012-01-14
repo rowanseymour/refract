@@ -110,4 +110,16 @@ public interface Renderer {
 	 * @param size the size
 	 */
 	public void setPalette(Palette palette, int size);
+	
+	/**
+	 * Gets the palette offset
+	 * @return the offset
+	 */
+	public int getPaletteOffset();
+	
+	/**
+	 * Sets the palette offset
+	 * @param offset the offset
+	 */
+	public void setPaletteOffset(int offset);
 }

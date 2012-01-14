@@ -22,7 +22,7 @@
 /**
  * Allocates a context
  */
-refract_context* refract_init(uint16_t width, uint16_t height) {
+refract_context* refract_init(int width, int height) {
 	// Allocate context
 	refract_context* context = (refract_context*)malloc(sizeof (refract_context));
 	if (!context)
@@ -86,8 +86,9 @@ void refract_render(refract_context* context, color_t* pixels, int stride) {
 
 	// Gather up frequently used items
 	const iterc_t* restrict iters = context->iter_cache;
-	const color_t* restrict colors = context->palette->colors;
-	const uint16_t palsize = context->palette->size;
+	const color_t* restrict colors = context->palette.colors;
+	const int pal_size = context->palette.size;
+	const int pal_offset = context->palette.offset;
 
 	// Render cached iteration values into pixels
 	color_t* restrict line = pixels;
@@ -95,7 +96,8 @@ void refract_render(refract_context* context, color_t* pixels, int stride) {
 	for (int y = 0, index = 0; y < context->height; ++y) {
 		for (int x = 0; x < context->width; ++x, ++index) {
 			iterc_t iterc = iters[index];
-			line[x] = (iterc == max_iters) ? BLACK : colors[iterc % palsize];
+			int pal_index = (iterc + pal_offset) % pal_size;
+			line[x] = (iterc == max_iters) ? BLACK : colors[pal_index];
 		}
 
 		// go to next line
@@ -107,8 +109,8 @@ void refract_render(refract_context* context, color_t* pixels, int stride) {
  * Frees a context
  */
 void refract_free(refract_context* context) {
-	// Free palette
-	refract_palette_free(context->palette);
+	// Free context's palette
+	refract_palette_free(&context->palette);
 
 	// Free cache buffers
 	if (context->iter_cache)

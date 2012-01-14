@@ -65,7 +65,8 @@ typedef struct {
  * Palette
  */
 typedef struct {
-	uint16_t size;
+	int size;
+	int offset;
 	color_t* colors;
 
 } palette_t;
@@ -74,10 +75,10 @@ typedef struct {
  * Rendering context
  */
 typedef struct {
-	uint16_t width;
-	uint16_t height;
+	int width;
+	int height;
 	params_t params;
-	palette_t* palette;
+	palette_t palette;
 
 	bool cache_valid;
 	iterc_t cache_max_iters;
@@ -89,7 +90,7 @@ typedef struct {
 /**
  * Context functions
  */
-refract_context* refract_init(uint16_t width, uint16_t height);
+refract_context* refract_init(int width, int height);
 void refract_iterate(refract_context* context, iterc_t iters, params_t params, bool use_cache);
 void refract_render(refract_context* context, color_t* pixels, int stride);
 void refract_free(refract_context* context);
@@ -105,5 +106,5 @@ void refract_iterate_m4(refract_context* context, complex_t offset, float_t zoom
 /**
  * Palette functions
  */
-palette_t* refract_palette_init(color_t* colors, float* anchors, uint16_t points, uint32_t size);
+bool refract_palette_init(palette_t* palette, color_t* colors, float* anchors, int points, int size);
 void refract_palette_free(palette_t* palette);
