@@ -13,7 +13,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.PreferencesActivity" android:label="@string/str_preferences"></activity>
+        <activity android:name=".activity.SettingsActivity" android:label="@string/str_settings"></activity>
     </application>
 
 </manifest>

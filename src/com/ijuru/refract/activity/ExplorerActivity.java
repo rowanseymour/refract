@@ -66,8 +66,14 @@ public class ExplorerActivity extends Activity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.menupreferences:
-			startActivity(new Intent(getApplicationContext(), PreferencesActivity.class));
+		case R.id.menureset:
+			// TODO
+	    	break;
+		case R.id.menusettings:
+			startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
+	    	break;
+		case R.id.menusetas:
+			// TODO
 	    	break;
 	    case R.id.menuabout:
 	    	onMenuAbout();

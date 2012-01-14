@@ -34,7 +34,7 @@ import android.widget.Toast;
 /**
  * Activity for application preferences
  */
-public class PreferencesActivity extends PreferenceActivity implements OnPreferenceChangeListener {
+public class SettingsActivity extends PreferenceActivity implements OnPreferenceChangeListener {
 
 	private ListPreference iterFuncPref;
 	private EditTextPreference itersPerFramePref;

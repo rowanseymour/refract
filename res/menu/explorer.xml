@@ -1,13 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
-    <item 
-        android:id="@+id/menupreferences" 
-        android:title="@string/str_preferences" 
-        android:icon="@android:drawable/ic_menu_preferences"
-    />
-    <item 
-        android:id="@+id/menuabout" 
-        android:title="@string/str_about" 
-        android:icon="@android:drawable/ic_menu_info_details"
-    />
+	<item 
+		android:id="@+id/menureset" 
+		android:title="@string/str_reset" 
+		android:icon="@drawable/ic_menu_reset"
+	/>
+	<item 
+		android:id="@+id/menusettings" 
+		android:title="@string/str_settings" 
+		android:icon="@drawable/ic_menu_settings"
+	/>
+	<item 
+		android:id="@+id/menusetas" 
+		android:title="@string/str_setas" 
+		android:icon="@drawable/ic_menu_setas"
+		android:enabled="false"
+	/>
+	<item 
+		android:id="@+id/menuabout" 
+		android:title="@string/str_about" 
+		android:icon="@drawable/ic_menu_about"
+	/>
 </menu>
