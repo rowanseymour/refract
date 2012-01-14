@@ -35,6 +35,7 @@ import android.graphics.Bitmap.Config;
 import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.SurfaceHolder;
@@ -53,11 +54,9 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	
 	// Rendering parameters
 	private int itersPerFrame;
-	
-	// For dragging / panning
-	private double oldMouseX, oldMouseY;
 
-	// For pinch zooming
+	// For panning and zooming
+	private GestureDetector panDetector;
 	private ScaleGestureDetector scaleDetector;
 	
 	public RendererView(Context context, AttributeSet attrs) {
@@ -65,6 +64,7 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 		
 		getHolder().addCallback(this);
 		
+		panDetector = new GestureDetector(context, new PanListener());
 		scaleDetector = new ScaleGestureDetector(context, new ZoomListener());
 	}
 	
@@ -179,34 +179,34 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	 */
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
+		// Let the gesture detectors handle the event
+		panDetector.onTouchEvent(event);
 		scaleDetector.onTouchEvent(event);
 		
-		if (renderer == null)
-			return false;
-		
-		switch (event.getAction()) {
-		case (MotionEvent.ACTION_DOWN): // Touch screen pressed
-			oldMouseX = event.getX();
-			oldMouseY = event.getY();
-			break;
-		case (MotionEvent.ACTION_MOVE): // Dragged finger
-			if (!scaleDetector.isInProgress()) {
-				double zoom = renderer.getZoom();
-				Complex offset = renderer.getOffset();
-				offset.re += (oldMouseX - event.getX()) / zoom;
-				offset.im -= (oldMouseY - event.getY()) / zoom;
-				renderer.setOffset(offset);
-				oldMouseX = event.getX();
-				oldMouseY = event.getY();
-				
-				// Update listener
-				if (listener != null)
-					listener.onOffsetChanged(RendererView.this, offset);
-			}
-			break;
-		}
-		
 		return true;
+	}
+	
+	/**
+	 * Listener for drag-pan gestures
+	 */
+	private class PanListener extends GestureDetector.SimpleOnGestureListener {
+		
+		/**
+		 * @see GestureDetector.SimpleOnGestureListener#onScroll(MotionEvent, MotionEvent, float, float)
+		 */
+		@Override
+		public boolean onScroll(MotionEvent event1, MotionEvent event2, float distanceX, float distanceY) {
+			double zoom = renderer.getZoom();
+			Complex offset = renderer.getOffset();
+			Complex delta = new Complex(distanceX / zoom, -distanceY / zoom);
+			renderer.setOffset(offset.add(delta));
+			
+			// Update listener
+			if (listener != null)
+				listener.onOffsetChanged(RendererView.this, offset);
+			
+			return true;
+		}
 	}
 	
 	/**
