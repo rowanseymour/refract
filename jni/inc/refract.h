@@ -88,25 +88,17 @@ typedef struct {
 	iterc_t cache_max_iters;
 	complex_t* z_cache;
 
-} refract_context;
+} renderer_t;
 
 /**
- * Context functions
+ * Renderer functions
  */
-bool refract_init(refract_context* context, int width, int height);
-void refract_iterate(refract_context* context, iterc_t iters, params_t params, bool use_cache);
-void refract_render(refract_context* context, color_t* pixels, int stride);
-bool refract_acquire_lock(refract_context* context);
-bool refract_release_lock(refract_context* context);
-void refract_free(refract_context* context);
-
-/**
- * Iteration functions
- */
-void refract_iterate_m2(refract_context* context, complex_t offset, float_t zoom, iterc_t max_iters, bool use_cache);
-void refract_iterate_m3(refract_context* context, complex_t offset, float_t zoom, iterc_t max_iters, bool use_cache);
-void refract_iterate_m4(refract_context* context, complex_t offset, float_t zoom, iterc_t max_iters, bool use_cache);
-
+bool refract_renderer_init(renderer_t* renderer, int width, int height);
+void refract_renderer_iterate(renderer_t* renderer, iterc_t iters, params_t params, bool use_cache);
+void refract_renderer_render(renderer_t* renderer, color_t* pixels, int stride);
+bool refract_renderer_acquire_lock(renderer_t* renderer);
+bool refract_renderer_release_lock(renderer_t* renderer);
+void refract_renderer_free(renderer_t* renderer);
 
 /**
  * Palette functions

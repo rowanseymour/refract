@@ -30,7 +30,10 @@ import android.graphics.Bitmap;
  */
 public class NativeRenderer implements Renderer {
 	
-	private long context;
+	/**
+	 * Used by native code
+	 */
+	private long renderer;
 	
 	@Override public native boolean allocate(int width, int height);
 	@Override public native int iterate(int iters);

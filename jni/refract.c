@@ -20,34 +20,41 @@
 #include "inc/refract.h"
 
 /**
- * Allocates a context
+ * Iteration functions from iterate.h
  */
-bool refract_init(refract_context* context, int width, int height) {
-	// Initialize context
-	memset(context, 0, sizeof (refract_context));
-	context->width = width;
-	context->height = height;
-	context->params.func = MANDELBROT;
-	context->params.offset.re = 0;
-	context->params.offset.im = 0;
-	context->params.zoom = width / 2;
+void refract_renderer_iterate_m2(renderer_t* renderer, complex_t offset, float_t zoom, iterc_t max_iters, bool use_cache);
+void refract_renderer_iterate_m3(renderer_t* renderer, complex_t offset, float_t zoom, iterc_t max_iters, bool use_cache);
+void refract_renderer_iterate_m4(renderer_t* renderer, complex_t offset, float_t zoom, iterc_t max_iters, bool use_cache);
+
+/**
+ * Allocates a renderer
+ */
+bool refract_renderer_init(renderer_t* renderer, int width, int height) {
+	// Initialize renderer
+	memset(renderer, 0, sizeof (renderer_t));
+	renderer->width = width;
+	renderer->height = height;
+	renderer->params.func = MANDELBROT;
+	renderer->params.offset.re = 0;
+	renderer->params.offset.im = 0;
+	renderer->params.zoom = width / 2;
 
 	// Allocate buffers
-	context->iter_buffer = malloc(sizeof (iterc_t) * width * height);
-	context->z_cache = malloc(sizeof (complex_t) * width * height);
+	renderer->iter_buffer = malloc(sizeof (iterc_t) * width * height);
+	renderer->z_cache = malloc(sizeof (complex_t) * width * height);
 
 	// Check buffers were allocated
-	if (!context->iter_buffer || !context->z_cache) {
-		refract_free(context);
+	if (!renderer->iter_buffer || !renderer->z_cache) {
+		refract_renderer_free(renderer);
 		return false;
 	}
 
 	// Zeroize cache buffers
-	memset(context->iter_buffer, 0, sizeof (iterc_t) * width * height);
-	memset(context->z_cache, 0, sizeof (complex_t) * width * height);
+	memset(renderer->iter_buffer, 0, sizeof (iterc_t) * width * height);
+	memset(renderer->z_cache, 0, sizeof (complex_t) * width * height);
 
 	// Initialize renderer mutex
-	pthread_mutex_init(&context->mutex, NULL);
+	pthread_mutex_init(&renderer->mutex, NULL);
 
 	return true;
 }
@@ -55,44 +62,44 @@ bool refract_init(refract_context* context, int width, int height) {
 /**
  * Performs iterations
  */
-void refract_iterate(refract_context* context, iterc_t iters, params_t params, bool use_cache) {
+void refract_renderer_iterate(renderer_t* renderer, iterc_t iters, params_t params, bool use_cache) {
 	// Increment or reset max-iters depending on whether we'll be using the cache
-	iterc_t max_iters = use_cache ? (context->cache_max_iters + iters) : iters;
+	iterc_t max_iters = use_cache ? (renderer->cache_max_iters + iters) : iters;
 
 	switch (params.func) {
 	case MANDELBROT:
-		refract_iterate_m2(context, params.offset, params.zoom, max_iters, use_cache);
+		refract_renderer_iterate_m2(renderer, params.offset, params.zoom, max_iters, use_cache);
 		break;
 	case MANDELBROT_3:
-		refract_iterate_m3(context, params.offset, params.zoom, max_iters, use_cache);
+		refract_renderer_iterate_m3(renderer, params.offset, params.zoom, max_iters, use_cache);
 		break;
 	case MANDELBROT_4:
-		refract_iterate_m4(context, params.offset, params.zoom, max_iters, use_cache);
+		refract_renderer_iterate_m4(renderer, params.offset, params.zoom, max_iters, use_cache);
 		break;
 	}
 
 	// Update cache status
-	context->cache_max_iters = max_iters;
+	renderer->cache_max_iters = max_iters;
 }
 
 /**
- * Renders a context to the given pixel buffer
+ * Renders a renderer to the given pixel buffer
  */
-void refract_render(refract_context* context, color_t* pixels, int stride) {
+void refract_renderer_render(renderer_t* renderer, color_t* pixels, int stride) {
 	// Number of iters to be considered in the set
-	const iterc_t max_iters = context->cache_max_iters;
+	const iterc_t max_iters = renderer->cache_max_iters;
 
 	// Gather up frequently used items
-	const iterc_t* restrict iter_buffer = context->iter_buffer;
-	const color_t* restrict colors = context->palette.colors;
-	const int pal_size = context->palette.size;
-	const int pal_offset = context->palette.offset;
+	const iterc_t* restrict iter_buffer = renderer->iter_buffer;
+	const color_t* restrict colors = renderer->palette.colors;
+	const int pal_size = renderer->palette.size;
+	const int pal_offset = renderer->palette.offset;
 
 	// Render cached iteration values into pixels
 	color_t* restrict line = pixels;
 
-	for (int y = 0, index = 0; y < context->height; ++y) {
-		for (int x = 0; x < context->width; ++x, ++index) {
+	for (int y = 0, index = 0; y < renderer->height; ++y) {
+		for (int x = 0; x < renderer->width; ++x, ++index) {
 			iterc_t iterc = iter_buffer[index];
 			int pal_index = (iterc + pal_offset) % pal_size;
 			line[x] = (iterc == max_iters) ? BLACK : colors[pal_index];
@@ -106,30 +113,34 @@ void refract_render(refract_context* context, color_t* pixels, int stride) {
 /**
  * Acquires lock on the renderer
  */
-bool refract_acquire_lock(refract_context* context) {
-	return pthread_mutex_lock(&context->mutex) == 0;
+bool refract_renderer_acquire_lock(renderer_t* renderer) {
+	return pthread_mutex_lock(&renderer->mutex) == 0;
 }
 
 /**
  * Releases lock on the renderer
  */
-bool refract_release_lock(refract_context* context) {
-	return pthread_mutex_unlock(&context->mutex) == 0;
+bool refract_renderer_release_lock(renderer_t* renderer) {
+	return pthread_mutex_unlock(&renderer->mutex) == 0;
 }
 
 /**
- * Frees a context
+ * Frees a renderer
  */
-void refract_free(refract_context* context) {
-	// Free context's palette
-	refract_palette_free(&context->palette);
+void refract_renderer_free(renderer_t* renderer) {
+	// Free renderer's palette
+	refract_palette_free(&renderer->palette);
 
 	// Free buffers
-	if (context->iter_buffer)
-		free(context->iter_buffer);
-	if (context->z_cache)
-		free(context->z_cache);
+	if (renderer->iter_buffer) {
+		free(renderer->iter_buffer);
+		renderer->iter_buffer = NULL;
+	}
+	if (renderer->z_cache) {
+		free(renderer->z_cache);
+		renderer->z_cache = NULL;
+	}
 
 	// Free render params mutex
-	pthread_mutex_destroy(&context->mutex);
+	pthread_mutex_destroy(&renderer->mutex);
 }

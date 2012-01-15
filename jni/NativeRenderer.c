@@ -38,8 +38,8 @@
 #define COMPLEX_CLASS			"com/ijuru/refract/Complex"
 
 // Cached Java entities
-jclass renderer_class, complex_class, function_class;
-jfieldID renderer_context_fid, complex_re_fid, complex_im_fid;
+jclass nativerenderer_class, complex_class, function_class;
+jfieldID nativerenderer_renderer_fid, complex_re_fid, complex_im_fid;
 jmethodID function_ordinal_mid, function_values_mid, complex_cid;
 
 /**
@@ -54,8 +54,8 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* jvm, void* reserved)
 
 	// Cache Java classes
 	jclass cls = (*env)->FindClass(env, NATIVERENDERER_CLASS);
-	renderer_class = (*env)->NewGlobalRef(env, cls);
-	renderer_context_fid = (*env)->GetFieldID(env, renderer_class, "context", "J");
+	nativerenderer_class = (*env)->NewGlobalRef(env, cls);
+	nativerenderer_renderer_fid = (*env)->GetFieldID(env, nativerenderer_class, "renderer", "J");
 
 	cls = (*env)->FindClass(env, FUNCTION_CLASS);
 	function_class = (*env)->NewGlobalRef(env, cls);
@@ -79,38 +79,38 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* jvm, void* reserved) {
 	if ((*jvm)->GetEnv(jvm, (void**)&env, JNI_VERSION_1_4))
 		return;
 
-	(*env)->DeleteGlobalRef(env, renderer_class);
+	(*env)->DeleteGlobalRef(env, nativerenderer_class);
 	(*env)->DeleteGlobalRef(env, function_class);
 	(*env)->DeleteGlobalRef(env, complex_class);
 }
 
 /**
- * Gets the context field of a Renderer object
+ * Gets the renderer field of a NativeRenderer object
  */
-static refract_context* get_context(JNIEnv* env, jobject renderer) {
-	return (refract_context*)(intptr_t)((*env)->GetLongField(env, renderer, renderer_context_fid));
+static renderer_t* get_renderer(JNIEnv* env, jobject this) {
+	return (renderer_t*)(intptr_t)((*env)->GetLongField(env, this, nativerenderer_renderer_fid));
 }
 
 /**
- * Sets the context field of a Renderer object
+ * Sets the renderer field of a NativeRenderer object
  */
-static void set_context(JNIEnv* env, jobject renderer, refract_context* context) {
-	(*env)->SetLongField(env, renderer, renderer_context_fid, (jlong)(intptr_t)context);
+static void set_renderer(JNIEnv* env, jobject this, renderer_t* renderer) {
+	(*env)->SetLongField(env, this, nativerenderer_renderer_fid, (jlong)(intptr_t)renderer);
 }
 
 /**
- * Allocates the context for the given renderer
+ * Allocates the renderer for the given renderer
  */
-JNIEXPORT jboolean JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_allocate(JNIEnv* env, jobject renderer, jint width, jint height) {
-	// Allocate context object
-	refract_context* context = (refract_context*)malloc(sizeof (refract_context));
-	if (!context)
+JNIEXPORT jboolean JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_allocate(JNIEnv* env, jobject this, jint width, jint height) {
+	// Allocate renderer object
+	renderer_t* renderer = (renderer_t*)malloc(sizeof (renderer_t));
+	if (!renderer)
 		return false;
 
 	// Initialize it
-	if (refract_init(context, width, height)) {
+	if (refract_renderer_init(renderer, width, height)) {
 		// Store pointer on Java object
-		set_context(env, renderer, context);
+		set_renderer(env, this, renderer);
 
 		LOG_D("Allocated renderer internal resources");
 		return true;
@@ -124,97 +124,97 @@ JNIEXPORT jboolean JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_alloca
 /**
  * Gets the width
  */
-JNIEXPORT jint JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_getWidth(JNIEnv* env, jobject renderer) {
-	refract_context* context = get_context(env, renderer);
-	return (jint)context->width;
+JNIEXPORT jint JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_getWidth(JNIEnv* env, jobject this) {
+	renderer_t* renderer = get_renderer(env, this);
+	return (jint)renderer->width;
 }
 
 /**
  * Gets the height
  */
-JNIEXPORT jint JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_getHeight(JNIEnv* env, jobject renderer) {
-	refract_context* context = get_context(env, renderer);
-	return (jint)context->height;
+JNIEXPORT jint JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_getHeight(JNIEnv* env, jobject this) {
+	renderer_t* renderer = get_renderer(env, this);
+	return (jint)renderer->height;
 }
 
 /**
  * Gets the iteration function
  */
-JNIEXPORT jobject JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_getFunction(JNIEnv* env, jobject renderer) {
-	refract_context* context = get_context(env, renderer);
+JNIEXPORT jobject JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_getFunction(JNIEnv* env, jobject this) {
+	renderer_t* renderer = get_renderer(env, this);
 	jobject values_obj = (*env)->CallStaticObjectMethod(env, function_class, function_values_mid);
-	return (*env)->GetObjectArrayElement(env, values_obj, (int)context->params.func);
+	return (*env)->GetObjectArrayElement(env, values_obj, (int)renderer->params.func);
 }
 
 /**
  * Sets the iteration function
  */
-JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setFunction(JNIEnv* env, jobject renderer, jobject function) {
-	refract_context* context = get_context(env, renderer);
-	refract_acquire_lock(context);
+JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setFunction(JNIEnv* env, jobject this, jobject function) {
+	renderer_t* renderer = get_renderer(env, this);
+	refract_renderer_acquire_lock(renderer);
 
 	func_t func = (func_t)(*env)->CallIntMethod(env, function, function_ordinal_mid);
 
-	context->params.func = func;
-	context->cache_valid = false;
+	renderer->params.func = func;
+	renderer->cache_valid = false;
 
-	refract_release_lock(context);
+	refract_renderer_release_lock(renderer);
 }
 
 /**
  * Gets the offset in complex space
  */
-JNIEXPORT jobject JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_getOffset(JNIEnv* env, jobject renderer) {
-	refract_context* context = get_context(env, renderer);
-	return (*env)->NewObject(env, complex_class, complex_cid, (jdouble)context->params.offset.re, (jdouble)context->params.offset.im);
+JNIEXPORT jobject JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_getOffset(JNIEnv* env, jobject this) {
+	renderer_t* renderer = get_renderer(env, this);
+	return (*env)->NewObject(env, complex_class, complex_cid, (jdouble)renderer->params.offset.re, (jdouble)renderer->params.offset.im);
 }
 
 /**
  * Sets the offset in complex space
  */
-JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setOffset(JNIEnv* env, jobject renderer, jobject offset) {
-	refract_context* context = get_context(env, renderer);
-	refract_acquire_lock(context);
+JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setOffset(JNIEnv* env, jobject this, jobject offset) {
+	renderer_t* renderer = get_renderer(env, this);
+	refract_renderer_acquire_lock(renderer);
 
 	float_t re = (float_t)((*env)->GetDoubleField(env, offset, complex_re_fid));
 	float_t im = (float_t)((*env)->GetDoubleField(env, offset, complex_im_fid));
 
-	context->params.offset.re = (float_t)re;
-	context->params.offset.im = (float_t)im;
-	context->cache_valid = false;
+	renderer->params.offset.re = (float_t)re;
+	renderer->params.offset.im = (float_t)im;
+	renderer->cache_valid = false;
 
-	refract_release_lock(context);
+	refract_renderer_release_lock(renderer);
 }
 
 /**
  * Sets the iteration function
  */
-JNIEXPORT jdouble JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_getZoom(JNIEnv* env, jobject renderer) {
-	refract_context* context = get_context(env, renderer);
-	return (jdouble)context->params.zoom;
+JNIEXPORT jdouble JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_getZoom(JNIEnv* env, jobject this) {
+	renderer_t* renderer = get_renderer(env, this);
+	return (jdouble)renderer->params.zoom;
 }
 
 /**
  * Sets the iteration function
  */
-JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setZoom(JNIEnv* env, jobject renderer, jdouble zoom) {
-	refract_context* context = get_context(env, renderer);
-	refract_acquire_lock(context);
+JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setZoom(JNIEnv* env, jobject this, jdouble zoom) {
+	renderer_t* renderer = get_renderer(env, this);
+	refract_renderer_acquire_lock(renderer);
 
-	context->params.zoom = (float_t)zoom;
-	context->cache_valid = false;
+	renderer->params.zoom = (float_t)zoom;
+	renderer->cache_valid = false;
 
-	refract_release_lock(context);
+	refract_renderer_release_lock(renderer);
 }
 
 /**
  * Sets the palette
  */
-JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setPalette(JNIEnv* env, jobject renderer, jobject palette, jint size) {
-	refract_context* context = get_context(env, renderer);
+JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setPalette(JNIEnv* env, jobject this, jobject palette, jint size) {
+	renderer_t* renderer = get_renderer(env, this);
 
 	// Free existing palette
-	refract_palette_free(&context->palette);
+	refract_palette_free(&renderer->palette);
 
 	// Get palette object fields
 	jclass palette_class = (*env)->GetObjectClass(env, palette);
@@ -231,7 +231,7 @@ JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setPalette
 	jfloat* anchorvals = (*env)->GetFloatArrayElements(env, *anchors, NULL);
 	int points = (*env)->GetArrayLength(env, *colors);
 
-	refract_palette_init(&context->palette, (color_t*)colorvals, (float*)anchorvals, points, size);
+	refract_palette_init(&renderer->palette, (color_t*)colorvals, (float*)anchorvals, points, size);
 
 	(*env)->ReleaseIntArrayElements(env, *colors, colorvals, 0);
 	(*env)->ReleaseFloatArrayElements(env, *anchors, anchorvals, 0);
@@ -242,45 +242,45 @@ JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setPalette
 /**
  * Gets the palette offset
  */
-JNIEXPORT jint JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_getPaletteOffset(JNIEnv* env, jobject renderer) {
-	refract_context* context = get_context(env, renderer);
-	return (jint)context->palette.offset;
+JNIEXPORT jint JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_getPaletteOffset(JNIEnv* env, jobject this) {
+	renderer_t* renderer = get_renderer(env, this);
+	return (jint)renderer->palette.offset;
 }
 
 /**
  * Sets the palette offset
  */
-JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setPaletteOffset(JNIEnv* env, jobject renderer, jint offset) {
-	refract_context* context = get_context(env, renderer);
-	context->palette.offset = (int)offset;
+JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setPaletteOffset(JNIEnv* env, jobject this, jint offset) {
+	renderer_t* renderer = get_renderer(env, this);
+	renderer->palette.offset = (int)offset;
 }
 
 /**
- * Updates (i.e. renders a frame) the refract context for the given FractalRenderer
+ * Updates (i.e. renders a frame) the refract renderer for the given FractalRenderer
  */
-JNIEXPORT jint JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_iterate(JNIEnv* env, jobject obj, jint iters) {
-	refract_context* context = get_context(env, obj);
+JNIEXPORT jint JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_iterate(JNIEnv* env, jobject this, jint iters) {
+	renderer_t* renderer = get_renderer(env, this);
 
 	// Another thread might try to change the render parameters
-	refract_acquire_lock(context);
+	refract_renderer_acquire_lock(renderer);
 
 	// Gather the parameters for these iterations while we have exclusive access
-	params_t params = context->params;
-	bool use_cache = context->cache_valid;
-	context->cache_valid = true;
+	params_t params = renderer->params;
+	bool use_cache = renderer->cache_valid;
+	renderer->cache_valid = true;
 
-	refract_release_lock(context);
+	refract_renderer_release_lock(renderer);
 
-	refract_iterate(context, (iterc_t)iters, params, use_cache);
+	refract_renderer_iterate(renderer, (iterc_t)iters, params, use_cache);
 
-	return context->cache_max_iters;
+	return renderer->cache_max_iters;
 }
 
 /**
- * Updates (i.e. renders a frame) the refract context for the given FractalRenderer
+ * Updates (i.e. renders a frame) the refract renderer for the given FractalRenderer
  */
-JNIEXPORT jboolean JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_render(JNIEnv* env, jobject obj, jobject bitmap) {
-	refract_context* context = get_context(env, obj);
+JNIEXPORT jboolean JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_render(JNIEnv* env, jobject this, jobject bitmap) {
+	renderer_t* renderer = get_renderer(env, this);
 
 	AndroidBitmapInfo info;
 	AndroidBitmap_getInfo(env, bitmap, &info);
@@ -293,24 +293,24 @@ JNIEXPORT jboolean JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_render
 		return (jboolean)false;
 	}
 
-	refract_render(context, pixels, info.stride);
+	refract_renderer_render(renderer, pixels, info.stride);
 
 	AndroidBitmap_unlockPixels(env, bitmap);
 	return (jboolean)true;
 }
 
 /**
- * Frees the context for the given renderer
+ * Frees the renderer for the given renderer
  */
-JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_free(JNIEnv* env, jobject renderer) {
-	refract_context* context = get_context(env, renderer);
+JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_free(JNIEnv* env, jobject this) {
+	renderer_t* renderer = get_renderer(env, this);
 
-	refract_free(context);
+	refract_renderer_free(renderer);
 
-	// Free context object itself
-	free(context);
+	// Free renderer object itself
+	free(renderer);
 
-	set_context(env, renderer, NULL);
+	set_renderer(env, this, NULL);
 
 	LOG_D("Freed renderer internal resources");
 }

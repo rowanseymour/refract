@@ -22,21 +22,21 @@
 /**
  * Iterates z = z^2 + c
  */
-void refract_iterate_m2(refract_context* context, complex_t offset, float_t zoom, iterc_t max_iters, bool use_cache) {
+void refract_renderer_iterate_m2(renderer_t* renderer, complex_t offset, float_t zoom, iterc_t max_iters, bool use_cache) {
 	// Calculate screen dimensions
-	const int half_cx = context->width / 2;
-	const int half_cy = context->height / 2;
+	const int half_cx = renderer->width / 2;
+	const int half_cy = renderer->height / 2;
 	const float_t offset_x = offset.re;
 	const float_t offset_y = offset.im;
 	const float_t inv_zoom = 1 / zoom;
-	const iterc_t cache_max_iters = context->cache_max_iters;
+	const iterc_t cache_max_iters = renderer->cache_max_iters;
 
 	// Allow optimized access to memory locations
-	iterc_t* restrict iter_buffer = context->iter_buffer;
-	complex_t* restrict z_cache = context->z_cache;
+	iterc_t* restrict iter_buffer = renderer->iter_buffer;
+	complex_t* restrict z_cache = renderer->z_cache;
 
-	for (int y = 0, index = 0; y < context->height; ++y) {
-		for (int x = 0; x < context->width; ++x, ++index) {
+	for (int y = 0, index = 0; y < renderer->height; ++y) {
+		for (int x = 0; x < renderer->width; ++x, ++index) {
 			iterc_t iters;
 			float_t zr, zi;
 
@@ -89,21 +89,21 @@ void refract_iterate_m2(refract_context* context, complex_t offset, float_t zoom
 /**
  * Iterates z = z^3 + c
  */
-void refract_iterate_m3(refract_context* context, complex_t offset, float_t zoom, iterc_t max_iters, bool use_cache) {
+void refract_renderer_iterate_m3(renderer_t* renderer, complex_t offset, float_t zoom, iterc_t max_iters, bool use_cache) {
 	// Calculate screen dimensions
-	const int half_cx = context->width / 2;
-	const int half_cy = context->height / 2;
+	const int half_cx = renderer->width / 2;
+	const int half_cy = renderer->height / 2;
 	const float_t offset_x = offset.re;
 	const float_t offset_y = offset.im;
 	const float_t inv_zoom = 1 / zoom;
-	const iterc_t cache_max_iters = context->cache_max_iters;
+	const iterc_t cache_max_iters = renderer->cache_max_iters;
 
 	// Allow optimized access to memory locations
-	iterc_t* restrict iter_buffer = context->iter_buffer;
-	complex_t* restrict z_cache = context->z_cache;
+	iterc_t* restrict iter_buffer = renderer->iter_buffer;
+	complex_t* restrict z_cache = renderer->z_cache;
 
-	for (int y = 0, index = 0; y < context->height; ++y) {
-		for (int x = 0; x < context->width; ++x, ++index) {
+	for (int y = 0, index = 0; y < renderer->height; ++y) {
+		for (int x = 0; x < renderer->width; ++x, ++index) {
 			iterc_t iters;
 			float_t zr, zi;
 
@@ -156,21 +156,21 @@ void refract_iterate_m3(refract_context* context, complex_t offset, float_t zoom
 /**
  * Iterates z = z^4 + c
  */
-void refract_iterate_m4(refract_context* context, complex_t offset, float_t zoom, iterc_t max_iters, bool use_cache) {
+void refract_renderer_iterate_m4(renderer_t* renderer, complex_t offset, float_t zoom, iterc_t max_iters, bool use_cache) {
 	// Calculate screen dimensions
-	const int half_cx = context->width / 2;
-	const int half_cy = context->height / 2;
+	const int half_cx = renderer->width / 2;
+	const int half_cy = renderer->height / 2;
 	const float_t offset_x = offset.re;
 	const float_t offset_y = offset.im;
 	const float_t inv_zoom = 1 / zoom;
-	const iterc_t cache_max_iters = context->cache_max_iters;
+	const iterc_t cache_max_iters = renderer->cache_max_iters;
 
 	// Allow optimized access to memory locations
-	iterc_t* restrict iter_buffer = context->iter_buffer;
-	complex_t* restrict z_cache = context->z_cache;
+	iterc_t* restrict iter_buffer = renderer->iter_buffer;
+	complex_t* restrict z_cache = renderer->z_cache;
 
-	for (int y = 0, index = 0; y < context->height; ++y) {
-		for (int x = 0; x < context->width; ++x, ++index) {
+	for (int y = 0, index = 0; y < renderer->height; ++y) {
+		for (int x = 0; x < renderer->width; ++x, ++index) {
 			iterc_t iters;
 			float_t zr, zi;
 
