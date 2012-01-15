@@ -37,18 +37,18 @@ refract_context* refract_init(int width, int height) {
 	context->params.offset.im = 0;
 	context->params.zoom = width / 2;
 
-	// Allocate cache buffers
-	context->iter_cache = malloc(sizeof (iterc_t) * width * height);
+	// Allocate buffers
+	context->iter_buffer = malloc(sizeof (iterc_t) * width * height);
 	context->z_cache = malloc(sizeof (complex_t) * width * height);
 
 	// Check buffers were allocated
-	if (!(context->iter_cache && context->z_cache)) {
+	if (!(context->iter_buffer && context->z_cache)) {
 		refract_free(context);
 		return NULL;
 	}
 
 	// Zeroize cache buffers
-	memset(context->iter_cache, 0, sizeof (iterc_t) * width * height);
+	memset(context->iter_buffer, 0, sizeof (iterc_t) * width * height);
 	memset(context->z_cache, 0, sizeof (complex_t) * width * height);
 
 	return context;
@@ -85,7 +85,7 @@ void refract_render(refract_context* context, color_t* pixels, int stride) {
 	const iterc_t max_iters = context->cache_max_iters;
 
 	// Gather up frequently used items
-	const iterc_t* restrict iters = context->iter_cache;
+	const iterc_t* restrict iter_buffer = context->iter_buffer;
 	const color_t* restrict colors = context->palette.colors;
 	const int pal_size = context->palette.size;
 	const int pal_offset = context->palette.offset;
@@ -95,7 +95,7 @@ void refract_render(refract_context* context, color_t* pixels, int stride) {
 
 	for (int y = 0, index = 0; y < context->height; ++y) {
 		for (int x = 0; x < context->width; ++x, ++index) {
-			iterc_t iterc = iters[index];
+			iterc_t iterc = iter_buffer[index];
 			int pal_index = (iterc + pal_offset) % pal_size;
 			line[x] = (iterc == max_iters) ? BLACK : colors[pal_index];
 		}
@@ -112,9 +112,9 @@ void refract_free(refract_context* context) {
 	// Free context's palette
 	refract_palette_free(&context->palette);
 
-	// Free cache buffers
-	if (context->iter_cache)
-		free(context->iter_cache);
+	// Free buffers
+	if (context->iter_buffer)
+		free(context->iter_buffer);
 	if (context->z_cache)
 		free(context->z_cache);
 

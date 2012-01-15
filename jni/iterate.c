@@ -32,8 +32,8 @@ void refract_iterate_m2(refract_context* context, complex_t offset, float_t zoom
 	const iterc_t cache_max_iters = context->cache_max_iters;
 
 	// Allow optimized access to memory locations
+	iterc_t* restrict iter_buffer = context->iter_buffer;
 	complex_t* restrict z_cache = context->z_cache;
-	iterc_t* restrict iter_cache = context->iter_cache;
 
 	for (int y = 0, index = 0; y < context->height; ++y) {
 		for (int x = 0; x < context->width; ++x, ++index) {
@@ -42,7 +42,7 @@ void refract_iterate_m2(refract_context* context, complex_t offset, float_t zoom
 
 			// Only refine locations that reached maximum iterations previously
 			if (use_cache) {
-				iters = iter_cache[index];
+				iters = iter_buffer[index];
 				if (iters != cache_max_iters)
 					continue;
 
@@ -76,10 +76,12 @@ void refract_iterate_m2(refract_context* context, complex_t offset, float_t zoom
 				++iters;
 			}
 
-			// Store iteration data in cache for possible refinement in next frame
+			// Store result in iteration buffer
+			iter_buffer[index] = iters;
+
+			// Store z in cache for possible refinement in next frame
 			complex_t z = { zr, zi };
 			z_cache[index] = z;
-			iter_cache[index] = iters;
 		}
 	}
 }
@@ -97,8 +99,8 @@ void refract_iterate_m3(refract_context* context, complex_t offset, float_t zoom
 	const iterc_t cache_max_iters = context->cache_max_iters;
 
 	// Allow optimized access to memory locations
+	iterc_t* restrict iter_buffer = context->iter_buffer;
 	complex_t* restrict z_cache = context->z_cache;
-	iterc_t* restrict iter_cache = context->iter_cache;
 
 	for (int y = 0, index = 0; y < context->height; ++y) {
 		for (int x = 0; x < context->width; ++x, ++index) {
@@ -107,7 +109,7 @@ void refract_iterate_m3(refract_context* context, complex_t offset, float_t zoom
 
 			// Only refine locations that reached maximum iterations previously
 			if (use_cache) {
-				iters = iter_cache[index];
+				iters = iter_buffer[index];
 				if (iters != cache_max_iters)
 					continue;
 
@@ -141,10 +143,12 @@ void refract_iterate_m3(refract_context* context, complex_t offset, float_t zoom
 				++iters;
 			}
 
-			// Store iteration data in cache for possible refinement in next frame
+			// Store result in iteration buffer
+			iter_buffer[index] = iters;
+
+			// Store z in cache for possible refinement in next frame
 			complex_t z = { zr, zi };
 			z_cache[index] = z;
-			iter_cache[index] = iters;
 		}
 	}
 }
@@ -162,8 +166,8 @@ void refract_iterate_m4(refract_context* context, complex_t offset, float_t zoom
 	const iterc_t cache_max_iters = context->cache_max_iters;
 
 	// Allow optimized access to memory locations
+	iterc_t* restrict iter_buffer = context->iter_buffer;
 	complex_t* restrict z_cache = context->z_cache;
-	iterc_t* restrict iter_cache = context->iter_cache;
 
 	for (int y = 0, index = 0; y < context->height; ++y) {
 		for (int x = 0; x < context->width; ++x, ++index) {
@@ -172,7 +176,7 @@ void refract_iterate_m4(refract_context* context, complex_t offset, float_t zoom
 
 			// Only refine locations that reached maximum iterations previously
 			if (use_cache) {
-				iters = iter_cache[index];
+				iters = iter_buffer[index];
 				if (iters != cache_max_iters)
 					continue;
 
@@ -206,10 +210,12 @@ void refract_iterate_m4(refract_context* context, complex_t offset, float_t zoom
 				++iters;
 			}
 
-			// Store iteration data in cache for possible refinement in next frame
+			// Store result in iteration buffer
+			iter_buffer[index] = iters;
+
+			// Store z in cache for possible refinement in next frame
 			complex_t z = { zr, zi };
 			z_cache[index] = z;
-			iter_cache[index] = iters;
 		}
 	}
 }

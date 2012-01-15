@@ -79,10 +79,10 @@ typedef struct {
 	int height;
 	params_t params;
 	palette_t palette;
+	iterc_t* iter_buffer;
 
 	bool cache_valid;
 	iterc_t cache_max_iters;
-	iterc_t* iter_cache;
 	complex_t* z_cache;
 
 } refract_context;
