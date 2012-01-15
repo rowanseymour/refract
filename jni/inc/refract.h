@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <math.h>
+#include <pthread.h>
 
 #include "color.h"
 
@@ -77,7 +78,9 @@ typedef struct {
 typedef struct {
 	int width;
 	int height;
+
 	params_t params;
+	pthread_mutex_t mutex;
 	palette_t palette;
 	iterc_t* iter_buffer;
 
@@ -90,9 +93,11 @@ typedef struct {
 /**
  * Context functions
  */
-refract_context* refract_init(int width, int height);
+bool refract_init(refract_context* context, int width, int height);
 void refract_iterate(refract_context* context, iterc_t iters, params_t params, bool use_cache);
 void refract_render(refract_context* context, color_t* pixels, int stride);
+bool refract_acquire_lock(refract_context* context);
+bool refract_release_lock(refract_context* context);
 void refract_free(refract_context* context);
 
 /**

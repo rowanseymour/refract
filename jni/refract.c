@@ -22,12 +22,7 @@
 /**
  * Allocates a context
  */
-refract_context* refract_init(int width, int height) {
-	// Allocate context
-	refract_context* context = (refract_context*)malloc(sizeof (refract_context));
-	if (!context)
-		return NULL;
-
+bool refract_init(refract_context* context, int width, int height) {
 	// Initialize context
 	memset(context, 0, sizeof (refract_context));
 	context->width = width;
@@ -42,16 +37,19 @@ refract_context* refract_init(int width, int height) {
 	context->z_cache = malloc(sizeof (complex_t) * width * height);
 
 	// Check buffers were allocated
-	if (!(context->iter_buffer && context->z_cache)) {
+	if (!context->iter_buffer || !context->z_cache) {
 		refract_free(context);
-		return NULL;
+		return false;
 	}
 
 	// Zeroize cache buffers
 	memset(context->iter_buffer, 0, sizeof (iterc_t) * width * height);
 	memset(context->z_cache, 0, sizeof (complex_t) * width * height);
 
-	return context;
+	// Initialize renderer mutex
+	pthread_mutex_init(&context->mutex, NULL);
+
+	return true;
 }
 
 /**
@@ -106,6 +104,20 @@ void refract_render(refract_context* context, color_t* pixels, int stride) {
 }
 
 /**
+ * Acquires lock on the renderer
+ */
+bool refract_acquire_lock(refract_context* context) {
+	return pthread_mutex_lock(&context->mutex) == 0;
+}
+
+/**
+ * Releases lock on the renderer
+ */
+bool refract_release_lock(refract_context* context) {
+	return pthread_mutex_unlock(&context->mutex) == 0;
+}
+
+/**
  * Frees a context
  */
 void refract_free(refract_context* context) {
@@ -118,6 +130,6 @@ void refract_free(refract_context* context) {
 	if (context->z_cache)
 		free(context->z_cache);
 
-	// Free context itself
-	free(context);
+	// Free render params mutex
+	pthread_mutex_destroy(&context->mutex);
 }

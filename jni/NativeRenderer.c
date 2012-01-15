@@ -47,10 +47,12 @@ jmethodID function_ordinal_mid, function_values_mid, complex_cid;
  */
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* jvm, void* reserved)
  {
+	// Get JNI environment
 	JNIEnv* env;
 	if ((*jvm)->GetEnv(jvm, (void**)&env, JNI_VERSION_1_4))
 		return JNI_ERR;
 
+	// Cache Java classes
 	jclass cls = (*env)->FindClass(env, NATIVERENDERER_CLASS);
 	renderer_class = (*env)->NewGlobalRef(env, cls);
 	renderer_context_fid = (*env)->GetFieldID(env, renderer_class, "context", "J");
@@ -90,15 +92,25 @@ static refract_context* get_context(JNIEnv* env, jobject renderer) {
 }
 
 /**
+ * Sets the context field of a Renderer object
+ */
+static void set_context(JNIEnv* env, jobject renderer, refract_context* context) {
+	(*env)->SetLongField(env, renderer, renderer_context_fid, (jlong)(intptr_t)context);
+}
+
+/**
  * Allocates the context for the given renderer
  */
 JNIEXPORT jboolean JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_allocate(JNIEnv* env, jobject renderer, jint width, jint height) {
-	refract_context* context = refract_init((uint16_t)width, (uint16_t)height);
+	// Allocate context object
+	refract_context* context = (refract_context*)malloc(sizeof (refract_context));
+	if (!context)
+		return false;
 
-	if (context) {
-		jclass this_class = (*env)->GetObjectClass(env, renderer);
-		jfieldID fid_context = (*env)->GetFieldID(env, this_class, "context", "J");
-		(*env)->SetLongField(env, renderer, fid_context, (jlong)(intptr_t)context);
+	// Initialize it
+	if (refract_init(context, width, height)) {
+		// Store pointer on Java object
+		set_context(env, renderer, context);
 
 		LOG_D("Allocated renderer internal resources");
 		return true;
@@ -139,10 +151,14 @@ JNIEXPORT jobject JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_getFunc
  */
 JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setFunction(JNIEnv* env, jobject renderer, jobject function) {
 	refract_context* context = get_context(env, renderer);
+	refract_acquire_lock(context);
+
 	func_t func = (func_t)(*env)->CallIntMethod(env, function, function_ordinal_mid);
 
 	context->params.func = func;
 	context->cache_valid = false;
+
+	refract_release_lock(context);
 }
 
 /**
@@ -158,12 +174,16 @@ JNIEXPORT jobject JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_getOffs
  */
 JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setOffset(JNIEnv* env, jobject renderer, jobject offset) {
 	refract_context* context = get_context(env, renderer);
+	refract_acquire_lock(context);
+
 	float_t re = (float_t)((*env)->GetDoubleField(env, offset, complex_re_fid));
 	float_t im = (float_t)((*env)->GetDoubleField(env, offset, complex_im_fid));
 
 	context->params.offset.re = (float_t)re;
 	context->params.offset.im = (float_t)im;
 	context->cache_valid = false;
+
+	refract_release_lock(context);
 }
 
 /**
@@ -179,9 +199,12 @@ JNIEXPORT jdouble JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_getZoom
  */
 JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setZoom(JNIEnv* env, jobject renderer, jdouble zoom) {
 	refract_context* context = get_context(env, renderer);
+	refract_acquire_lock(context);
 
 	context->params.zoom = (float_t)zoom;
 	context->cache_valid = false;
+
+	refract_release_lock(context);
 }
 
 /**
@@ -238,10 +261,15 @@ JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setPalette
 JNIEXPORT jint JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_iterate(JNIEnv* env, jobject obj, jint iters) {
 	refract_context* context = get_context(env, obj);
 
-	// Because multiple threads might modify this class, cache the parameters for these iterations
+	// Another thread might try to change the render parameters
+	refract_acquire_lock(context);
+
+	// Gather the parameters for these iterations while we have exclusive access
 	params_t params = context->params;
 	bool use_cache = context->cache_valid;
 	context->cache_valid = true;
+
+	refract_release_lock(context);
 
 	refract_iterate(context, (iterc_t)iters, params, use_cache);
 
@@ -274,9 +302,15 @@ JNIEXPORT jboolean JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_render
 /**
  * Frees the context for the given renderer
  */
-JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_free(JNIEnv* env, jobject obj) {
-	refract_context* context = get_context(env, obj);
+JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_free(JNIEnv* env, jobject renderer) {
+	refract_context* context = get_context(env, renderer);
+
 	refract_free(context);
+
+	// Free context object itself
+	free(context);
+
+	set_context(env, renderer, NULL);
 
 	LOG_D("Freed renderer internal resources");
 }
