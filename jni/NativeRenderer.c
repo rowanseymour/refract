@@ -151,14 +151,10 @@ JNIEXPORT jobject JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_getFunc
  */
 JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setFunction(JNIEnv* env, jobject this, jobject function) {
 	renderer_t* renderer = get_renderer(env, this);
-	refract_renderer_acquire_lock(renderer);
 
 	func_t func = (func_t)(*env)->CallIntMethod(env, function, function_ordinal_mid);
 
-	renderer->params.func = func;
-	renderer->cache_valid = false;
-
-	refract_renderer_release_lock(renderer);
+	refract_renderer_setfunction(renderer, func);
 }
 
 /**
@@ -174,16 +170,12 @@ JNIEXPORT jobject JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_getOffs
  */
 JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setOffset(JNIEnv* env, jobject this, jobject offset) {
 	renderer_t* renderer = get_renderer(env, this);
-	refract_renderer_acquire_lock(renderer);
 
 	float_t re = (float_t)((*env)->GetDoubleField(env, offset, complex_re_fid));
 	float_t im = (float_t)((*env)->GetDoubleField(env, offset, complex_im_fid));
+	complex_t o = { re, im };
 
-	renderer->params.offset.re = (float_t)re;
-	renderer->params.offset.im = (float_t)im;
-	renderer->cache_valid = false;
-
-	refract_renderer_release_lock(renderer);
+	refract_renderer_setoffset(renderer, o);
 }
 
 /**
@@ -199,12 +191,8 @@ JNIEXPORT jdouble JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_getZoom
  */
 JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setZoom(JNIEnv* env, jobject this, jdouble zoom) {
 	renderer_t* renderer = get_renderer(env, this);
-	refract_renderer_acquire_lock(renderer);
 
-	renderer->params.zoom = (float_t)zoom;
-	renderer->cache_valid = false;
-
-	refract_renderer_release_lock(renderer);
+	refract_renderer_setzoom(renderer, (float_t)zoom);
 }
 
 /**

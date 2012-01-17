@@ -60,6 +60,42 @@ bool refract_renderer_init(renderer_t* renderer, int width, int height) {
 }
 
 /**
+ * Sets the function which invalidates the caches
+ */
+void refract_renderer_setfunction(renderer_t* renderer, func_t func) {
+	refract_renderer_acquire_lock(renderer);
+
+	renderer->params.func = func;
+	renderer->cache_valid = false;
+
+	refract_renderer_release_lock(renderer);
+}
+
+/**
+ * Sets the offset which invalidates the caches
+ */
+void refract_renderer_setoffset(renderer_t* renderer, complex_t offset) {
+	refract_renderer_acquire_lock(renderer);
+
+	renderer->params.offset = offset;
+	renderer->cache_valid = false;
+
+	refract_renderer_release_lock(renderer);
+}
+
+/**
+ * Sets the zoom factor which invalidates the caches
+ */
+void refract_renderer_setzoom(renderer_t* renderer, float_t zoom) {
+	refract_renderer_acquire_lock(renderer);
+
+	renderer->params.zoom = zoom;
+	renderer->cache_valid = false;
+
+	refract_renderer_release_lock(renderer);
+}
+
+/**
  * Performs iterations
  */
 void refract_renderer_iterate(renderer_t* renderer, iterc_t iters, params_t params, bool use_cache) {
