@@ -99,6 +99,7 @@ typedef struct {
  * Renderer functions
  */
 bool refract_renderer_init(renderer_t* renderer, int width, int height);
+bool refract_renderer_resize(renderer_t* renderer, int width, int height);
 void refract_renderer_setfunction(renderer_t* renderer, func_t func);
 void refract_renderer_setoffset(renderer_t* renderer, complex_t offset);
 void refract_renderer_setzoom(renderer_t* renderer, float_t zoom);

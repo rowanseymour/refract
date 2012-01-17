@@ -31,11 +31,18 @@ import android.graphics.Bitmap;
 public interface Renderer {
 
 	/**
-	 * Allocates resources for a renderer with the given dimensions
+	 * Allocates the renderer with the given dimensions
 	 * @param width the width in pixels
 	 * @param height the height in pixels
 	 */
 	public boolean allocate(int width, int height);
+	
+	/**
+	 * Resizes the renderer to the given dimensions
+	 * @param width the width in pixels
+	 * @param height the height in pixels
+	 */
+	public boolean resize(int width, int height);
 	
 	/**
 	 * Sets the number of iterations per frame

@@ -99,7 +99,7 @@ static void set_renderer(JNIEnv* env, jobject this, renderer_t* renderer) {
 }
 
 /**
- * Allocates the renderer for the given renderer
+ * Initializes the renderer
  */
 JNIEXPORT jboolean JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_allocate(JNIEnv* env, jobject this, jint width, jint height) {
 	// Allocate renderer object
@@ -122,10 +122,20 @@ JNIEXPORT jboolean JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_alloca
 }
 
 /**
+ * Resizes the renderer
+ */
+JNIEXPORT jboolean JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_resize(JNIEnv* env, jobject this, jint width, jint height) {
+	renderer_t* renderer = get_renderer(env, this);
+
+	return refract_renderer_resize(renderer, (int)width, (int)height);
+}
+
+/**
  * Gets the width
  */
 JNIEXPORT jint JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_getWidth(JNIEnv* env, jobject this) {
 	renderer_t* renderer = get_renderer(env, this);
+
 	return (jint)renderer->width;
 }
 
@@ -134,6 +144,7 @@ JNIEXPORT jint JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_getWidth(J
  */
 JNIEXPORT jint JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_getHeight(JNIEnv* env, jobject this) {
 	renderer_t* renderer = get_renderer(env, this);
+
 	return (jint)renderer->height;
 }
 
@@ -142,6 +153,7 @@ JNIEXPORT jint JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_getHeight(
  */
 JNIEXPORT jobject JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_getFunction(JNIEnv* env, jobject this) {
 	renderer_t* renderer = get_renderer(env, this);
+
 	jobject values_obj = (*env)->CallStaticObjectMethod(env, function_class, function_values_mid);
 	return (*env)->GetObjectArrayElement(env, values_obj, (int)renderer->params.func);
 }
@@ -162,6 +174,7 @@ JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setFunctio
  */
 JNIEXPORT jobject JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_getOffset(JNIEnv* env, jobject this) {
 	renderer_t* renderer = get_renderer(env, this);
+
 	return (*env)->NewObject(env, complex_class, complex_cid, (jdouble)renderer->params.offset.re, (jdouble)renderer->params.offset.im);
 }
 
@@ -183,6 +196,7 @@ JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setOffset(
  */
 JNIEXPORT jdouble JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_getZoom(JNIEnv* env, jobject this) {
 	renderer_t* renderer = get_renderer(env, this);
+
 	return (jdouble)renderer->params.zoom;
 }
 

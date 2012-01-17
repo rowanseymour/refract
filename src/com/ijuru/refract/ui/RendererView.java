@@ -77,23 +77,15 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 		public void onUpdate(RendererView view, int iters);
 	}
 	
+	/**
+	 * @see android.view.SurfaceHolder.Callback#surfaceCreated(SurfaceHolder)
+	 */
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
-		rendererThread = new RendererThread(this);
+		bitmap = Bitmap.createBitmap(getWidth(), getHeight(), Config.ARGB_8888);
+		renderer = new NativeRenderer();
 		
-		Log.d("refract", "Render surface created [" + getWidth() + ", " + getHeight() + "]");
-	}
-
-	@Override
-	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-		bitmap = Bitmap.createBitmap(width, height, Config.ARGB_8888);
-		
-		if (renderer == null)
-			renderer = new NativeRenderer();
-		else
-			renderer.free();
-		
-		if (!renderer.allocate(width, height)) {
+		if (!renderer.allocate(getWidth(), getHeight())) {
 			Toast.makeText(getContext(), "Unable to allocate resources", Toast.LENGTH_LONG).show();
 			renderer = null;
 			return;
@@ -105,30 +97,42 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 		itersPerFrame = Utils.parseInteger(prefs.getString("itersperframe", "5"));
 		Palette palette = Palette.getPresetByName(prefs.getString("palette", "sunset").toLowerCase());
 		
-		reset();
-		
 		renderer.setFunction(iterFunc);
 		renderer.setPalette(palette, 128);
-			
-		if (!rendererThread.isAlive())
-			rendererThread.start();
+		
+		// Start renderer thread
+		rendererThread = new RendererThread(this);
+		rendererThread.start();
+		
+		Log.d("refract", "Render surface created [" + getWidth() + ", " + getHeight() + "]");
+	}
+
+	@Override
+	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+		if (renderer != null)
+			renderer.resize(width, height);
 		
 		Log.d("refract", "Render surface resized [" + width + ", " + height + "]");
 	}
 	
 	@Override
 	public void surfaceDestroyed(SurfaceHolder holder) {
-		boolean retry = true;
-		rendererThread.interrupt();
 		
-		while (retry) {
-			try {
-				rendererThread.join();
-				retry = false;
-			} catch (InterruptedException e) {
+		// Stop renderer thread
+		if (rendererThread != null) {
+			boolean retry = true;
+			rendererThread.interrupt();
+			
+			while (retry) {
+				try {
+					rendererThread.join();
+					retry = false;
+				} catch (InterruptedException e) {
+				}
 			}
 		}
 		
+		// Deallocate renderer
 		if (renderer != null) {
 			renderer.free();
 			renderer = null;
@@ -196,6 +200,9 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 		 */
 		@Override
 		public boolean onScroll(MotionEvent event1, MotionEvent event2, float distanceX, float distanceY) {
+			if (renderer == null)
+				return false;
+			
 			double zoom = renderer.getZoom();
 			Complex offset = renderer.getOffset();
 			Complex delta = new Complex(distanceX / zoom, -distanceY / zoom);
@@ -204,7 +211,7 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 			// Update listener
 			if (listener != null)
 				listener.onOffsetChanged(RendererView.this, offset);
-			
+		
 			return true;
 		}
 	}

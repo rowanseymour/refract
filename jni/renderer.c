@@ -32,12 +32,33 @@ void refract_renderer_iterate_m4(renderer_t* renderer, complex_t offset, float_t
 bool refract_renderer_init(renderer_t* renderer, int width, int height) {
 	// Initialize renderer
 	memset(renderer, 0, sizeof (renderer_t));
-	renderer->width = width;
-	renderer->height = height;
 	renderer->params.func = MANDELBROT;
 	renderer->params.offset.re = 0;
 	renderer->params.offset.im = 0;
 	renderer->params.zoom = width / 2;
+
+	// Allocate buffers
+	if (!refract_renderer_resize(renderer, width, height))
+		return false;
+
+	// Initialize renderer mutex
+	pthread_mutex_init(&renderer->mutex, NULL);
+
+	return true;
+}
+
+/**
+ * Resizes a renderer
+ */
+bool refract_renderer_resize(renderer_t* renderer, int width, int height) {
+	// Free buffers
+	if (renderer->iter_buffer)
+		free(renderer->iter_buffer);
+	if (renderer->z_cache)
+		free(renderer->z_cache);
+
+	renderer->width = width;
+	renderer->height = height;
 
 	// Allocate buffers
 	renderer->iter_buffer = malloc(sizeof (iterc_t) * width * height);
@@ -50,11 +71,8 @@ bool refract_renderer_init(renderer_t* renderer, int width, int height) {
 	}
 
 	// Zeroize cache buffers
-	memset(renderer->iter_buffer, 0, sizeof (iterc_t) * width * height);
-	memset(renderer->z_cache, 0, sizeof (complex_t) * width * height);
-
-	// Initialize renderer mutex
-	pthread_mutex_init(&renderer->mutex, NULL);
+	//memset(renderer->iter_buffer, 0, sizeof (iterc_t) * width * height);
+	//memset(renderer->z_cache, 0, sizeof (complex_t) * width * height);
 
 	return true;
 }

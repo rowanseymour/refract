@@ -36,6 +36,7 @@ public class NativeRenderer implements Renderer {
 	private long renderer;
 	
 	@Override public native boolean allocate(int width, int height);
+	@Override public native boolean resize(int width, int height);
 	@Override public native int iterate(int iters);
 	@Override public native boolean render(Bitmap bitmap);
 	@Override public native void free();
