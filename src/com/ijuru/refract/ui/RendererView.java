@@ -203,18 +203,10 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 		 */
 		@Override
 		public boolean onScroll(MotionEvent event1, MotionEvent event2, float distanceX, float distanceY) {
-			if (renderer == null)
-				return false;
-			
 			double zoom = renderer.getZoom();
 			Complex offset = renderer.getOffset();
 			Complex delta = new Complex(distanceX / zoom, -distanceY / zoom);
-			renderer.setOffset(offset.add(delta));
-			
-			// Update listener
-			if (listener != null)
-				listener.onOffsetChanged(RendererView.this, offset);
-		
+			setOffset(offset.add(delta));		
 			return true;
 		}
 	}
@@ -227,17 +219,8 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 		 * @see ScaleGestureDetector.SimpleOnScaleGestureListener#onScale(ScaleGestureDetector)
 		 */
 		@Override
-		public boolean onScale(ScaleGestureDetector detector) {
-			if (renderer == null)
-				return false;
-			
-			double newZoom = renderer.getZoom() * detector.getScaleFactor();
-			renderer.setZoom(newZoom);
-			
-			// Update listener
-			if (listener != null)
-				listener.onZoomChanged(RendererView.this, newZoom);
-			
+		public boolean onScale(ScaleGestureDetector detector) {		
+			setZoom(renderer.getZoom() * detector.getScaleFactor());			
 			return true;
 		}
 	}
@@ -246,17 +229,34 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	 * Resets this view so that it is centered on the origin
 	 */
 	public void reset() {
-		if (renderer != null) {
-			double zoom = renderer.getWidth() / 2;
-			renderer.setOffset(Complex.ORIGIN);
-			renderer.setZoom(zoom);
-			
-			// Update listener
-			if (listener != null) {
-				listener.onOffsetChanged(RendererView.this, Complex.ORIGIN);
-				listener.onZoomChanged(RendererView.this, zoom);
-			}
+		if (renderer != null) {		
+			setOffset(Complex.ORIGIN);
+			setZoom(renderer.getWidth() / 2);
 		}
+	}
+	
+	/**
+	 * Sets the offset of the renderer
+	 * @param offset the offset
+	 */
+	public void setOffset(Complex offset) {
+		if (renderer != null)
+			renderer.setOffset(offset);
+		
+		if (listener != null)
+			listener.onOffsetChanged(this, offset);
+	}
+	
+	/**
+	 * Sets the zoom of the renderer
+	 * @param zoom the zoom
+	 */
+	public void setZoom(double zoom) {
+		if (renderer != null)
+			renderer.setZoom(zoom);
+		
+		if (listener != null)
+			listener.onZoomChanged(this, zoom);
 	}
 	
 	/**
