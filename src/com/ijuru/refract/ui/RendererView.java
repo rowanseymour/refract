@@ -109,8 +109,11 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 
 	@Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-		if (renderer != null && (renderer.getWidth() != width || renderer.getHeight() != height))
+		// Reallocate renderer and off-screen bitmap only if size has changed
+		if (renderer != null && (renderer.getWidth() != width || renderer.getHeight() != height)) {
 			renderer.resize(width, height);
+			bitmap = Bitmap.createBitmap(getWidth(), getHeight(), Config.ARGB_8888);
+		}
 		
 		Log.d("refract", "Render surface resized [" + width + ", " + height + "]");
 	}
