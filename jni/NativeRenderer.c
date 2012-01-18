@@ -258,28 +258,16 @@ JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setPalette
 }
 
 /**
- * Updates (i.e. renders a frame) the refract renderer for the given FractalRenderer
+ * Iterates the renderer by the specified number of iterations
  */
 JNIEXPORT jint JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_iterate(JNIEnv* env, jobject this, jint iters) {
 	renderer_t* renderer = get_renderer(env, this);
 
-	// Another thread might try to change the render parameters
-	refract_renderer_acquire_lock(renderer);
-
-	// Gather the parameters for these iterations while we have exclusive access
-	params_t params = renderer->params;
-	bool use_cache = renderer->cache_valid;
-	renderer->cache_valid = true;
-
-	refract_renderer_release_lock(renderer);
-
-	refract_renderer_iterate(renderer, (iterc_t)iters, params, use_cache);
-
-	return renderer->cache_max_iters;
+	return (jint)refract_renderer_iterate(renderer, (iterc_t)iters);
 }
 
 /**
- * Updates (i.e. renders a frame) the refract renderer for the given FractalRenderer
+ * Renders the iterations buffer to a pixel buffer
  */
 JNIEXPORT jboolean JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_render(JNIEnv* env, jobject this, jobject bitmap) {
 	renderer_t* renderer = get_renderer(env, this);

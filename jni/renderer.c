@@ -42,7 +42,7 @@ bool refract_renderer_init(renderer_t* renderer, int width, int height) {
 		return false;
 
 	// Initialize renderer mutex
-	pthread_mutex_init(&renderer->mutex, NULL);
+	pthread_mutex_init(&renderer->params_mutex, NULL);
 
 	return true;
 }
@@ -81,42 +81,52 @@ bool refract_renderer_resize(renderer_t* renderer, int width, int height) {
  * Sets the function which invalidates the caches
  */
 void refract_renderer_setfunction(renderer_t* renderer, func_t func) {
-	refract_renderer_acquire_lock(renderer);
+	pthread_mutex_lock(&renderer->params_mutex);
 
 	renderer->params.func = func;
 	renderer->cache_valid = false;
 
-	refract_renderer_release_lock(renderer);
+	pthread_mutex_unlock(&renderer->params_mutex);
 }
 
 /**
  * Sets the offset which invalidates the caches
  */
 void refract_renderer_setoffset(renderer_t* renderer, complex_t offset) {
-	refract_renderer_acquire_lock(renderer);
+	pthread_mutex_lock(&renderer->params_mutex);
 
 	renderer->params.offset = offset;
 	renderer->cache_valid = false;
 
-	refract_renderer_release_lock(renderer);
+	pthread_mutex_unlock(&renderer->params_mutex);
 }
 
 /**
  * Sets the zoom factor which invalidates the caches
  */
 void refract_renderer_setzoom(renderer_t* renderer, float_t zoom) {
-	refract_renderer_acquire_lock(renderer);
+	pthread_mutex_lock(&renderer->params_mutex);
 
 	renderer->params.zoom = zoom;
 	renderer->cache_valid = false;
 
-	refract_renderer_release_lock(renderer);
+	pthread_mutex_unlock(&renderer->params_mutex);
 }
 
 /**
- * Performs iterations
+ * Iterates the renderer by the given number of iterations
  */
-void refract_renderer_iterate(renderer_t* renderer, iterc_t iters, params_t params, bool use_cache) {
+iterc_t refract_renderer_iterate(renderer_t* renderer, iterc_t iters) {
+	// Another thread might try to change the render parameters
+	pthread_mutex_lock(&renderer->params_mutex);
+
+	// Gather the parameters for these iterations while we have exclusive access
+	params_t params = renderer->params;
+	bool use_cache = renderer->cache_valid;
+	renderer->cache_valid = true;
+
+	pthread_mutex_unlock(&renderer->params_mutex);
+
 	// Increment or reset max-iters depending on whether we'll be using the cache
 	iterc_t max_iters = use_cache ? (renderer->cache_max_iters + iters) : iters;
 
@@ -134,6 +144,8 @@ void refract_renderer_iterate(renderer_t* renderer, iterc_t iters, params_t para
 
 	// Update cache status
 	renderer->cache_max_iters = max_iters;
+
+	return renderer->cache_max_iters;
 }
 
 /**
@@ -165,20 +177,6 @@ void refract_renderer_render(renderer_t* renderer, color_t* pixels, int stride) 
 }
 
 /**
- * Acquires lock on the renderer
- */
-bool refract_renderer_acquire_lock(renderer_t* renderer) {
-	return pthread_mutex_lock(&renderer->mutex) == 0;
-}
-
-/**
- * Releases lock on the renderer
- */
-bool refract_renderer_release_lock(renderer_t* renderer) {
-	return pthread_mutex_unlock(&renderer->mutex) == 0;
-}
-
-/**
  * Frees a renderer
  */
 void refract_renderer_free(renderer_t* renderer) {
@@ -196,5 +194,5 @@ void refract_renderer_free(renderer_t* renderer) {
 	}
 
 	// Free render params mutex
-	pthread_mutex_destroy(&renderer->mutex);
+	pthread_mutex_destroy(&renderer->params_mutex);
 }
