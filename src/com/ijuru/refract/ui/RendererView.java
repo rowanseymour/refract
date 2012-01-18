@@ -72,9 +72,10 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	 * Listener interface
 	 */
 	public interface RendererListener {
-		public void onOffsetChanged(RendererView view, Complex offset);
-		public void onZoomChanged(RendererView view, double zoom);
-		public void onUpdate(RendererView view, int iters);
+		public void onRendererCreated(RendererView view, Renderer renderer);
+		public void onRendererOffsetChanged(RendererView view, Complex offset);
+		public void onRendererZoomChanged(RendererView view, double zoom);
+		public void onRendererUpdate(RendererView view, int iters);
 	}
 	
 	/**
@@ -85,9 +86,11 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 		bitmap = Bitmap.createBitmap(getWidth(), getHeight(), Config.ARGB_8888);
 		renderer = new NativeRenderer();
 		
+		/**
+		 * TODO do something appropriate if renderer allocation fails
+		 */
 		if (!renderer.allocate(getWidth(), getHeight())) {
 			Toast.makeText(getContext(), "Unable to allocate resources", Toast.LENGTH_LONG).show();
-			renderer = null;
 			return;
 		}
 		
@@ -104,13 +107,16 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 		rendererThread = new RendererThread(this);
 		rendererThread.start();
 		
+		if (listener != null)
+			listener.onRendererCreated(this, renderer);
+		
 		Log.d("refract", "Render surface created [" + getWidth() + ", " + getHeight() + "]");
 	}
 
 	@Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
 		// Reallocate renderer and off-screen bitmap only if size has changed
-		if (renderer != null && (renderer.getWidth() != width || renderer.getHeight() != height)) {
+		if (renderer.getWidth() != width || renderer.getHeight() != height) {
 			renderer.resize(width, height);
 			bitmap = Bitmap.createBitmap(getWidth(), getHeight(), Config.ARGB_8888);
 		}
@@ -136,10 +142,7 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 		}
 		
 		// Deallocate renderer
-		if (renderer != null) {
-			renderer.free();
-			renderer = null;
-		}
+		renderer.free();
 		
 		Log.d("refract", "Render surface destroyed");
 	}
@@ -167,7 +170,7 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 		}
 		
 		if (listener != null)
-			listener.onUpdate(RendererView.this, iters);
+			listener.onRendererUpdate(RendererView.this, iters);
 		
 		//Log.v("refract", "Render surface updated [" + rendererThread.getLastFrameTime() + "ms]");
 	}
@@ -177,8 +180,7 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	 */
 	@Override
 	protected void onDraw(Canvas canvas) {
-		if (renderer != null)
-			canvas.drawBitmap(bitmap, 0, 0, null);
+		canvas.drawBitmap(bitmap, 0, 0, null);
 	}
 
 	/**
@@ -229,10 +231,16 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	 * Resets this view so that it is centered on the origin
 	 */
 	public void reset() {
-		if (renderer != null) {		
-			setOffset(Complex.ORIGIN);
-			setZoom(renderer.getWidth() / 2);
-		}
+		setOffset(Complex.ORIGIN);
+		setZoom(renderer.getWidth() / 2);
+	}
+	
+	/**
+	 * Gets the offset of the renderer
+	 * @return the offset
+	 */
+	public Complex getOffset() {
+		return renderer.getOffset();
 	}
 	
 	/**
@@ -240,11 +248,18 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	 * @param offset the offset
 	 */
 	public void setOffset(Complex offset) {
-		if (renderer != null)
-			renderer.setOffset(offset);
+		renderer.setOffset(offset);
 		
 		if (listener != null)
-			listener.onOffsetChanged(this, offset);
+			listener.onRendererOffsetChanged(this, offset);
+	}
+	
+	/**
+	 * Gets the zoom of the renderer
+	 * @return the zoom
+	 */
+	public double getZoom() {
+		return renderer.getZoom();
 	}
 	
 	/**
@@ -252,11 +267,10 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	 * @param zoom the zoom
 	 */
 	public void setZoom(double zoom) {
-		if (renderer != null)
-			renderer.setZoom(zoom);
+		renderer.setZoom(zoom);
 		
 		if (listener != null)
-			listener.onZoomChanged(this, zoom);
+			listener.onRendererZoomChanged(this, zoom);
 	}
 	
 	/**

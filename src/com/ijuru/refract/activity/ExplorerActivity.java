@@ -21,6 +21,7 @@ package com.ijuru.refract.activity;
 
 import com.ijuru.refract.Complex;
 import com.ijuru.refract.R;
+import com.ijuru.refract.renderer.Renderer;
 import com.ijuru.refract.ui.RendererView;
 import com.ijuru.refract.ui.StatusPanel;
 import com.ijuru.refract.utils.Utils;
@@ -29,6 +30,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -40,6 +42,7 @@ public class ExplorerActivity extends Activity implements RendererView.RendererL
 	
 	private RendererView rendererView;
 	private StatusPanel statusPanel;
+	private Bundle savedInstanceState;
 	
 	/**
 	 * Load the native code
@@ -61,7 +64,28 @@ public class ExplorerActivity extends Activity implements RendererView.RendererL
 		statusPanel = (StatusPanel)findViewById(R.id.statusPanel);
 		
 		rendererView.setRendererListener(this);
+		
+		// Keep bundle for later when we have a renderer
+		this.savedInstanceState = savedInstanceState;
+		
+		Log.d("refract", "Creating explorer activity");
     }
+	
+	/**
+	 * @see android.app.Activity#onSaveInstanceState(android.os.Bundle)
+	 */
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		// Save rendering parameters to bundle
+		Complex offset = rendererView.getOffset();
+		outState.putDouble("offset_re", offset.re);
+		outState.putDouble("offset_im", offset.im);
+		outState.putDouble("zoom", rendererView.getZoom());
+		
+		Log.d("refract", "Parameters saved to bundle");
+		
+		super.onSaveInstanceState(outState);
+	}
 
 	/**
 	 * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
@@ -115,12 +139,29 @@ public class ExplorerActivity extends Activity implements RendererView.RendererL
 		new AlertDialog.Builder(this).setTitle(title).setMessage(message)
 			.setPositiveButton(android.R.string.ok, null).show();
 	}
+	
+	/**
+	 * @see com.ijuru.refract.ui.RendererView.RendererListener#onRendererCreated(RendererView, Renderer)
+	 */
+	@Override
+	public void onRendererCreated(RendererView view, Renderer renderer) {
+		if (savedInstanceState != null) {
+			// Load rendering parameters from bundle
+			double offset_re = savedInstanceState.getDouble("offset_re");
+			double offset_im = savedInstanceState.getDouble("offset_im");
+			double zoom = savedInstanceState.getDouble("zoom");
+			renderer.setOffset(new Complex(offset_re, offset_im));
+			renderer.setZoom(zoom);
+			
+			Log.d("refract", "Parameters restored from bundle");
+		}
+	}
 
 	/**
 	 * @see com.ijuru.refract.ui.RendererView.RendererListener#onOffsetChanged(RendererView, Complex)
 	 */
 	@Override
-	public void onOffsetChanged(RendererView view, Complex offset) {
+	public void onRendererOffsetChanged(RendererView view, Complex offset) {
 		statusPanel.setCoords(offset.re, offset.im);
 	}
 
@@ -128,7 +169,7 @@ public class ExplorerActivity extends Activity implements RendererView.RendererL
 	 * @see com.ijuru.refract.ui.RendererView.RendererListener#onZoomChanged(RendererView, double)
 	 */
 	@Override
-	public void onZoomChanged(RendererView view, double zoom) {
+	public void onRendererZoomChanged(RendererView view, double zoom) {
 		statusPanel.setZoom(zoom);
 	}
 
@@ -136,7 +177,7 @@ public class ExplorerActivity extends Activity implements RendererView.RendererL
 	 * @see com.ijuru.refract.ui.RendererView.RendererListener#onUpdate(RendererView, int)
 	 */
 	@Override
-	public void onUpdate(RendererView view, int iters) {
+	public void onRendererUpdate(RendererView view, int iters) {
 		long avgFrameTime = view.getRendererThread().calcSmoothedFrameTime();
 		
 		statusPanel.setPerformanceInfo(iters, avgFrameTime > 0 ? 1000.0 / avgFrameTime : 0);
