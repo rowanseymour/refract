@@ -41,8 +41,9 @@ bool refract_renderer_init(renderer_t* renderer, int width, int height) {
 	if (!refract_renderer_resize(renderer, width, height))
 		return false;
 
-	// Initialize renderer mutex
+	// Initialize mutexes
 	pthread_mutex_init(&renderer->params_mutex, NULL);
+	pthread_mutex_init(&renderer->buffers_mutex, NULL);
 
 	return true;
 }
@@ -51,6 +52,9 @@ bool refract_renderer_init(renderer_t* renderer, int width, int height) {
  * Resizes a renderer
  */
 bool refract_renderer_resize(renderer_t* renderer, int width, int height) {
+	// Lock access to buffers so they can't be drawn on or freed while we're iterating
+	pthread_mutex_lock(&renderer->buffers_mutex);
+
 	// Free buffers
 	if (renderer->iter_buffer)
 		free(renderer->iter_buffer);
@@ -73,6 +77,9 @@ bool refract_renderer_resize(renderer_t* renderer, int width, int height) {
 	// Zeroize cache buffers
 	//memset(renderer->iter_buffer, 0, sizeof (iterc_t) * width * height);
 	//memset(renderer->z_cache, 0, sizeof (complex_t) * width * height);
+
+	// Unlock access to buffers
+	pthread_mutex_unlock(&renderer->buffers_mutex);
 
 	return true;
 }
@@ -127,6 +134,9 @@ iterc_t refract_renderer_iterate(renderer_t* renderer, iterc_t iters) {
 
 	pthread_mutex_unlock(&renderer->params_mutex);
 
+	// Lock access to buffers so they can't be resized or freed while we're iterating
+	pthread_mutex_lock(&renderer->buffers_mutex);
+
 	// Increment or reset max-iters depending on whether we'll be using the cache
 	iterc_t max_iters = use_cache ? (renderer->cache_max_iters + iters) : iters;
 
@@ -145,6 +155,9 @@ iterc_t refract_renderer_iterate(renderer_t* renderer, iterc_t iters) {
 	// Update cache status
 	renderer->cache_max_iters = max_iters;
 
+	// Unlock access to buffers
+	pthread_mutex_unlock(&renderer->buffers_mutex);
+
 	return renderer->cache_max_iters;
 }
 
@@ -152,6 +165,9 @@ iterc_t refract_renderer_iterate(renderer_t* renderer, iterc_t iters) {
  * Renders a renderer to the given pixel buffer
  */
 void refract_renderer_render(renderer_t* renderer, color_t* pixels, int stride) {
+	// Lock access to buffers
+	pthread_mutex_lock(&renderer->buffers_mutex);
+
 	// Number of iters to be considered in the set
 	const iterc_t max_iters = renderer->cache_max_iters;
 
@@ -174,12 +190,18 @@ void refract_renderer_render(renderer_t* renderer, color_t* pixels, int stride) 
 		// go to next line
 		line = (color_t*)((char*)line + stride);
 	}
+
+	// Unlock access to buffers
+	pthread_mutex_unlock(&renderer->buffers_mutex);
 }
 
 /**
  * Frees a renderer
  */
 void refract_renderer_free(renderer_t* renderer) {
+	// Lock access to buffers
+	pthread_mutex_lock(&renderer->buffers_mutex);
+
 	// Free renderer's palette
 	refract_palette_free(&renderer->palette);
 
@@ -193,6 +215,10 @@ void refract_renderer_free(renderer_t* renderer) {
 		renderer->z_cache = NULL;
 	}
 
-	// Free render params mutex
+	// Unlock access to buffers
+	pthread_mutex_unlock(&renderer->buffers_mutex);
+
+	// Free mutexes
 	pthread_mutex_destroy(&renderer->params_mutex);
+	pthread_mutex_destroy(&renderer->buffers_mutex);
 }

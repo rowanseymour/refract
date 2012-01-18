@@ -93,6 +93,7 @@ typedef struct {
 	complex_t* z_cache;
 
 	pthread_mutex_t params_mutex;
+	pthread_mutex_t buffers_mutex;
 
 } renderer_t;
 
