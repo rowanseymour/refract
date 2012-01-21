@@ -22,6 +22,7 @@ package com.ijuru.refract.ui;
 import com.ijuru.refract.Complex;
 import com.ijuru.refract.Function;
 import com.ijuru.refract.Palette;
+import com.ijuru.refract.R;
 import com.ijuru.refract.RendererThread;
 import com.ijuru.refract.renderer.NativeRenderer;
 import com.ijuru.refract.renderer.Renderer;
@@ -29,6 +30,7 @@ import com.ijuru.refract.utils.Utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Bitmap.Config;
@@ -47,6 +49,7 @@ import android.widget.Toast;
  */
 public class RendererView extends SurfaceView implements SurfaceHolder.Callback {
 	
+	private boolean navigationEnabled;
 	private Bitmap bitmap;
 	private Renderer renderer;
 	private RendererThread rendererThread;
@@ -69,8 +72,16 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 		
 		getHolder().addCallback(this);
 		
-		panDetector = new GestureDetector(context, new PanListener());
-		scaleDetector = new ScaleGestureDetector(context, new ZoomListener());
+		// Get custom attribute values
+		TypedArray arrAttrs = getContext().obtainStyledAttributes(attrs, R.styleable.RendererView);
+		navigationEnabled = arrAttrs.getBoolean(R.styleable.RendererView_navigationEnabled, true);
+		arrAttrs.recycle();
+		
+		// Optionally enable touch based navigation
+		if (navigationEnabled) {
+			panDetector = new GestureDetector(context, new PanListener());
+			scaleDetector = new ScaleGestureDetector(context, new ZoomListener());
+		}
 	}
 	
 	/**
@@ -206,9 +217,11 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	 */
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
-		// Let the gesture detectors handle the event
-		panDetector.onTouchEvent(event);
-		scaleDetector.onTouchEvent(event);
+		if (navigationEnabled) {
+			// Let the gesture detectors handle the event
+			panDetector.onTouchEvent(event);
+			scaleDetector.onTouchEvent(event);
+		}
 		
 		return true;
 	}

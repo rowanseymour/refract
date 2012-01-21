@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:refract="http://schemas.android.com/apk/res/com.ijuru.refract"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -14,7 +16,8 @@
 	    <com.ijuru.refract.ui.WallpaperRendererView
 	        android:id="@+id/rendererView"
 	        android:layout_width="match_parent"
-	        android:layout_height="match_parent" 
+	        android:layout_height="match_parent"
+	        refract:navigationEnabled="false"
 	    />
     </LinearLayout>
 	
