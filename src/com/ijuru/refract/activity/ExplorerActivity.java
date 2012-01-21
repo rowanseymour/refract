@@ -30,7 +30,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -67,24 +66,17 @@ public class ExplorerActivity extends Activity implements RendererView.RendererL
 		
 		// Keep bundle for later when we have a renderer
 		this.savedInstanceState = savedInstanceState;
-		
-		Log.d("refract", "Creating explorer activity");
     }
 	
 	/**
 	 * @see android.app.Activity#onSaveInstanceState(android.os.Bundle)
 	 */
 	@Override
-	protected void onSaveInstanceState(Bundle outState) {
+	protected void onSaveInstanceState(Bundle bundle) {
 		// Save rendering parameters to bundle
-		Complex offset = rendererView.getOffset();
-		outState.putDouble("offset_re", offset.re);
-		outState.putDouble("offset_im", offset.im);
-		outState.putDouble("zoom", rendererView.getZoom());
+		saveParametersToBundle(bundle);
 		
-		Log.d("refract", "Parameters saved to bundle");
-		
-		super.onSaveInstanceState(outState);
+		super.onSaveInstanceState(bundle);
 	}
 
 	/**
@@ -109,8 +101,8 @@ public class ExplorerActivity extends Activity implements RendererView.RendererL
 		case R.id.menusettings:
 			startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
 	    	break;
-		case R.id.menusetas:
-			onMenuSetAs();
+		case R.id.menuwallpaper:
+			onMenuWallpaper();
 	    	break;
 	    case R.id.menuabout:
 	    	onMenuAbout();
@@ -122,8 +114,12 @@ public class ExplorerActivity extends Activity implements RendererView.RendererL
 	/**
 	 * Displays the 'set as' dialog
 	 */
-	private void onMenuSetAs() {
-		startActivity(new Intent(getApplicationContext(), SetAsWallpaperActivity.class));
+	private void onMenuWallpaper() {
+		Intent intent = new Intent(getApplicationContext(), RenderAsWallpaperActivity.class);
+		Bundle bundle = new Bundle();
+		saveParametersToBundle(bundle);
+		intent.putExtras(bundle);
+		startActivity(intent);
 	}
 	
 	/**
@@ -152,9 +148,18 @@ public class ExplorerActivity extends Activity implements RendererView.RendererL
 			double zoom = savedInstanceState.getDouble("zoom");
 			renderer.setOffset(new Complex(offset_re, offset_im));
 			renderer.setZoom(zoom);
-			
-			Log.d("refract", "Parameters restored from bundle");
 		}
+	}
+	
+	/**
+	 * SAves the render parameters to a bundle
+	 * @param bundle the bundle
+	 */
+	private void saveParametersToBundle(Bundle bundle) {
+		Complex offset = rendererView.getOffset();
+		bundle.putDouble("offset_re", offset.re);
+		bundle.putDouble("offset_im", offset.im);
+		bundle.putDouble("zoom", rendererView.getZoom());
 	}
 
 	/**

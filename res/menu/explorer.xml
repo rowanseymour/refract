@@ -11,9 +11,9 @@
 		android:icon="@drawable/ic_menu_settings"
 	/>
 	<item
-		android:id="@+id/menusetas" 
+		android:id="@+id/menuwallpaper" 
 		android:title="@string/str_wallpaper" 
-		android:icon="@drawable/ic_menu_setas"
+		android:icon="@drawable/ic_menu_wallpaper"
 	/>
 	<item 
 		android:id="@+id/menuabout" 
