@@ -12,7 +12,7 @@
 	/>
 	<item
 		android:id="@+id/menusetas" 
-		android:title="@string/str_setas" 
+		android:title="@string/str_wallpaper" 
 		android:icon="@drawable/ic_menu_setas"
 	/>
 	<item 

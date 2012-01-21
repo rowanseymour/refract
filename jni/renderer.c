@@ -19,6 +19,8 @@
 
 #include "inc/refract.h"
 
+static int g_last_renderer_id = 0;
+
 /**
  * Iteration functions from iterate.h
  */
@@ -32,6 +34,7 @@ void refract_renderer_iterate_m4(renderer_t* renderer, complex_t offset, float_t
 bool refract_renderer_init(renderer_t* renderer, int width, int height) {
 	// Initialize renderer
 	memset(renderer, 0, sizeof (renderer_t));
+	renderer->id = ++g_last_renderer_id;
 	renderer->params.func = MANDELBROT;
 	renderer->params.offset.re = 0;
 	renderer->params.offset.im = 0;

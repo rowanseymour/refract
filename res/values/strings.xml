@@ -9,7 +9,7 @@
 	<string name="str_palettesize">Palette size</string>
 	<string name="str_iterating">Iterating</string>
 	<string name="str_reset">Reset</string>
-	<string name="str_setas">Set as</string>
+	<string name="str_wallpaper">Wallpaper</string>
 	<string name="str_setaswallpaper">Set as wallpaper</string>
 	<string name="str_settings">Settings</string>
 	<string name="err_numberrange">Must be between %1$d and %2$d</string>

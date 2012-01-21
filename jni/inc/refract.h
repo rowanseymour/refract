@@ -81,6 +81,7 @@ typedef struct {
  * Rendering context
  */
 typedef struct {
+	int id;
 	int width;
 	int height;
 

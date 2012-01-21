@@ -51,7 +51,7 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	private Renderer renderer;
 	private RendererThread rendererThread;
 	private RendererListener listener;
-	
+
 	// Rendering parameters
 	private int itersPerFrame;
 
@@ -59,6 +59,11 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	private GestureDetector panDetector;
 	private ScaleGestureDetector scaleDetector;
 	
+	/**
+	 * Constructs a renderer view whose renderer scales it's internal storage with the view
+	 * @param context the context
+	 * @param attrs the attributes from the layout resource
+	 */
 	public RendererView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		
@@ -83,13 +88,16 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	 */
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
-		bitmap = Bitmap.createBitmap(getWidth(), getHeight(), Config.ARGB_8888);
+		int rendererWidth = getDesiredRendererWidth(getWidth());
+		int rendererHeight = getDesiredRendererHeight(getHeight());
+		
+		bitmap = Bitmap.createBitmap(rendererWidth, rendererHeight, Config.ARGB_8888);
 		renderer = new NativeRenderer();
 		
 		/**
 		 * TODO do something appropriate if renderer allocation fails
 		 */
-		if (!renderer.allocate(getWidth(), getHeight())) {
+		if (!renderer.allocate(rendererWidth, rendererHeight)) {
 			Toast.makeText(getContext(), "Unable to allocate resources", Toast.LENGTH_LONG).show();
 			return;
 		}
@@ -110,15 +118,18 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 		if (listener != null)
 			listener.onRendererCreated(this, renderer);
 		
-		Log.d("refract", "Render surface created [" + getWidth() + ", " + getHeight() + "]");
+		Log.d("refract", "Render created [" + rendererWidth + ", " + rendererHeight + "]");
 	}
 
 	@Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-		// Reallocate renderer and off-screen bitmap only if size has changed
-		if (renderer.getWidth() != width || renderer.getHeight() != height) {
+		int rendererWidth = getDesiredRendererWidth(width);
+		int rendererHeight = getDesiredRendererHeight(height);
+		
+		// Reallocate renderer and off-screen bitmap only if size has changed 
+		if (renderer.getWidth() != rendererWidth || renderer.getHeight() != rendererHeight) {
 			renderer.resize(width, height);
-			bitmap = Bitmap.createBitmap(getWidth(), getHeight(), Config.ARGB_8888);
+			bitmap = Bitmap.createBitmap(width, height, Config.ARGB_8888);
 		}
 		
 		Log.d("refract", "Render surface resized [" + width + ", " + height + "]");
@@ -128,18 +139,7 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	public void surfaceDestroyed(SurfaceHolder holder) {
 		
 		// Stop renderer thread
-		if (rendererThread != null) {
-			boolean retry = true;
-			rendererThread.interrupt();
-			
-			while (retry) {
-				try {
-					rendererThread.join();
-					retry = false;
-				} catch (InterruptedException e) {
-				}
-			}
-		}
+		stopRendering();
 		
 		// Deallocate renderer
 		renderer.free();
@@ -181,6 +181,24 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	@Override
 	protected void onDraw(Canvas canvas) {
 		canvas.drawBitmap(bitmap, 0, 0, null);
+	}
+	
+	/**
+	 * Stops the rendering thread
+	 */
+	public void stopRendering() {
+		if (rendererThread != null) {
+			boolean retry = true;
+			rendererThread.interrupt();
+			
+			while (retry) {
+				try {
+					rendererThread.join();
+					retry = false;
+				} catch (InterruptedException e) {
+				}
+			}
+		}
 	}
 
 	/**
@@ -287,5 +305,31 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	 */
 	public RendererThread getRendererThread() {
 		return rendererThread;
+	}
+	
+	/**
+	 * Gets the offscreen bitmap
+	 * @return the bitmap
+	 */
+	public Bitmap getBitmap() {
+		return bitmap;
+	}
+	
+	/**
+	 * Gets the desired renderer width
+	 * @param viewWidth the width of the view
+	 * @return the width
+	 */
+	protected int getDesiredRendererWidth(int viewWidth) {
+		return viewWidth;
+	}
+	
+	/**
+	 * Gets the desired renderer height
+	 * @param viewHeight the height of the view
+	 * @return the height
+	 */
+	protected int getDesiredRendererHeight(int viewHeight) {
+		return viewHeight;
 	}
 }

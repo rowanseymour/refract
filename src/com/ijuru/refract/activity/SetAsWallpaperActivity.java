@@ -19,12 +19,15 @@
 
 package com.ijuru.refract.activity;
 
+import java.io.IOException;
+
 import com.ijuru.refract.R;
+import com.ijuru.refract.ui.RendererView;
 
 import android.app.Activity;
 import android.app.WallpaperManager;
+import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 
 /**
@@ -32,25 +35,43 @@ import android.view.View;
  */
 public class SetAsWallpaperActivity extends Activity {
 	
+	private RendererView rendererView;
+	
 	/**
-	 * @see com.ijuru.refract.activity.ExplorerActivity#onCreate(Bundle)
+	 * @see android.app.Activity#onCreate(Bundle)
 	 */
 	@Override
     public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
 		setContentView(R.layout.set_as_wallpaper);
+		
+		rendererView = (RendererView)findViewById(R.id.rendererView);
 	}
 	
+	/**
+	 * Called when user presses OK button
+	 * @param view the button
+	 */
 	public void onOK(View view) {
-		WallpaperManager manager = WallpaperManager.getInstance(this);
+		rendererView.stopRendering();
 		
-		int width = manager.getDesiredMinimumWidth();
-		int height = manager.getDesiredMinimumHeight();
+		Bitmap bitmap = rendererView.getBitmap();
 		
-		Log.i("refract", "Desired wallpaper size: " + width + "x" + height);
+		try {
+			WallpaperManager wallpaperManager = WallpaperManager.getInstance(this);
+			wallpaperManager.setBitmap(bitmap);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		finish();
 	}
 	
+	/**
+	 * Called when user presses Cancel button
+	 * @param view the button
+	 */
 	public void onCancel(View view) {
 		finish();
 	}

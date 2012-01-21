@@ -68,6 +68,8 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* jvm, void* reserved)
 	complex_re_fid = (*env)->GetFieldID(env, complex_class, "re", "D");
 	complex_im_fid = (*env)->GetFieldID(env, complex_class, "im", "D");
 
+	LOG_D("Loaded library");
+
 	return JNI_VERSION_1_4;
 }
 
@@ -82,6 +84,8 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* jvm, void* reserved) {
 	(*env)->DeleteGlobalRef(env, nativerenderer_class);
 	(*env)->DeleteGlobalRef(env, function_class);
 	(*env)->DeleteGlobalRef(env, complex_class);
+
+	LOG_D("Unloaded library");
 }
 
 /**
@@ -112,11 +116,11 @@ JNIEXPORT jboolean JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_alloca
 		// Store pointer on Java object
 		set_renderer(env, this, renderer);
 
-		LOG_D("Allocated renderer internal resources");
+		LOG_D("Renderer #%d: allocated resources (%dx%d)", renderer->id, renderer->width, renderer->height);
 		return true;
 	}
 	else {
-		LOG_E("Unable to allocate renderer internal resources");
+		LOG_E("Renderer #%d: unable to allocate resources", renderer->id);
 		return false;
 	}
 }
@@ -126,6 +130,8 @@ JNIEXPORT jboolean JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_alloca
  */
 JNIEXPORT jboolean JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_resize(JNIEnv* env, jobject this, jint width, jint height) {
 	renderer_t* renderer = get_renderer(env, this);
+
+	LOG_D("Renderer #%d: resizing (%dx%d) -> (%dx%d)", renderer->id, renderer->width, renderer->height, (int)width, (int)height);
 
 	return refract_renderer_resize(renderer, (int)width, (int)height);
 }
@@ -238,7 +244,7 @@ JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setPalette
 	(*env)->ReleaseIntArrayElements(env, *colors, colorvals, 0);
 	(*env)->ReleaseFloatArrayElements(env, *anchors, anchorvals, 0);
 
-	LOG_D("Updated renderer palette");
+	LOG_D("Renderer #%d: updated palette", renderer->id);
 }
 
 /**
@@ -297,10 +303,10 @@ JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_free(JNIEn
 
 	refract_renderer_free(renderer);
 
+	LOG_D("Renderer #%d: freed resources", renderer->id);
+
 	// Free renderer object itself
 	free(renderer);
 
 	set_renderer(env, this, NULL);
-
-	LOG_D("Freed renderer internal resources");
 }
