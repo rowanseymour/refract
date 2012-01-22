@@ -178,6 +178,7 @@ void refract_renderer_render(renderer_t* renderer, color_t* pixels, int stride) 
 	const iterc_t* restrict iter_buffer = renderer->iter_buffer;
 	const color_t* restrict colors = renderer->palette.colors;
 	const int pal_size = renderer->palette.size;
+	const int pal_index_max = pal_size - 1;
 
 	// Render cached iteration values into pixels
 	color_t* restrict line = pixels;
@@ -197,7 +198,7 @@ void refract_renderer_render(renderer_t* renderer, color_t* pixels, int stride) 
 		for (int y = 0, index = 0; y < renderer->height; ++y) {
 			for (int x = 0; x < renderer->width; ++x, ++index) {
 				iterc_t iterc = iter_buffer[index];
-				int pal_index = MIN(iterc, pal_size);
+				int pal_index = MIN(iterc, pal_index_max);
 				line[x] = (iterc == max_iters) ? BLACK : colors[pal_index];
 			}
 			line = (color_t*)((char*)line + stride);

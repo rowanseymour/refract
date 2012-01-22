@@ -54,7 +54,7 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 		itersPerFramePref.setOnPreferenceChangeListener(this);
 		
 		paletteMappingPref = (ListPreference)getPreferenceScreen().findPreference("palettemapping");
-		iterFunctionPref.setOnPreferenceChangeListener(this);
+		paletteMappingPref.setOnPreferenceChangeListener(this);
 		
 		paletteSizePref = (EditTextPreference)getPreferenceScreen().findPreference("palettesize");
 		paletteSizePref.setOnPreferenceChangeListener(this);
