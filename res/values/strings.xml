@@ -6,6 +6,7 @@
 	<string name="str_function">Function</string>
 	<string name="str_itersperframe">Iterations per frame</string>
 	<string name="str_palette">Palette</string>
+	<string name="str_mapping">Mapping</string>
 	<string name="str_palettesize">Palette size</string>
 	<string name="str_iterating">Iterating</string>
 	<string name="str_reset">Reset</string>
@@ -13,14 +14,14 @@
 	<string name="str_renderaswallpaper">Render as wallpaper</string>
 	<string name="str_settings">Settings</string>
 	<string name="err_numberrange">Must be between %1$d and %2$d</string>
-	<string-array name="arr_iterfunclabels">
+	<string-array name="arr_iterfunctionlabels">
 		<item>z = z\u00B2 + c</item>
 		<item>z = z\u00B3 + c</item>
 		<item>z = z\u2074 + c</item>
 	</string-array>
-	<string-array name="arr_iterfunckeys">
-		<item>mandelbrot</item>
-		<item>mandelbrot_3</item>
-		<item>mandelbrot_4</item>
+	<string-array name="arr_palettemappinglabels">
+		<item>Repeat</item>
+		<item>Clamp</item>
+		<!--<item>Scale (slow)</item>-->
 	</string-array>
 </resources>

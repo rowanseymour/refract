@@ -43,17 +43,16 @@ public class Utils {
 	}
 	
 	/**
-	 * Parses a string into an integer
-	 * @param val the string
-	 * @return the integer or null if not a valid integer
+	 * Gets a shared preference as a string
+	 * @param context the context
+	 * @param key the preference key
+	 * @param defResId the resource id of the default value
+	 * @return the preference value
 	 */
-	public static Integer parseInteger(String val) {
-		try {
-			return Integer.parseInt(val);
-		}
-		catch (NumberFormatException ex) {
-			return null;
-		}
+	public static String getStringPreference(Context context, String key, int defResId) {
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+		String defValue = context.getResources().getString(defResId);
+		return preferences.getString(key, defValue);
 	}
 	
 	/**
@@ -67,5 +66,19 @@ public class Utils {
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 		String defValue = "" + context.getResources().getInteger(defResId);
 		return Utils.parseInteger(preferences.getString(key, defValue));
+	}
+	
+	/**
+	 * Parses a string into an integer
+	 * @param val the string
+	 * @return the integer or null if not a valid integer
+	 */
+	public static Integer parseInteger(String val) {
+		try {
+			return Integer.parseInt(val);
+		}
+		catch (NumberFormatException ex) {
+			return null;
+		}
 	}
 }

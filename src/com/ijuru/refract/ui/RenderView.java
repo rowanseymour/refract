@@ -29,12 +29,10 @@ import com.ijuru.refract.renderer.RendererFactory;
 import com.ijuru.refract.utils.Utils;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Bitmap.Config;
-import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -113,15 +111,15 @@ public class RenderView extends SurfaceView implements SurfaceHolder.Callback {
 		}
 		
 		// Get rendering parameters from preferences
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
-		Function iterFunc = Function.parseString(prefs.getString("iterfunc", "mandelbrot"));
+		Function iterFunction = Function.parseString(Utils.getStringPreference(getContext(), "iterfunction", R.string.def_iterfunction));
 		itersPerFrame = Utils.getIntegerPreference(getContext(), "itersperframe", R.integer.def_itersperframe);
-		Palette palette = Palette.getPresetByName(prefs.getString("palette", "sunset").toLowerCase());
+		Palette palette = Palette.getPresetByName(Utils.getStringPreference(getContext(), "palette", R.string.def_palette));
+		Mapping paletteMapping = Mapping.parseString(Utils.getStringPreference(getContext(), "palettemapping", R.string.def_palettemapping));
 		int paletteSize = Utils.getIntegerPreference(getContext(), "palettesize", R.integer.def_palettesize);
 		
-		renderer.setFunction(iterFunc);
+		renderer.setFunction(iterFunction);
 		renderer.setPalette(palette, paletteSize);
-		renderer.setPaletteMapping(Mapping.CLAMP);
+		renderer.setPaletteMapping(paletteMapping);
 		
 		// Start renderer thread
 		rendererThread = new RenderThread(this);
