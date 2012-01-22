@@ -25,6 +25,12 @@
 #include "color.h"
 
 /**
+ * General purpose macros
+ */
+#define MAX(a, b) ((a) > (b) ? a : b)
+#define MIN(a, b) ((a) < (b) ? a : b)
+
+/**
  * Counts of iterations
  */
 typedef uint16_t iterc_t;
@@ -72,10 +78,19 @@ typedef struct {
  */
 typedef struct {
 	int size;
-	int offset;
 	color_t* colors;
 
 } palette_t;
+
+/**
+ * Mapping options
+ */
+typedef enum {
+	REPEAT,
+	CLAMP,
+	SCALE
+
+} mapping_t;
 
 /**
  * Rendering context
@@ -87,6 +102,8 @@ typedef struct {
 
 	params_t params;
 	palette_t palette;
+	mapping_t palette_mapping;
+
 	iterc_t* iter_buffer;
 
 	bool cache_valid;

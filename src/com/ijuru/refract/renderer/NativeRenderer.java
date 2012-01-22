@@ -21,7 +21,8 @@ package com.ijuru.refract.renderer;
 
 import com.ijuru.refract.Complex;
 import com.ijuru.refract.Function;
-import com.ijuru.refract.PaletteDefinition;
+import com.ijuru.refract.Mapping;
+import com.ijuru.refract.Palette;
 
 import android.graphics.Bitmap;
 
@@ -48,7 +49,7 @@ public class NativeRenderer implements Renderer {
 	@Override public native void setOffset(Complex offset);
 	@Override public native double getZoom();
 	@Override public native void setZoom(double zoom);
-	@Override public native void setPalette(PaletteDefinition palette, int size);
-	@Override public native int getPaletteOffset();
-	@Override public native void setPaletteOffset(int offset);
+	@Override public native void setPalette(Palette palette, int size);
+	@Override public native Mapping getPaletteMapping();
+	@Override public native void setPaletteMapping(Mapping mapping);
 }

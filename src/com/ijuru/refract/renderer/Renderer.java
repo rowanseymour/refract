@@ -21,7 +21,8 @@ package com.ijuru.refract.renderer;
 
 import com.ijuru.refract.Complex;
 import com.ijuru.refract.Function;
-import com.ijuru.refract.PaletteDefinition;
+import com.ijuru.refract.Mapping;
+import com.ijuru.refract.Palette;
 
 import android.graphics.Bitmap;
 
@@ -116,17 +117,17 @@ public interface Renderer {
 	 * @param palette the palette
 	 * @param size the size
 	 */
-	public void setPalette(PaletteDefinition palette, int size);
+	public void setPalette(Palette palette, int size);
 	
 	/**
-	 * Gets the palette offset
-	 * @return the offset
+	 * Gets the palette mapping type
+	 * @return the mapping
 	 */
-	public int getPaletteOffset();
+	public Mapping getPaletteMapping();
 	
 	/**
-	 * Sets the palette offset
-	 * @param offset the offset
+	 * Sets the palette mapping type
+	 * @param mapping the mapping
 	 */
-	public void setPaletteOffset(int offset);
+	public void setPaletteMapping(Mapping mapping);
 }

@@ -20,7 +20,9 @@
 package com.ijuru.refract.utils;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.preference.PreferenceManager;
 
 /**
  * General utility methods
@@ -52,5 +54,18 @@ public class Utils {
 		catch (NumberFormatException ex) {
 			return null;
 		}
+	}
+	
+	/**
+	 * Gets a shared preference as an integer
+	 * @param context the context
+	 * @param key the preference key
+	 * @param defResId the resource id of the default value
+	 * @return the preference value
+	 */
+	public static int getIntegerPreference(Context context, String key, int defResId) {
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+		String defValue = "" + context.getResources().getInteger(defResId);
+		return Utils.parseInteger(preferences.getString(key, defValue));
 	}
 }

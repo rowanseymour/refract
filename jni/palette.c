@@ -24,7 +24,6 @@
  */
 bool refract_palette_init(palette_t* palette, color_t* colors, float* anchors, int points, int size) {
 	palette->size = size;
-	palette->offset = 0;
 	palette->colors = malloc(sizeof (color_t) * size);
 
 	if (!colors)

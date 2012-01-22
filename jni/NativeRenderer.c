@@ -36,11 +36,12 @@
 #define NATIVERENDERER_CLASS	"com/ijuru/refract/renderer/NativeRenderer"
 #define FUNCTION_CLASS			"com/ijuru/refract/Function"
 #define COMPLEX_CLASS			"com/ijuru/refract/Complex"
+#define MAPPING_CLASS			"com/ijuru/refract/Mapping"
 
 // Cached Java entities
-jclass nativerenderer_class, complex_class, function_class;
+jclass nativerenderer_class, function_class, complex_class, mapping_class;
 jfieldID nativerenderer_renderer_fid, complex_re_fid, complex_im_fid;
-jmethodID function_ordinal_mid, function_values_mid, complex_cid;
+jmethodID function_ordinal_mid, function_values_mid, complex_cid, mapping_ordinal_mid, mapping_values_mid;
 
 /**
  * Called by JVM as library is being loaded
@@ -68,6 +69,11 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* jvm, void* reserved)
 	complex_re_fid = (*env)->GetFieldID(env, complex_class, "re", "D");
 	complex_im_fid = (*env)->GetFieldID(env, complex_class, "im", "D");
 
+	cls = (*env)->FindClass(env, MAPPING_CLASS);
+	mapping_class = (*env)->NewGlobalRef(env, cls);
+	mapping_ordinal_mid = (*env)->GetMethodID(env, mapping_class, "ordinal", "()I");
+	mapping_values_mid = (*env)->GetStaticMethodID(env, mapping_class, "values", "()[L" MAPPING_CLASS ";");
+
 	LOG_D("Loaded library");
 
 	return JNI_VERSION_1_4;
@@ -84,6 +90,7 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* jvm, void* reserved) {
 	(*env)->DeleteGlobalRef(env, nativerenderer_class);
 	(*env)->DeleteGlobalRef(env, function_class);
 	(*env)->DeleteGlobalRef(env, complex_class);
+	(*env)->DeleteGlobalRef(env, mapping_class);
 
 	LOG_D("Unloaded library");
 }
@@ -171,7 +178,6 @@ JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setFunctio
 	renderer_t* renderer = get_renderer(env, this);
 
 	func_t func = (func_t)(*env)->CallIntMethod(env, function, function_ordinal_mid);
-
 	refract_renderer_setfunction(renderer, func);
 }
 
@@ -248,19 +254,22 @@ JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setPalette
 }
 
 /**
- * Gets the palette offset
+ * Gets the palette mapping type
  */
-JNIEXPORT jint JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_getPaletteOffset(JNIEnv* env, jobject this) {
+JNIEXPORT jobject JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_getPaletteMapping(JNIEnv* env, jobject this) {
 	renderer_t* renderer = get_renderer(env, this);
-	return (jint)renderer->palette.offset;
+
+	jobject values_obj = (*env)->CallStaticObjectMethod(env, mapping_class, mapping_values_mid);
+	return (*env)->GetObjectArrayElement(env, values_obj, (int)renderer->palette_mapping);
 }
 
 /**
- * Sets the palette offset
+ * Sets the palette mapping type
  */
-JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setPaletteOffset(JNIEnv* env, jobject this, jint offset) {
+JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setPaletteMapping(JNIEnv* env, jobject this, jobject mapping) {
 	renderer_t* renderer = get_renderer(env, this);
-	renderer->palette.offset = (int)offset;
+
+	renderer->palette_mapping = (mapping_t)(*env)->CallIntMethod(env, mapping, mapping_ordinal_mid);
 }
 
 /**

@@ -19,7 +19,7 @@
 
 package com.ijuru.refract.ui;
 
-import com.ijuru.refract.PaletteDefinition;
+import com.ijuru.refract.Palette;
 import com.ijuru.refract.R;
 
 import android.content.Context;
@@ -32,13 +32,13 @@ import android.widget.ArrayAdapter;
 /**
  * List adapter for palette objects
  */
-public class PaletteListAdapter extends ArrayAdapter<PaletteDefinition> implements OnClickListener {
+public class PaletteListAdapter extends ArrayAdapter<Palette> implements OnClickListener {
 
 	private PalettePreference preference;
 	private LayoutInflater inflater;
 	
 	public PaletteListAdapter(Context context, PalettePreference preference) {
-		super(context, R.layout.palette_list_item, PaletteDefinition.getPresets());
+		super(context, R.layout.palette_list_item, Palette.getPresets());
 		
 		this.preference = preference;
 		this.inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -53,7 +53,7 @@ public class PaletteListAdapter extends ArrayAdapter<PaletteDefinition> implemen
 		view.setOnClickListener(this);
 		view.setId(position);
 
-		PaletteDefinition palette = this.getItem(position);
+		Palette palette = this.getItem(position);
 		PaletteView preview = (PaletteView)view.findViewById(R.id.preview);
 		preview.setPalette(palette);
 		

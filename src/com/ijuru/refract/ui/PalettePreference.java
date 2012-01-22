@@ -19,7 +19,7 @@
 
 package com.ijuru.refract.ui;
 
-import com.ijuru.refract.PaletteDefinition;
+import com.ijuru.refract.Palette;
 
 import android.app.AlertDialog.Builder;
 import android.content.Context;
@@ -35,9 +35,9 @@ public class PalettePreference extends ListPreference {
 		super(context, attrs);
 		
 		// Make array of palette names
-		String[] palNames = new String[PaletteDefinition.getPresets().size()];
+		String[] palNames = new String[Palette.getPresets().size()];
 		for (int p = 0; p < palNames.length; ++p) {
-			palNames[p] = PaletteDefinition.getPresets().get(p).getName();
+			palNames[p] = Palette.getPresets().get(p).getName();
 		}
 		
 		setEntries(palNames);

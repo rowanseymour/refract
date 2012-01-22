@@ -178,20 +178,34 @@ void refract_renderer_render(renderer_t* renderer, color_t* pixels, int stride) 
 	const iterc_t* restrict iter_buffer = renderer->iter_buffer;
 	const color_t* restrict colors = renderer->palette.colors;
 	const int pal_size = renderer->palette.size;
-	const int pal_offset = renderer->palette.offset;
 
 	// Render cached iteration values into pixels
 	color_t* restrict line = pixels;
 
-	for (int y = 0, index = 0; y < renderer->height; ++y) {
-		for (int x = 0; x < renderer->width; ++x, ++index) {
-			iterc_t iterc = iter_buffer[index];
-			int pal_index = (iterc + pal_offset) % pal_size;
-			line[x] = (iterc == max_iters) ? BLACK : colors[pal_index];
+	switch (renderer->palette_mapping) {
+	case REPEAT:
+		for (int y = 0, index = 0; y < renderer->height; ++y) {
+			for (int x = 0; x < renderer->width; ++x, ++index) {
+				iterc_t iterc = iter_buffer[index];
+				int pal_index = iterc % pal_size;
+				line[x] = (iterc == max_iters) ? BLACK : colors[pal_index];
+			}
+			line = (color_t*)((char*)line + stride);
 		}
-
-		// go to next line
-		line = (color_t*)((char*)line + stride);
+		break;
+	case CLAMP:
+		for (int y = 0, index = 0; y < renderer->height; ++y) {
+			for (int x = 0; x < renderer->width; ++x, ++index) {
+				iterc_t iterc = iter_buffer[index];
+				int pal_index = MIN(iterc, pal_size);
+				line[x] = (iterc == max_iters) ? BLACK : colors[pal_index];
+			}
+			line = (color_t*)((char*)line + stride);
+		}
+		break;
+	case SCALE:
+		// TODO
+		break;
 	}
 
 	// Unlock access to buffers

@@ -25,36 +25,36 @@ import java.util.List;
 /**
  * Palette used to render a fractal as a bitmap. These use ARGB codes for colors rather than the ABGR used by the JNI code.
  */
-public class PaletteDefinition {
+public class Palette {
 	
 	private String name;
 	private int[] colors;
 	private float[] anchors;
 	
-	private static List<PaletteDefinition> presets = new ArrayList<PaletteDefinition>();
+	private static List<Palette> presets = new ArrayList<Palette>();
 	
 	static {
-		presets.add(new PaletteDefinition("sunset",
+		presets.add(new Palette("sunset",
 			new int[] { 0xFF640032, 0xFFFF0000, 0xFFFFFF00 },
 			new float[] { 0.0f, 0.3f, 1.0f }
 		));
-		presets.add(new PaletteDefinition("hubble",
+		presets.add(new Palette("hubble",
 			new int[] { 0xFF0D1C40, 0xFF46787A, 0xFFFFFF00 },
 			new float[] { 0.0f, 0.4f, 1.0f }
 		));
-		presets.add(new PaletteDefinition("rainbow",
+		presets.add(new Palette("rainbow",
 			new int[] { 0xFFFF0000, 0xFFFF8000, 0xFFFFFF00, 0xFF00FF00, 0xFF00FFFF, 0xFF0080FF, 0xFF0000FF, 0xFFFF0000 },
 			new float[] { 0.0f, 0.143f, 0.286f, 0.429f, 0.571f, 0.714f, 0.857f, 1.0f }
 		));
-		presets.add(new PaletteDefinition("chrome",
+		presets.add(new Palette("chrome",
 			new int[] { 0xFF2989CC, 0xFFFFFFFF, 0xFF906A00, 0xFFD99F00, 0xFFFFFFFF },
 			new float[] { 0.0f, 0.49f, 0.5f, 0.625f, 1.0f }
 		));
-		presets.add(new PaletteDefinition("evening",
+		presets.add(new Palette("evening",
 			new int[] { 0xFF002874, 0xFFFD7C00, 0xFF6F156C, 0xFFF9E600 },
 			new float[] { 0.0f, 0.333f, 0.666f, 1.0f }
 		));
-		presets.add(new PaletteDefinition("electric",
+		presets.add(new Palette("electric",
 			new int[] { 0xFF000010, 0xFF1000F0, 0xFFFFFFFF },
 			new float[] { 0.0f, 0.3f, 1.0f }
 		));
@@ -66,7 +66,7 @@ public class PaletteDefinition {
 	 * @param colors the color points
 	 * @param anchors the point positions 0.0...1.0
 	 */
-	private PaletteDefinition(String name, int[] colors, float[] anchors) {
+	private Palette(String name, int[] colors, float[] anchors) {
 		this.name = name;
 		this.colors = colors;
 		this.anchors = anchors;
@@ -77,8 +77,8 @@ public class PaletteDefinition {
 	 * @param name the name
 	 * @return the palette
 	 */
-	public static PaletteDefinition getPresetByName(String name) {
-		for (PaletteDefinition preset : presets) {
+	public static Palette getPresetByName(String name) {
+		for (Palette preset : presets) {
 			if (preset.name.equals(name))
 				return preset;
 		}
@@ -89,7 +89,7 @@ public class PaletteDefinition {
 	 * Gets all of the presets
 	 * @return the presets
 	 */
-	public static List<PaletteDefinition> getPresets() {
+	public static List<Palette> getPresets() {
 		return presets;
 	}
 	

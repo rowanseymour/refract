@@ -21,7 +21,8 @@ package com.ijuru.refract.ui;
 
 import com.ijuru.refract.Complex;
 import com.ijuru.refract.Function;
-import com.ijuru.refract.PaletteDefinition;
+import com.ijuru.refract.Mapping;
+import com.ijuru.refract.Palette;
 import com.ijuru.refract.R;
 import com.ijuru.refract.renderer.Renderer;
 import com.ijuru.refract.renderer.RendererFactory;
@@ -114,11 +115,13 @@ public class RenderView extends SurfaceView implements SurfaceHolder.Callback {
 		// Get rendering parameters from preferences
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
 		Function iterFunc = Function.parseString(prefs.getString("iterfunc", "mandelbrot"));
-		itersPerFrame = Utils.parseInteger(prefs.getString("itersperframe", "5"));
-		PaletteDefinition palette = PaletteDefinition.getPresetByName(prefs.getString("palette", "sunset").toLowerCase());
+		itersPerFrame = Utils.getIntegerPreference(getContext(), "itersperframe", R.integer.def_itersperframe);
+		Palette palette = Palette.getPresetByName(prefs.getString("palette", "sunset").toLowerCase());
+		int paletteSize = Utils.getIntegerPreference(getContext(), "palettesize", R.integer.def_palettesize);
 		
 		renderer.setFunction(iterFunc);
-		renderer.setPalette(palette, 128);
+		renderer.setPalette(palette, paletteSize);
+		renderer.setPaletteMapping(Mapping.CLAMP);
 		
 		// Start renderer thread
 		rendererThread = new RenderThread(this);
