@@ -36,7 +36,7 @@ import android.widget.Toast;
  */
 public class SettingsActivity extends PreferenceActivity implements OnPreferenceChangeListener {
 
-	private ListPreference iterFunctionPref;
+	private ListPreference iterFunctionPref, paletteMappingPref;
 	private EditTextPreference itersPerFramePref, paletteSizePref;
 	
 	/**
@@ -53,11 +53,15 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 		itersPerFramePref = (EditTextPreference)getPreferenceScreen().findPreference("itersperframe");
 		itersPerFramePref.setOnPreferenceChangeListener(this);
 		
+		paletteMappingPref = (ListPreference)getPreferenceScreen().findPreference("palettemapping");
+		iterFunctionPref.setOnPreferenceChangeListener(this);
+		
 		paletteSizePref = (EditTextPreference)getPreferenceScreen().findPreference("palettesize");
 		paletteSizePref.setOnPreferenceChangeListener(this);
 		
 		updatePreferenceSummary(iterFunctionPref, iterFunctionPref.getValue());
 		updatePreferenceSummary(itersPerFramePref, itersPerFramePref.getText());
+		updatePreferenceSummary(paletteMappingPref, paletteMappingPref.getValue());
 		updatePreferenceSummary(paletteSizePref, paletteSizePref.getText());
 	}
 
