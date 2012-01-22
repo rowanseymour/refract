@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-	<com.ijuru.refract.ui.RendererView
+	<com.ijuru.refract.ui.RenderView
 	    android:id="@+id/rendererView"
 	    android:layout_width="match_parent"
 	    android:layout_height="match_parent"

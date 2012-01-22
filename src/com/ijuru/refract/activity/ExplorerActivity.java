@@ -22,7 +22,7 @@ package com.ijuru.refract.activity;
 import com.ijuru.refract.Complex;
 import com.ijuru.refract.R;
 import com.ijuru.refract.renderer.Renderer;
-import com.ijuru.refract.ui.RendererView;
+import com.ijuru.refract.ui.RenderView;
 import com.ijuru.refract.ui.StatusPanel;
 import com.ijuru.refract.utils.Utils;
 
@@ -37,9 +37,9 @@ import android.view.MenuItem;
 /**
  * Activity for exploring fractals
  */
-public class ExplorerActivity extends Activity implements RendererView.RendererListener {
+public class ExplorerActivity extends Activity implements RenderView.RendererListener {
 	
-	private RendererView rendererView;
+	private RenderView rendererView;
 	private StatusPanel statusPanel;
 	private Bundle savedInstanceState;
 	
@@ -59,7 +59,7 @@ public class ExplorerActivity extends Activity implements RendererView.RendererL
 		
 		setContentView(R.layout.explorer);
 		
-		rendererView = (RendererView)findViewById(R.id.rendererView);
+		rendererView = (RenderView)findViewById(R.id.rendererView);
 		statusPanel = (StatusPanel)findViewById(R.id.statusPanel);
 		
 		rendererView.setRendererListener(this);
@@ -115,7 +115,7 @@ public class ExplorerActivity extends Activity implements RendererView.RendererL
 	 * Displays the 'set as' dialog
 	 */
 	private void onMenuWallpaper() {
-		Intent intent = new Intent(getApplicationContext(), RenderAsWallpaperActivity.class);
+		Intent intent = new Intent(getApplicationContext(), WallpaperActivity.class);
 		Bundle bundle = new Bundle();
 		saveParametersToBundle(bundle);
 		intent.putExtras(bundle);
@@ -137,10 +137,10 @@ public class ExplorerActivity extends Activity implements RendererView.RendererL
 	}
 	
 	/**
-	 * @see com.ijuru.refract.ui.RendererView.RendererListener#onRendererCreated(RendererView, Renderer)
+	 * @see com.ijuru.refract.ui.RenderView.RendererListener#onRendererCreated(RenderView, Renderer)
 	 */
 	@Override
-	public void onRendererCreated(RendererView view, Renderer renderer) {
+	public void onRendererCreated(RenderView view, Renderer renderer) {
 		if (savedInstanceState != null) {
 			// Load rendering parameters from bundle
 			double offset_re = savedInstanceState.getDouble("offset_re");
@@ -163,26 +163,26 @@ public class ExplorerActivity extends Activity implements RendererView.RendererL
 	}
 
 	/**
-	 * @see com.ijuru.refract.ui.RendererView.RendererListener#onOffsetChanged(RendererView, Complex)
+	 * @see com.ijuru.refract.ui.RenderView.RendererListener#onOffsetChanged(RenderView, Complex)
 	 */
 	@Override
-	public void onRendererOffsetChanged(RendererView view, Complex offset) {
+	public void onRendererOffsetChanged(RenderView view, Complex offset) {
 		statusPanel.setCoords(offset.re, offset.im);
 	}
 
 	/**
-	 * @see com.ijuru.refract.ui.RendererView.RendererListener#onZoomChanged(RendererView, double)
+	 * @see com.ijuru.refract.ui.RenderView.RendererListener#onZoomChanged(RenderView, double)
 	 */
 	@Override
-	public void onRendererZoomChanged(RendererView view, double zoom) {
+	public void onRendererZoomChanged(RenderView view, double zoom) {
 		statusPanel.setZoom(zoom);
 	}
 
 	/**
-	 * @see com.ijuru.refract.ui.RendererView.RendererListener#onUpdate(RendererView, int)
+	 * @see com.ijuru.refract.ui.RenderView.RendererListener#onUpdate(RenderView, int)
 	 */
 	@Override
-	public void onRendererUpdate(RendererView view, int iters) {
+	public void onRendererUpdate(RenderView view, int iters) {
 		long avgFrameTime = view.getRendererThread().calcSmoothedFrameTime();
 		
 		statusPanel.setPerformanceInfo(iters, avgFrameTime > 0 ? 1000.0 / avgFrameTime : 0);

@@ -21,11 +21,10 @@ package com.ijuru.refract.ui;
 
 import com.ijuru.refract.Complex;
 import com.ijuru.refract.Function;
-import com.ijuru.refract.Palette;
+import com.ijuru.refract.PaletteDefinition;
 import com.ijuru.refract.R;
-import com.ijuru.refract.RendererThread;
-import com.ijuru.refract.renderer.NativeRenderer;
 import com.ijuru.refract.renderer.Renderer;
+import com.ijuru.refract.renderer.RendererFactory;
 import com.ijuru.refract.utils.Utils;
 
 import android.content.Context;
@@ -36,7 +35,6 @@ import android.graphics.Canvas;
 import android.graphics.Bitmap.Config;
 import android.preference.PreferenceManager;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -45,14 +43,14 @@ import android.view.SurfaceView;
 import android.widget.Toast;
 
 /**
- * View which displays the fractal rendering
+ * View which displays a rendering
  */
-public class RendererView extends SurfaceView implements SurfaceHolder.Callback {
+public class RenderView extends SurfaceView implements SurfaceHolder.Callback {
 	
 	private boolean navigationEnabled;
 	private Bitmap bitmap;
 	private Renderer renderer;
-	private RendererThread rendererThread;
+	private RenderThread rendererThread;
 	private RendererListener listener;
 
 	// Rendering parameters
@@ -67,7 +65,7 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	 * @param context the context
 	 * @param attrs the attributes from the layout resource
 	 */
-	public RendererView(Context context, AttributeSet attrs) {
+	public RenderView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		
 		getHolder().addCallback(this);
@@ -88,10 +86,10 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	 * Listener interface
 	 */
 	public interface RendererListener {
-		public void onRendererCreated(RendererView view, Renderer renderer);
-		public void onRendererOffsetChanged(RendererView view, Complex offset);
-		public void onRendererZoomChanged(RendererView view, double zoom);
-		public void onRendererUpdate(RendererView view, int iters);
+		public void onRendererCreated(RenderView view, Renderer renderer);
+		public void onRendererOffsetChanged(RenderView view, Complex offset);
+		public void onRendererZoomChanged(RenderView view, double zoom);
+		public void onRendererUpdate(RenderView view, int iters);
 	}
 	
 	/**
@@ -103,7 +101,7 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 		int rendererHeight = getDesiredRendererHeight(getHeight());
 		
 		bitmap = Bitmap.createBitmap(rendererWidth, rendererHeight, Config.ARGB_8888);
-		renderer = new NativeRenderer();
+		renderer = RendererFactory.createRenderer();
 		
 		/**
 		 * TODO do something appropriate if renderer allocation fails
@@ -117,19 +115,17 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
 		Function iterFunc = Function.parseString(prefs.getString("iterfunc", "mandelbrot"));
 		itersPerFrame = Utils.parseInteger(prefs.getString("itersperframe", "5"));
-		Palette palette = Palette.getPresetByName(prefs.getString("palette", "sunset").toLowerCase());
+		PaletteDefinition palette = PaletteDefinition.getPresetByName(prefs.getString("palette", "sunset").toLowerCase());
 		
 		renderer.setFunction(iterFunc);
 		renderer.setPalette(palette, 128);
 		
 		// Start renderer thread
-		rendererThread = new RendererThread(this);
+		rendererThread = new RenderThread(this);
 		rendererThread.start();
 		
 		if (listener != null)
 			listener.onRendererCreated(this, renderer);
-		
-		Log.d("refract", "Render created [" + rendererWidth + ", " + rendererHeight + "]");
 	}
 
 	@Override
@@ -142,8 +138,6 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 			renderer.resize(width, height);
 			bitmap = Bitmap.createBitmap(width, height, Config.ARGB_8888);
 		}
-		
-		Log.d("refract", "Render surface resized [" + width + ", " + height + "]");
 	}
 	
 	@Override
@@ -154,8 +148,6 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 		
 		// Deallocate renderer
 		renderer.free();
-		
-		Log.d("refract", "Render surface destroyed");
 	}
 	
 	/**
@@ -181,7 +173,7 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 		}
 		
 		if (listener != null)
-			listener.onRendererUpdate(RendererView.this, iters);
+			listener.onRendererUpdate(RenderView.this, iters);
 		
 		//Log.v("refract", "Render surface updated [" + rendererThread.getLastFrameTime() + "ms]");
 	}
@@ -316,7 +308,7 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	 * Gets the renderer thread
 	 * @return the renderer thread
 	 */
-	public RendererThread getRendererThread() {
+	public RenderThread getRendererThread() {
 		return rendererThread;
 	}
 	

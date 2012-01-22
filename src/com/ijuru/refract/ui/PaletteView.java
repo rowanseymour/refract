@@ -19,7 +19,7 @@
 
 package com.ijuru.refract.ui;
 
-import com.ijuru.refract.Palette;
+import com.ijuru.refract.PaletteDefinition;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -34,7 +34,7 @@ import android.view.View;
  */
 public class PaletteView extends View {
 
-	private Palette palette;
+	private PaletteDefinition palette;
 	
 	public PaletteView(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -56,7 +56,7 @@ public class PaletteView extends View {
 	 * Sets the palette to be displayed
 	 * @param palette the palette
 	 */
-	public void setPalette(Palette palette) {
+	public void setPalette(PaletteDefinition palette) {
 		this.palette = palette;
 	}
 }

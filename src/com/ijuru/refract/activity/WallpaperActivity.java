@@ -24,7 +24,7 @@ import java.io.IOException;
 import com.ijuru.refract.Complex;
 import com.ijuru.refract.R;
 import com.ijuru.refract.renderer.Renderer;
-import com.ijuru.refract.ui.RendererView;
+import com.ijuru.refract.ui.RenderView;
 
 import android.app.Activity;
 import android.app.WallpaperManager;
@@ -35,9 +35,9 @@ import android.view.View;
 /**
  * Activity to set fractal rendering as device wallpaper
  */
-public class RenderAsWallpaperActivity extends Activity implements RendererView.RendererListener {
+public class WallpaperActivity extends Activity implements RenderView.RendererListener {
 	
-	private RendererView rendererView;
+	private RenderView rendererView;
 	
 	/**
 	 * @see android.app.Activity#onCreate(Bundle)
@@ -48,7 +48,7 @@ public class RenderAsWallpaperActivity extends Activity implements RendererView.
 		
 		setContentView(R.layout.set_as_wallpaper);
 		
-		rendererView = (RendererView)findViewById(R.id.rendererView);
+		rendererView = (RenderView)findViewById(R.id.rendererView);
 		rendererView.setRendererListener(this);
 	}
 	
@@ -80,10 +80,10 @@ public class RenderAsWallpaperActivity extends Activity implements RendererView.
 	}
 
 	/**
-	 * @see com.ijuru.refract.ui.RendererView.RendererListener#onRendererCreated(RendererView, Renderer)
+	 * @see com.ijuru.refract.ui.RenderView.RendererListener#onRendererCreated(RenderView, Renderer)
 	 */
 	@Override
-	public void onRendererCreated(RendererView view, Renderer renderer) {
+	public void onRendererCreated(RenderView view, Renderer renderer) {
 		// Set render parameters from intent if they exist
 		if (getIntent().hasExtra("offset_re") && getIntent().hasExtra("offset_im")) {
 			double offset_re = getIntent().getDoubleExtra("offset_re", 0.0);
@@ -95,23 +95,23 @@ public class RenderAsWallpaperActivity extends Activity implements RendererView.
 	}
 
 	/**
-	 * @see com.ijuru.refract.ui.RendererView.RendererListener#onRendererOffsetChanged(RendererView, Complex)
+	 * @see com.ijuru.refract.ui.RenderView.RendererListener#onRendererOffsetChanged(RenderView, Complex)
 	 */
 	@Override
-	public void onRendererOffsetChanged(RendererView view, Complex offset) {	
+	public void onRendererOffsetChanged(RenderView view, Complex offset) {	
 	}
 
 	/**
-	 * @see com.ijuru.refract.ui.RendererView.RendererListener#onRendererZoomChanged(RendererView, double)
+	 * @see com.ijuru.refract.ui.RenderView.RendererListener#onRendererZoomChanged(RenderView, double)
 	 */
 	@Override
-	public void onRendererZoomChanged(RendererView view, double zoom) {	
+	public void onRendererZoomChanged(RenderView view, double zoom) {	
 	}
 
 	/**
-	 * @see com.ijuru.refract.ui.RendererView.RendererListener#onRendererUpdate(RendererView, int)
+	 * @see com.ijuru.refract.ui.RenderView.RendererListener#onRendererUpdate(RenderView, int)
 	 */
 	@Override
-	public void onRendererUpdate(RendererView view, int iters) {
+	public void onRendererUpdate(RenderView view, int iters) {
 	}	
 }

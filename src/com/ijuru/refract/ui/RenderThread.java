@@ -17,18 +17,17 @@
  * along with Refract. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.ijuru.refract;
+package com.ijuru.refract.ui;
 
-import com.ijuru.refract.ui.RendererView;
 
 import android.util.Log;
 
 /**
  * Thread to update fractal rendering
  */
-public class RendererThread extends Thread {
+public class RenderThread extends Thread {
 	
-	private RendererView view;
+	private RenderView view;
 	
 	private static final int STAT_FRAMES = 10;
 	private long lastFrameTime = 0;
@@ -37,7 +36,7 @@ public class RendererThread extends Thread {
 	private long beginTime = 0;
 	private long lastUpdateTime = 0;
 
-	public RendererThread(RendererView view) {
+	public RenderThread(RenderView view) {
 		this.view = view;
 	}
 
