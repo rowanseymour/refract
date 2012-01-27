@@ -26,7 +26,7 @@ import android.util.AttributeSet;
 /**
  * Renderer view whose renderer size matches the system wallpaper size
  */
-public class WallpaperRenderView extends ScaledRenderView {
+public class WallpaperRendererView extends ScaledRenderView {
 	
 	private WallpaperManager wallpaperManager = WallpaperManager.getInstance(getContext());
 	
@@ -35,7 +35,7 @@ public class WallpaperRenderView extends ScaledRenderView {
 	 * @param context the context
 	 * @param attrs the attributes
 	 */
-	public WallpaperRenderView(Context context, AttributeSet attrs) {
+	public WallpaperRendererView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 	}
 	

@@ -19,15 +19,12 @@
 
 package com.ijuru.refract.ui;
 
-
-import android.util.Log;
-
 /**
  * Thread to update fractal rendering
  */
-public class RenderThread extends Thread {
+public class RendererThread extends Thread {
 	
-	private RenderView view;
+	private RendererView view;
 	
 	private static final int STAT_FRAMES = 10;
 	private long lastFrameTime = 0;
@@ -36,7 +33,7 @@ public class RenderThread extends Thread {
 	private long beginTime = 0;
 	private long lastUpdateTime = 0;
 
-	public RenderThread(RenderView view) {
+	public RendererThread(RendererView view) {
 		this.view = view;
 	}
 
@@ -54,8 +51,6 @@ public class RenderThread extends Thread {
 			lastUpdateTime = updateTime;
 			++updateNumber;
 		}
-		
-		Log.d("refract", "Average frame time: " + calcAverageFrameTime() + "ms");
 	}
 	
 	/**

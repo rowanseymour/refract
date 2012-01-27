@@ -22,12 +22,19 @@ package com.ijuru.refract.activity;
 import java.io.IOException;
 
 import com.ijuru.refract.Complex;
+import com.ijuru.refract.Function;
+import com.ijuru.refract.Mapping;
+import com.ijuru.refract.Palette;
+import com.ijuru.refract.Parameters;
 import com.ijuru.refract.R;
 import com.ijuru.refract.renderer.Renderer;
-import com.ijuru.refract.ui.RenderView;
+import com.ijuru.refract.renderer.RendererListener;
+import com.ijuru.refract.ui.RendererView;
+import com.ijuru.refract.utils.Utils;
 
 import android.app.Activity;
 import android.app.WallpaperManager;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.View;
@@ -35,9 +42,9 @@ import android.view.View;
 /**
  * Activity to set fractal rendering as device wallpaper
  */
-public class WallpaperActivity extends Activity implements RenderView.RendererListener {
+public class WallpaperActivity extends Activity implements RendererListener {
 	
-	private RenderView rendererView;
+	private RendererView rendererView;
 	
 	/**
 	 * @see android.app.Activity#onCreate(Bundle)
@@ -48,7 +55,7 @@ public class WallpaperActivity extends Activity implements RenderView.RendererLi
 		
 		setContentView(R.layout.set_as_wallpaper);
 		
-		rendererView = (RenderView)findViewById(R.id.rendererView);
+		rendererView = (RendererView)findViewById(R.id.rendererView);
 		rendererView.setRendererListener(this);
 	}
 	
@@ -80,38 +87,54 @@ public class WallpaperActivity extends Activity implements RenderView.RendererLi
 	}
 
 	/**
-	 * @see com.ijuru.refract.ui.RenderView.RendererListener#onRendererCreated(RenderView, Renderer)
+	 * @see com.ijuru.refract.ui.RendererView.RendererListener#onRendererCreated(RendererView, Renderer)
 	 */
 	@Override
-	public void onRendererCreated(RenderView view, Renderer renderer) {
+	public void onRendererCreated(RendererView view, Renderer renderer) {
+		// Get renderer parameters from preferences
+		Function iterFunction = Function.parseString(Utils.getStringPreference(this, "iterfunction", R.string.def_iterfunction));
+		Palette palette = Palette.getPresetByName(Utils.getStringPreference(this, "palette", R.string.def_palette));
+		int paletteSize = Utils.getIntegerPreference(this, "palettesize", R.integer.def_palettesize);
+		
+		renderer.setFunction(iterFunction);
+		renderer.setPalette(palette, paletteSize);
+		renderer.setPaletteMapping(Mapping.CLAMP);
+			
 		// Set render parameters from intent if they exist
-		if (getIntent().hasExtra("offset_re") && getIntent().hasExtra("offset_im")) {
-			double offset_re = getIntent().getDoubleExtra("offset_re", 0.0);
-			double offset_im = getIntent().getDoubleExtra("offset_im", 0.0);
-			rendererView.setOffset(new Complex(offset_re, offset_im));
+		Intent intent = getIntent();
+		if (intent != null && intent.hasExtra("params")) {
+			Parameters params = (Parameters)intent.getParcelableExtra("params");
+			renderer.setOffset(params.getOffset());
+			renderer.setZoom(params.getZoom());
 		}
-		if (getIntent().hasExtra("zoom"))
-			rendererView.setZoom(getIntent().getDoubleExtra("zoom", 200));
 	}
 
 	/**
-	 * @see com.ijuru.refract.ui.RenderView.RendererListener#onRendererOffsetChanged(RenderView, Complex)
+	 * @see com.ijuru.refract.ui.RendererView.RendererListener#onRendererOffsetChanged(RendererView, Renderer, Complex)
 	 */
 	@Override
-	public void onRendererOffsetChanged(RenderView view, Complex offset) {	
+	public void onRendererOffsetChanged(RendererView view, Renderer renderer, Complex offset) {	
 	}
 
 	/**
-	 * @see com.ijuru.refract.ui.RenderView.RendererListener#onRendererZoomChanged(RenderView, double)
+	 * @see com.ijuru.refract.ui.RendererView.RendererListener#onRendererZoomChanged(RendererView, Renderer, double)
 	 */
 	@Override
-	public void onRendererZoomChanged(RenderView view, double zoom) {	
+	public void onRendererZoomChanged(RendererView view, Renderer renderer, double zoom) {	
 	}
 
 	/**
-	 * @see com.ijuru.refract.ui.RenderView.RendererListener#onRendererUpdate(RenderView, int)
+	 * @see com.ijuru.refract.ui.RendererView.RendererListener#onRendererIterated(RendererView, Renderer, int)
 	 */
 	@Override
-	public void onRendererUpdate(RenderView view, int iters) {
-	}	
+	public void onRendererIterated(RendererView view, Renderer renderer, int iters) {
+		// TODO display number of iterations somewhere
+	}
+	
+	/**
+	 * @see com.ijuru.refract.ui.RendererView.RendererListener#onRendererDestroy(RendererView, Renderer)
+	 */
+	@Override
+	public void onRendererDestroy(RendererView view, Renderer renderer) {
+	}
 }

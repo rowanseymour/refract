@@ -20,13 +20,10 @@
 package com.ijuru.refract.ui;
 
 import com.ijuru.refract.Complex;
-import com.ijuru.refract.Function;
-import com.ijuru.refract.Mapping;
-import com.ijuru.refract.Palette;
 import com.ijuru.refract.R;
 import com.ijuru.refract.renderer.Renderer;
 import com.ijuru.refract.renderer.RendererFactory;
-import com.ijuru.refract.utils.Utils;
+import com.ijuru.refract.renderer.RendererListener;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -44,16 +41,16 @@ import android.widget.Toast;
 /**
  * View which displays a rendering
  */
-public class RenderView extends SurfaceView implements SurfaceHolder.Callback {
+public class RendererView extends SurfaceView implements SurfaceHolder.Callback {
 	
 	private boolean navigationEnabled;
 	private Bitmap bitmap;
 	private Renderer renderer;
-	private RenderThread rendererThread;
+	private RendererThread rendererThread;
 	private RendererListener listener;
 
 	// Rendering parameters
-	private int itersPerFrame;
+	private int itersPerFrame = 5;
 
 	// For panning and zooming
 	private GestureDetector panDetector;
@@ -64,7 +61,7 @@ public class RenderView extends SurfaceView implements SurfaceHolder.Callback {
 	 * @param context the context
 	 * @param attrs the attributes from the layout resource
 	 */
-	public RenderView(Context context, AttributeSet attrs) {
+	public RendererView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		
 		getHolder().addCallback(this);
@@ -82,20 +79,10 @@ public class RenderView extends SurfaceView implements SurfaceHolder.Callback {
 	}
 	
 	/**
-	 * Listener interface
-	 */
-	public interface RendererListener {
-		public void onRendererCreated(RenderView view, Renderer renderer);
-		public void onRendererOffsetChanged(RenderView view, Complex offset);
-		public void onRendererZoomChanged(RenderView view, double zoom);
-		public void onRendererUpdate(RenderView view, int iters);
-	}
-	
-	/**
 	 * @see android.view.SurfaceHolder.Callback#surfaceCreated(SurfaceHolder)
 	 */
 	@Override
-	public void surfaceCreated(SurfaceHolder holder) {
+	public void surfaceCreated(SurfaceHolder holder) {		
 		int rendererWidth = getDesiredRendererWidth(getWidth());
 		int rendererHeight = getDesiredRendererHeight(getHeight());
 		
@@ -110,27 +97,16 @@ public class RenderView extends SurfaceView implements SurfaceHolder.Callback {
 			return;
 		}
 		
-		// Get rendering parameters from preferences
-		Function iterFunction = Function.parseString(Utils.getStringPreference(getContext(), "iterfunction", R.string.def_iterfunction));
-		itersPerFrame = Utils.getIntegerPreference(getContext(), "itersperframe", R.integer.def_itersperframe);
-		Palette palette = Palette.getPresetByName(Utils.getStringPreference(getContext(), "palette", R.string.def_palette));
-		Mapping paletteMapping = Mapping.parseString(Utils.getStringPreference(getContext(), "palettemapping", R.string.def_palettemapping));
-		int paletteSize = Utils.getIntegerPreference(getContext(), "palettesize", R.integer.def_palettesize);
-		
-		renderer.setFunction(iterFunction);
-		renderer.setPalette(palette, paletteSize);
-		renderer.setPaletteMapping(paletteMapping);
-		
-		// Start renderer thread
-		rendererThread = new RenderThread(this);
-		rendererThread.start();
-		
 		if (listener != null)
 			listener.onRendererCreated(this, renderer);
+		
+		// Start renderer thread
+		rendererThread = new RendererThread(this);
+		rendererThread.start();
 	}
 
 	@Override
-	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {	
 		int rendererWidth = getDesiredRendererWidth(width);
 		int rendererHeight = getDesiredRendererHeight(height);
 		
@@ -142,10 +118,13 @@ public class RenderView extends SurfaceView implements SurfaceHolder.Callback {
 	}
 	
 	@Override
-	public void surfaceDestroyed(SurfaceHolder holder) {
-		
+	public void surfaceDestroyed(SurfaceHolder holder) {	
 		// Stop renderer thread
 		stopRendering();
+		
+		// Notify listener that renderer is about to be destroyed
+		if (listener != null)
+			listener.onRendererDestroy(this, renderer);
 		
 		// Deallocate renderer
 		renderer.free();
@@ -156,6 +135,9 @@ public class RenderView extends SurfaceView implements SurfaceHolder.Callback {
 	 */
 	public void update() {
 		int iters = renderer.iterate(itersPerFrame);
+		
+		if (listener != null)
+			listener.onRendererIterated(this, renderer, iters);
 		
 		// Render into off screen bitmap
 		renderer.render(bitmap);
@@ -172,11 +154,6 @@ public class RenderView extends SurfaceView implements SurfaceHolder.Callback {
 				getHolder().unlockCanvasAndPost(c);
 			}
 		}
-		
-		if (listener != null)
-			listener.onRendererUpdate(RenderView.this, iters);
-		
-		//Log.v("refract", "Render surface updated [" + rendererThread.getLastFrameTime() + "ms]");
 	}
 
 	/**
@@ -188,7 +165,7 @@ public class RenderView extends SurfaceView implements SurfaceHolder.Callback {
 	}
 	
 	/**
-	 * Stops the rendering thread
+	 * Stops the rendering thread and doesn't return until it does
 	 */
 	public void stopRendering() {
 		if (rendererThread != null) {
@@ -222,8 +199,7 @@ public class RenderView extends SurfaceView implements SurfaceHolder.Callback {
 	/**
 	 * Listener for drag-pan gestures
 	 */
-	private class PanListener extends GestureDetector.SimpleOnGestureListener {
-		
+	private class PanListener extends GestureDetector.SimpleOnGestureListener {	
 		/**
 		 * @see GestureDetector.SimpleOnGestureListener#onScroll(MotionEvent, MotionEvent, float, float)
 		 */
@@ -275,7 +251,7 @@ public class RenderView extends SurfaceView implements SurfaceHolder.Callback {
 		renderer.setOffset(offset);
 		
 		if (listener != null)
-			listener.onRendererOffsetChanged(this, offset);
+			listener.onRendererOffsetChanged(this, renderer, offset);
 	}
 	
 	/**
@@ -294,7 +270,7 @@ public class RenderView extends SurfaceView implements SurfaceHolder.Callback {
 		renderer.setZoom(zoom);
 		
 		if (listener != null)
-			listener.onRendererZoomChanged(this, zoom);
+			listener.onRendererZoomChanged(this, renderer, zoom);
 	}
 	
 	/**
@@ -309,7 +285,7 @@ public class RenderView extends SurfaceView implements SurfaceHolder.Callback {
 	 * Gets the renderer thread
 	 * @return the renderer thread
 	 */
-	public RenderThread getRendererThread() {
+	public RendererThread getRendererThread() {
 		return rendererThread;
 	}
 	
@@ -337,5 +313,21 @@ public class RenderView extends SurfaceView implements SurfaceHolder.Callback {
 	 */
 	protected int getDesiredRendererHeight(int viewHeight) {
 		return viewHeight;
+	}
+	
+	/**
+	 * Gets the number of iterations per frame
+	 * @return the number of iterations
+	 */
+	public int getIterationsPerFrame() {
+		return itersPerFrame;
+	}
+
+	/**
+	 * Sets the number of iterations per frame
+	 * @param itersPerFrame the number of iterations
+	 */
+	public void setIterationsPerFrame(int itersPerFrame) {
+		this.itersPerFrame = itersPerFrame;
 	}
 }

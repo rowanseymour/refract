@@ -20,9 +20,14 @@
 package com.ijuru.refract.activity;
 
 import com.ijuru.refract.Complex;
+import com.ijuru.refract.Function;
+import com.ijuru.refract.Mapping;
+import com.ijuru.refract.Palette;
+import com.ijuru.refract.Parameters;
 import com.ijuru.refract.R;
 import com.ijuru.refract.renderer.Renderer;
-import com.ijuru.refract.ui.RenderView;
+import com.ijuru.refract.renderer.RendererListener;
+import com.ijuru.refract.ui.RendererView;
 import com.ijuru.refract.ui.StatusPanel;
 import com.ijuru.refract.utils.Utils;
 
@@ -37,18 +42,10 @@ import android.view.MenuItem;
 /**
  * Activity for exploring fractals
  */
-public class ExplorerActivity extends Activity implements RenderView.RendererListener {
+public class ExplorerActivity extends Activity implements RendererListener {
 	
-	private RenderView rendererView;
+	private RendererView rendererView;
 	private StatusPanel statusPanel;
-	private Bundle savedInstanceState;
-	
-	/**
-	 * Load the native code
-	 */
-	static {
-        System.loadLibrary("refract");
-    }
 	
 	/**
 	 * @see com.ijuru.refract.activity.ExplorerActivity#onCreate(Bundle)
@@ -59,25 +56,11 @@ public class ExplorerActivity extends Activity implements RenderView.RendererLis
 		
 		setContentView(R.layout.explorer);
 		
-		rendererView = (RenderView)findViewById(R.id.rendererView);
+		rendererView = (RendererView)findViewById(R.id.rendererView);
 		statusPanel = (StatusPanel)findViewById(R.id.statusPanel);
 		
 		rendererView.setRendererListener(this);
-		
-		// Keep bundle for later when we have a renderer
-		this.savedInstanceState = savedInstanceState;
     }
-	
-	/**
-	 * @see android.app.Activity#onSaveInstanceState(android.os.Bundle)
-	 */
-	@Override
-	protected void onSaveInstanceState(Bundle bundle) {
-		// Save rendering parameters to bundle
-		saveParametersToBundle(bundle);
-		
-		super.onSaveInstanceState(bundle);
-	}
 
 	/**
 	 * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
@@ -117,7 +100,7 @@ public class ExplorerActivity extends Activity implements RenderView.RendererLis
 	private void onMenuWallpaper() {
 		Intent intent = new Intent(getApplicationContext(), WallpaperActivity.class);
 		Bundle bundle = new Bundle();
-		saveParametersToBundle(bundle);
+		bundle.putParcelable("params", new Parameters(rendererView.getOffset(), rendererView.getZoom()));
 		intent.putExtras(bundle);
 		startActivity(intent);
 	}
@@ -137,54 +120,56 @@ public class ExplorerActivity extends Activity implements RenderView.RendererLis
 	}
 	
 	/**
-	 * @see com.ijuru.refract.ui.RenderView.RendererListener#onRendererCreated(RenderView, Renderer)
+	 * @see com.ijuru.refract.ui.RendererView.RendererListener#onRendererCreated(RendererView, Renderer)
 	 */
 	@Override
-	public void onRendererCreated(RenderView view, Renderer renderer) {
-		if (savedInstanceState != null) {
-			// Load rendering parameters from bundle
-			double offset_re = savedInstanceState.getDouble("offset_re");
-			double offset_im = savedInstanceState.getDouble("offset_im");
-			double zoom = savedInstanceState.getDouble("zoom");
-			renderer.setOffset(new Complex(offset_re, offset_im));
-			renderer.setZoom(zoom);
-		}
-	}
-	
-	/**
-	 * SAves the render parameters to a bundle
-	 * @param bundle the bundle
-	 */
-	private void saveParametersToBundle(Bundle bundle) {
-		Complex offset = rendererView.getOffset();
-		bundle.putDouble("offset_re", offset.re);
-		bundle.putDouble("offset_im", offset.im);
-		bundle.putDouble("zoom", rendererView.getZoom());
+	public void onRendererCreated(RendererView view, Renderer renderer) {
+		// Get renderer options from preferences
+		Function iterFunction = Function.parseString(Utils.getStringPreference(this, "iterfunction", R.string.def_iterfunction));
+		Palette palette = Palette.getPresetByName(Utils.getStringPreference(this, "palette", R.string.def_palette));
+		Mapping paletteMapping = Mapping.parseString(Utils.getStringPreference(this, "palettemapping", R.string.def_palettemapping));
+		int paletteSize = Utils.getIntegerPreference(this, "palettesize", R.integer.def_palettesize);
+		
+		renderer.setFunction(iterFunction);
+		renderer.setPalette(palette, paletteSize);
+		renderer.setPaletteMapping(paletteMapping);
+		
+		// Get renderer view options from preferences
+		int itersPerFrame = Utils.getIntegerPreference(this, "itersperframe", R.integer.def_itersperframe);
+		view.setIterationsPerFrame(itersPerFrame);
 	}
 
 	/**
-	 * @see com.ijuru.refract.ui.RenderView.RendererListener#onOffsetChanged(RenderView, Complex)
+	 * @see com.ijuru.refract.ui.RendererView.RendererListener#onOffsetChanged(RendererView, Renderer, Complex)
 	 */
 	@Override
-	public void onRendererOffsetChanged(RenderView view, Complex offset) {
+	public void onRendererOffsetChanged(RendererView view, Renderer renderer, Complex offset) {
 		statusPanel.setCoords(offset.re, offset.im);
 	}
 
 	/**
-	 * @see com.ijuru.refract.ui.RenderView.RendererListener#onZoomChanged(RenderView, double)
+	 * @see com.ijuru.refract.ui.RendererView.RendererListener#onZoomChanged(RendererView, Renderer, double)
 	 */
 	@Override
-	public void onRendererZoomChanged(RenderView view, double zoom) {
+	public void onRendererZoomChanged(RendererView view, Renderer renderer, double zoom) {
 		statusPanel.setZoom(zoom);
 	}
 
 	/**
-	 * @see com.ijuru.refract.ui.RenderView.RendererListener#onUpdate(RenderView, int)
+	 * @see com.ijuru.refract.ui.RendererView.RendererListener#onUpdate(RendererView, Renderer, int)
 	 */
 	@Override
-	public void onRendererUpdate(RenderView view, int iters) {
-		long avgFrameTime = view.getRendererThread().calcSmoothedFrameTime();
+	public void onRendererIterated(RendererView view, Renderer renderer, int iters) {
+		long avgFrameTime = rendererView.getRendererThread().calcSmoothedFrameTime();
 		
 		statusPanel.setPerformanceInfo(iters, avgFrameTime > 0 ? 1000.0 / avgFrameTime : 0);
+	}
+	
+	/**
+	 * @see com.ijuru.refract.ui.RendererView.RendererListener#onRendererDestroy(RendererView, Renderer)
+	 */
+	@Override
+	public void onRendererDestroy(RendererView view, Renderer renderer) {
+		// TODO save renderer parameters
 	}
 }

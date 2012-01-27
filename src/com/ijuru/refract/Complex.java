@@ -71,7 +71,7 @@ public class Complex {
 	public Complex conj() {
 		return new Complex(re, -im);
 	}
-	
+
 	/**
 	 * @see java.lang.Object#equals(Object)
 	 */

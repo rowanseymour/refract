@@ -31,6 +31,11 @@ import android.util.AttributeSet;
  */
 public class PalettePreference extends ListPreference {
 
+	/**
+	 * Constructs a palette preference
+	 * @param context the context
+	 * @param attrs the attributes
+	 */
 	public PalettePreference(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		
@@ -49,20 +54,10 @@ public class PalettePreference extends ListPreference {
 	 */
 	@Override
 	protected void onPrepareDialogBuilder(Builder builder) {
-		//int index = findIndexOfValue(getSharedPreferences().getString(getKey(), "sunset"));
 		PaletteListAdapter adapter = new PaletteListAdapter(getContext(), this);
 		
 		builder.setAdapter(adapter, this);
 
 		super.onPrepareDialogBuilder(builder);
-	}
-
-	/**
-	 * @see android.preference.ListPreference#onDialogClosed(boolean)
-	 */
-	@Override
-	protected void onDialogClosed(boolean positiveResult) {
-		// TODO Auto-generated method stub
-		super.onDialogClosed(positiveResult);
 	}
 }

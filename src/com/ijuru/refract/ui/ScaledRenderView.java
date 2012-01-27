@@ -28,7 +28,7 @@ import android.util.AttributeSet;
 /**
  * A renderer view which maintains a fixed size renderer and scales it's image when drawing
  */
-public abstract class ScaledRenderView extends RenderView {
+public abstract class ScaledRenderView extends RendererView {
 	
 	/**
 	 * Constructs a scaled renderer view
@@ -40,7 +40,7 @@ public abstract class ScaledRenderView extends RenderView {
 	}
 		
 	/**
-	 * @see com.ijuru.refract.ui.RenderView#onDraw(android.graphics.Canvas)
+	 * @see com.ijuru.refract.ui.RendererView#onDraw(android.graphics.Canvas)
 	 */
 	@Override
 	protected void onDraw(Canvas canvas) {
@@ -71,14 +71,14 @@ public abstract class ScaledRenderView extends RenderView {
 
 	/**
 	 * Must be overridden by subclasses to specify renderer width
-	 * @see com.ijuru.refract.ui.RenderView#getDesiredRendererWidth(int)
+	 * @see com.ijuru.refract.ui.RendererView#getDesiredRendererWidth(int)
 	 */
 	@Override
 	protected abstract int getDesiredRendererWidth(int viewWidth);
 
 	/**
 	 * Must be overridden by subclasses to specify renderer height
-	 * @see com.ijuru.refract.ui.RenderView#getDesiredRendererHeight(int)
+	 * @see com.ijuru.refract.ui.RendererView#getDesiredRendererHeight(int)
 	 */
 	@Override
 	protected abstract int getDesiredRendererHeight(int viewHeight);
