@@ -20,7 +20,6 @@
 package com.ijuru.refract.activity;
 
 import com.ijuru.refract.R;
-import com.ijuru.refract.utils.Utils;
 
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -111,10 +110,15 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 	 * @return true if valid
 	 */
 	private boolean validateRange(Object value, int min, int max) {
-		Integer val = Utils.parseInteger(value.toString());
-		if (val == null || val < min || val > max) {
-			String message = String.format(getString(R.string.err_numberrange), min, max);
-			Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+		try {
+			Integer val = Integer.parseInt(value.toString());
+			if (val == null || val < min || val > max) {
+				String message = String.format(getString(R.string.err_numberrange), min, max);
+				Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+				return false;
+			}
+		}
+		catch (NumberFormatException ex) {
 			return false;
 		}
 		return true;

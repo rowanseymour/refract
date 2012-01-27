@@ -20,6 +20,7 @@
 package com.ijuru.refract;
 
 import android.app.Application;
+import android.content.pm.PackageManager.NameNotFoundException;
 
 /**
  * Application class
@@ -32,4 +33,17 @@ public class RefractApplication extends Application {
 	static {
         System.loadLibrary("refract");
     }
+	
+	/**
+	 * Gets the version name from the manifest
+	 * @return the version name
+	 */
+	public String getVersionName() {
+		try {
+			String packageName = getPackageName();
+			return getPackageManager().getPackageInfo(packageName, 0).versionName;
+		} catch (NameNotFoundException e) {
+			return null;
+		}
+	}
 }

@@ -30,7 +30,7 @@ import com.ijuru.refract.R;
 import com.ijuru.refract.renderer.Renderer;
 import com.ijuru.refract.renderer.RendererListener;
 import com.ijuru.refract.ui.RendererView;
-import com.ijuru.refract.utils.Utils;
+import com.ijuru.refract.utils.Preferences;
 
 import android.app.Activity;
 import android.app.WallpaperManager;
@@ -92,9 +92,9 @@ public class WallpaperActivity extends Activity implements RendererListener {
 	@Override
 	public void onRendererCreated(RendererView view, Renderer renderer) {
 		// Get renderer parameters from preferences
-		Function iterFunction = Function.parseString(Utils.getStringPreference(this, "iterfunction", R.string.def_iterfunction));
-		Palette palette = Palette.getPresetByName(Utils.getStringPreference(this, "palette", R.string.def_palette));
-		int paletteSize = Utils.getIntegerPreference(this, "palettesize", R.integer.def_palettesize);
+		Function iterFunction = Preferences.getFunctionPreference(this, "iterfunction", Function.MANDELBROT);
+		Palette palette = Palette.getPresetByName(Preferences.getStringPreference(this, "palette", R.string.def_palette));
+		int paletteSize = Preferences.getIntegerPreference(this, "palettesize", R.integer.def_palettesize);
 		
 		renderer.setFunction(iterFunction);
 		renderer.setPalette(palette, paletteSize);

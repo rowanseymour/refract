@@ -25,11 +25,12 @@ import com.ijuru.refract.Mapping;
 import com.ijuru.refract.Palette;
 import com.ijuru.refract.Parameters;
 import com.ijuru.refract.R;
+import com.ijuru.refract.RefractApplication;
 import com.ijuru.refract.renderer.Renderer;
 import com.ijuru.refract.renderer.RendererListener;
 import com.ijuru.refract.ui.RendererView;
 import com.ijuru.refract.ui.StatusPanel;
-import com.ijuru.refract.utils.Utils;
+import com.ijuru.refract.utils.Preferences;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -109,7 +110,9 @@ public class ExplorerActivity extends Activity implements RendererListener {
 	 * Displays the about dialog
 	 */
 	private void onMenuAbout() {
-		String title = getString(R.string.app_name) + " " + Utils.getVersionName(this);
+		RefractApplication app = (RefractApplication)getApplication();
+		
+		String title = getString(R.string.app_name) + " " + app.getVersionName();
 		String message = 
 				"Thank you for downloading " + getString(R.string.app_name) + "\n" +
 				"\n" +
@@ -124,18 +127,24 @@ public class ExplorerActivity extends Activity implements RendererListener {
 	 */
 	@Override
 	public void onRendererCreated(RendererView view, Renderer renderer) {
-		// Get renderer options from preferences
-		Function iterFunction = Function.parseString(Utils.getStringPreference(this, "iterfunction", R.string.def_iterfunction));
-		Palette palette = Palette.getPresetByName(Utils.getStringPreference(this, "palette", R.string.def_palette));
-		Mapping paletteMapping = Mapping.parseString(Utils.getStringPreference(this, "palettemapping", R.string.def_palettemapping));
-		int paletteSize = Utils.getIntegerPreference(this, "palettesize", R.integer.def_palettesize);
+		// Load renderer options from preferences
+		Function iterFunction = Preferences.getFunctionPreference(this, "iterfunction", Function.MANDELBROT);
+		Palette palette = Palette.getPresetByName(Preferences.getStringPreference(this, "palette", R.string.def_palette));
+		Mapping paletteMapping = Preferences.getMappingPreference(this, "palettemapping", Mapping.REPEAT);
+		int paletteSize = Preferences.getIntegerPreference(this, "palettesize", R.integer.def_palettesize);
 		
 		renderer.setFunction(iterFunction);
 		renderer.setPalette(palette, paletteSize);
 		renderer.setPaletteMapping(paletteMapping);
 		
-		// Get renderer view options from preferences
-		int itersPerFrame = Utils.getIntegerPreference(this, "itersperframe", R.integer.def_itersperframe);
+		// Load renderer parameters from preferences
+		Parameters params = Preferences.getParametersPreference(this, "params");
+		renderer.setOffset(params.getOffset());
+		if (params.getZoom() > 0.0)
+			renderer.setZoom(params.getZoom());
+		
+		// Load renderer view options from preferences
+		int itersPerFrame = Preferences.getIntegerPreference(this, "itersperframe", R.integer.def_itersperframe);
 		view.setIterationsPerFrame(itersPerFrame);
 	}
 
@@ -170,6 +179,8 @@ public class ExplorerActivity extends Activity implements RendererListener {
 	 */
 	@Override
 	public void onRendererDestroy(RendererView view, Renderer renderer) {
-		// TODO save renderer parameters
+		// Save renderer parameters to preferences
+		Parameters params = new Parameters(renderer.getOffset(), renderer.getZoom());
+		Preferences.setParametersPreference(this, "params", params);
 	}
 }
