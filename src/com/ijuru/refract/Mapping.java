@@ -25,7 +25,7 @@ package com.ijuru.refract;
 public enum Mapping {
 	REPEAT,
 	CLAMP,
-	SCALE;
+	SCALE_GLOBAL;
 	
 	/**
 	 * Parses a mapping from a string

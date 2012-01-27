@@ -88,7 +88,7 @@ typedef struct {
 typedef enum {
 	REPEAT,
 	CLAMP,
-	SCALE
+	SCALE_GLOBAL
 
 } mapping_t;
 

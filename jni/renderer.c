@@ -184,29 +184,42 @@ void refract_renderer_render(renderer_t* renderer, color_t* pixels, int stride) 
 	color_t* restrict line = pixels;
 
 	switch (renderer->palette_mapping) {
-	case REPEAT:
-		for (int y = 0, index = 0; y < renderer->height; ++y) {
-			for (int x = 0; x < renderer->width; ++x, ++index) {
-				iterc_t iterc = iter_buffer[index];
-				int pal_index = iterc % pal_size;
-				line[x] = (iterc == max_iters) ? BLACK : colors[pal_index];
+		case REPEAT:
+			for (int y = 0, index = 0; y < renderer->height; ++y) {
+				for (int x = 0; x < renderer->width; ++x, ++index) {
+					iterc_t iterc = iter_buffer[index];
+					int pal_index = iterc % pal_size;
+					line[x] = (iterc == max_iters) ? BLACK : colors[pal_index];
+				}
+				line = (color_t*)((char*)line + stride);
 			}
-			line = (color_t*)((char*)line + stride);
-		}
-		break;
-	case CLAMP:
-		for (int y = 0, index = 0; y < renderer->height; ++y) {
-			for (int x = 0; x < renderer->width; ++x, ++index) {
-				iterc_t iterc = iter_buffer[index];
-				int pal_index = MIN(iterc, pal_index_max);
-				line[x] = (iterc == max_iters) ? BLACK : colors[pal_index];
+			break;
+		case CLAMP:
+			for (int y = 0, index = 0; y < renderer->height; ++y) {
+				for (int x = 0; x < renderer->width; ++x, ++index) {
+					iterc_t iterc = iter_buffer[index];
+					int pal_index = MIN(iterc, pal_index_max);
+					line[x] = (iterc == max_iters) ? BLACK : colors[pal_index];
+				}
+				line = (color_t*)((char*)line + stride);
 			}
-			line = (color_t*)((char*)line + stride);
+			break;
+		case SCALE_GLOBAL: {
+			int* indices = malloc(max_iters * sizeof (int));
+			for (int i = 0; i < max_iters; ++i)
+				indices[i] = pal_size * i / max_iters;
+
+			for (int y = 0, index = 0; y < renderer->height; ++y) {
+				for (int x = 0; x < renderer->width; ++x, ++index) {
+					iterc_t iterc = iter_buffer[index];
+					line[x] = (iterc == max_iters) ? BLACK : colors[indices[iterc]];
+				}
+				line = (color_t*)((char*)line + stride);
+			}
+
+			free(indices);
+			break;
 		}
-		break;
-	case SCALE:
-		// TODO
-		break;
 	}
 
 	// Unlock access to buffers

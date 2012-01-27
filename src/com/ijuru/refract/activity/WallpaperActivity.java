@@ -98,7 +98,7 @@ public class WallpaperActivity extends Activity implements RendererListener {
 		
 		renderer.setFunction(iterFunction);
 		renderer.setPalette(palette, paletteSize);
-		renderer.setPaletteMapping(Mapping.CLAMP);
+		renderer.setPaletteMapping(Mapping.SCALE_GLOBAL);
 			
 		// Set render parameters from intent if they exist
 		Intent intent = getIntent();

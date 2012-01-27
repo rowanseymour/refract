@@ -22,6 +22,6 @@
 	<string-array name="arr_palettemappinglabels">
 		<item>Repeat</item>
 		<item>Clamp</item>
-		<!--<item>Scale (slow)</item>-->
+		<item>Scale global (slow)</item>
 	</string-array>
 </resources>
