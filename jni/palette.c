@@ -22,9 +22,10 @@
 /**
  * Initializes a palette
  */
-bool refract_palette_init(palette_t* palette, color_t* colors, float* anchors, int points, int size) {
+bool refract_palette_init(palette_t* palette, color_t* colors, float* anchors, int points, int size, color_t set_color) {
 	palette->size = size;
 	palette->colors = malloc(sizeof (color_t) * size);
+	palette->set_color = set_color;
 
 	if (!colors)
 		return false;

@@ -224,7 +224,7 @@ JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setZoom(JN
 /**
  * Sets the palette
  */
-JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setPalette(JNIEnv* env, jobject this, jobject palette, jint size) {
+JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setPalette(JNIEnv* env, jobject this, jobject palette, jint size, jint set_color) {
 	renderer_t* renderer = get_renderer(env, this);
 
 	// Free existing palette
@@ -245,7 +245,7 @@ JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setPalette
 	jfloat* anchorvals = (*env)->GetFloatArrayElements(env, *anchors, NULL);
 	int points = (*env)->GetArrayLength(env, *colors);
 
-	refract_palette_init(&renderer->palette, (color_t*)colorvals, (float*)anchorvals, points, size);
+	refract_palette_init(&renderer->palette, (color_t*)colorvals, (float*)anchorvals, points, size, RGB_TO_ABGR((int)set_color));
 
 	(*env)->ReleaseIntArrayElements(env, *colors, colorvals, 0);
 	(*env)->ReleaseFloatArrayElements(env, *anchors, anchorvals, 0);

@@ -23,4 +23,6 @@
 	<integer name="min_palettesize">16</integer>
     <integer name="def_palettesize">128</integer>
     <integer name="max_palettesize">1024</integer>
+    
+    <integer name="def_setcolor">0xFF000000</integer>
 </resources>

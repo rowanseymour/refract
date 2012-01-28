@@ -116,8 +116,9 @@ public interface Renderer {
 	 * Sets the palette for renders
 	 * @param palette the palette
 	 * @param size the size
+	 * @param the RGB color of the set
 	 */
-	public void setPalette(Palette palette, int size);
+	public void setPalette(Palette palette, int size, int setColor);
 	
 	/**
 	 * Gets the palette mapping type

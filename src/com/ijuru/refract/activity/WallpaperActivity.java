@@ -93,11 +93,12 @@ public class WallpaperActivity extends Activity implements RendererListener {
 	public void onRendererCreated(RendererView view, Renderer renderer) {
 		// Get renderer parameters from preferences
 		Function iterFunction = Preferences.getFunctionPreference(this, "iterfunction", Function.MANDELBROT);
-		Palette palette = Palette.getPresetByName(Preferences.getStringPreference(this, "palette", R.string.def_palette));
+		Palette palette = Palette.getPresetByName(Preferences.getStringPreference(this, "palettepreset", R.string.def_palette));
 		int paletteSize = Preferences.getIntegerPreference(this, "palettesize", R.integer.def_palettesize);
+		int setColor = Preferences.getIntegerPreference(this, "setcolor", R.integer.def_setcolor);
 		
 		renderer.setFunction(iterFunction);
-		renderer.setPalette(palette, paletteSize);
+		renderer.setPalette(palette, paletteSize, setColor);
 		renderer.setPaletteMapping(Mapping.SCALE_GLOBAL);
 			
 		// Set render parameters from intent if they exist

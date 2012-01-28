@@ -79,6 +79,7 @@ typedef struct {
 typedef struct {
 	int size;
 	color_t* colors;
+	color_t set_color;
 
 } palette_t;
 
@@ -101,8 +102,10 @@ typedef struct {
 	int height;
 
 	params_t params;
+
 	palette_t palette;
 	mapping_t palette_mapping;
+	int* palette_indexes;
 
 	iterc_t* iter_buffer;
 
@@ -130,5 +133,5 @@ void refract_renderer_free(renderer_t* renderer);
 /**
  * Palette functions
  */
-bool refract_palette_init(palette_t* palette, color_t* colors, float* anchors, int points, int size);
+bool refract_palette_init(palette_t* palette, color_t* colors, float* anchors, int points, int size, color_t set_color);
 void refract_palette_free(palette_t* palette);

@@ -40,7 +40,11 @@ bool refract_renderer_init(renderer_t* renderer, int width, int height) {
 	renderer->params.offset.im = 0;
 	renderer->params.zoom = width / 2;
 
-	// Allocate buffers
+	// Allocate palette index buffer
+	if ((renderer->palette_indexes = malloc(ITERC_MAX * sizeof (int))) == NULL)
+		return false;
+
+	// Allocate screen buffers
 	if (!refract_renderer_resize(renderer, width, height))
 		return false;
 
@@ -176,50 +180,36 @@ void refract_renderer_render(renderer_t* renderer, color_t* pixels, int stride) 
 
 	// Gather up frequently used items
 	const iterc_t* restrict iter_buffer = renderer->iter_buffer;
-	const color_t* restrict colors = renderer->palette.colors;
 	const int pal_size = renderer->palette.size;
 	const int pal_index_max = pal_size - 1;
-
-	// Render cached iteration values into pixels
-	color_t* restrict line = pixels;
+	int* restrict indexes = renderer->palette_indexes;
 
 	switch (renderer->palette_mapping) {
-		case REPEAT:
-			for (int y = 0, index = 0; y < renderer->height; ++y) {
-				for (int x = 0; x < renderer->width; ++x, ++index) {
-					iterc_t iterc = iter_buffer[index];
-					int pal_index = iterc % pal_size;
-					line[x] = (iterc == max_iters) ? BLACK : colors[pal_index];
-				}
-				line = (color_t*)((char*)line + stride);
-			}
-			break;
-		case CLAMP:
-			for (int y = 0, index = 0; y < renderer->height; ++y) {
-				for (int x = 0; x < renderer->width; ++x, ++index) {
-					iterc_t iterc = iter_buffer[index];
-					int pal_index = MIN(iterc, pal_index_max);
-					line[x] = (iterc == max_iters) ? BLACK : colors[pal_index];
-				}
-				line = (color_t*)((char*)line + stride);
-			}
-			break;
-		case SCALE_GLOBAL: {
-			int* indices = malloc(max_iters * sizeof (int));
-			for (int i = 0; i < max_iters; ++i)
-				indices[i] = pal_size * i / max_iters;
+	case REPEAT:
+		for (int i = 0; i < max_iters; ++i)
+			indexes[i] = i % pal_size;
+		break;
+	case CLAMP:
+		for (int i = 0; i < max_iters; ++i)
+			indexes[i] = MIN(i, pal_index_max); // TODO optimize?
+		break;
+	case SCALE_GLOBAL:
+		for (int i = 0; i < max_iters; ++i)
+			indexes[i] = pal_size * i / max_iters;
+		break;
+	}
 
-			for (int y = 0, index = 0; y < renderer->height; ++y) {
-				for (int x = 0; x < renderer->width; ++x, ++index) {
-					iterc_t iterc = iter_buffer[index];
-					line[x] = (iterc == max_iters) ? BLACK : colors[indices[iterc]];
-				}
-				line = (color_t*)((char*)line + stride);
-			}
+	const color_t* restrict colors = renderer->palette.colors;
+	color_t* restrict line = pixels;
+	color_t set_color = renderer->palette.set_color;
 
-			free(indices);
-			break;
+	// Fill pixel buffer based on palette indexes
+	for (int y = 0, index = 0; y < renderer->height; ++y) {
+		for (int x = 0; x < renderer->width; ++x, ++index) {
+			iterc_t iterc = iter_buffer[index];
+			line[x] = (iterc == max_iters) ? set_color : colors[indexes[iterc]];
 		}
+		line = (color_t*)((char*)line + stride);
 	}
 
 	// Unlock access to buffers
@@ -233,10 +223,16 @@ void refract_renderer_free(renderer_t* renderer) {
 	// Lock access to buffers
 	pthread_mutex_lock(&renderer->buffers_mutex);
 
-	// Free renderer's palette
+	// Free palette
 	refract_palette_free(&renderer->palette);
 
-	// Free buffers
+	// Free palette indexes
+	if (renderer->palette_indexes) {
+		free(renderer->palette_indexes);
+		renderer->palette_indexes = NULL;
+	}
+
+	// Free screen buffers
 	if (renderer->iter_buffer) {
 		free(renderer->iter_buffer);
 		renderer->iter_buffer = NULL;

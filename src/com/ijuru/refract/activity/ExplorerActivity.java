@@ -132,9 +132,10 @@ public class ExplorerActivity extends Activity implements RendererListener {
 		Palette palette = Palette.getPresetByName(Preferences.getStringPreference(this, "palette", R.string.def_palette));
 		Mapping paletteMapping = Preferences.getMappingPreference(this, "palettemapping", Mapping.REPEAT);
 		int paletteSize = Preferences.getIntegerPreference(this, "palettesize", R.integer.def_palettesize);
+		int setColor = Preferences.getIntegerPreference(this, "setcolor", R.integer.def_setcolor);
 		
 		renderer.setFunction(iterFunction);
-		renderer.setPalette(palette, paletteSize);
+		renderer.setPalette(palette, paletteSize, setColor);
 		renderer.setPaletteMapping(paletteMapping);
 		
 		// Load renderer parameters from preferences
