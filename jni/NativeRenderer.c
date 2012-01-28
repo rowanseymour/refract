@@ -33,10 +33,10 @@
 // Set to 1 to enable debug log traces
 #define DEBUG 1
 
-#define NATIVERENDERER_CLASS	"com/ijuru/refract/renderer/NativeRenderer"
-#define FUNCTION_CLASS			"com/ijuru/refract/Function"
-#define COMPLEX_CLASS			"com/ijuru/refract/Complex"
-#define MAPPING_CLASS			"com/ijuru/refract/Mapping"
+#define NATIVERENDERER_CLASS	"com/ijuru/refract/renderer/jni/NativeRenderer"
+#define FUNCTION_CLASS			"com/ijuru/refract/renderer/Function"
+#define COMPLEX_CLASS			"com/ijuru/refract/renderer/Complex"
+#define MAPPING_CLASS			"com/ijuru/refract/renderer/Mapping"
 
 // Cached Java entities
 jclass nativerenderer_class, function_class, complex_class, mapping_class;
@@ -112,7 +112,7 @@ static void set_renderer(JNIEnv* env, jobject this, renderer_t* renderer) {
 /**
  * Initializes the renderer
  */
-JNIEXPORT jboolean JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_allocate(JNIEnv* env, jobject this, jint width, jint height) {
+JNIEXPORT jboolean JNICALL Java_com_ijuru_refract_renderer_jni_NativeRenderer_allocate(JNIEnv* env, jobject this, jint width, jint height) {
 	// Allocate renderer object
 	renderer_t* renderer = (renderer_t*)malloc(sizeof (renderer_t));
 	if (!renderer)
@@ -135,7 +135,7 @@ JNIEXPORT jboolean JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_alloca
 /**
  * Resizes the renderer
  */
-JNIEXPORT jboolean JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_resize(JNIEnv* env, jobject this, jint width, jint height) {
+JNIEXPORT jboolean JNICALL Java_com_ijuru_refract_renderer_jni_NativeRenderer_resize(JNIEnv* env, jobject this, jint width, jint height) {
 	renderer_t* renderer = get_renderer(env, this);
 
 	LOG_D("Renderer #%d: resizing (%dx%d) -> (%dx%d)", renderer->id, renderer->width, renderer->height, (int)width, (int)height);
@@ -146,7 +146,7 @@ JNIEXPORT jboolean JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_resize
 /**
  * Gets the width
  */
-JNIEXPORT jint JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_getWidth(JNIEnv* env, jobject this) {
+JNIEXPORT jint JNICALL Java_com_ijuru_refract_renderer_jni_NativeRenderer_getWidth(JNIEnv* env, jobject this) {
 	renderer_t* renderer = get_renderer(env, this);
 
 	return (jint)renderer->width;
@@ -155,7 +155,7 @@ JNIEXPORT jint JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_getWidth(J
 /**
  * Gets the height
  */
-JNIEXPORT jint JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_getHeight(JNIEnv* env, jobject this) {
+JNIEXPORT jint JNICALL Java_com_ijuru_refract_renderer_jni_NativeRenderer_getHeight(JNIEnv* env, jobject this) {
 	renderer_t* renderer = get_renderer(env, this);
 
 	return (jint)renderer->height;
@@ -164,7 +164,7 @@ JNIEXPORT jint JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_getHeight(
 /**
  * Gets the iteration function
  */
-JNIEXPORT jobject JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_getFunction(JNIEnv* env, jobject this) {
+JNIEXPORT jobject JNICALL Java_com_ijuru_refract_renderer_jni_NativeRenderer_getFunction(JNIEnv* env, jobject this) {
 	renderer_t* renderer = get_renderer(env, this);
 
 	jobject values_obj = (*env)->CallStaticObjectMethod(env, function_class, function_values_mid);
@@ -174,7 +174,7 @@ JNIEXPORT jobject JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_getFunc
 /**
  * Sets the iteration function
  */
-JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setFunction(JNIEnv* env, jobject this, jobject function) {
+JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_jni_NativeRenderer_setFunction(JNIEnv* env, jobject this, jobject function) {
 	renderer_t* renderer = get_renderer(env, this);
 
 	func_t func = (func_t)(*env)->CallIntMethod(env, function, function_ordinal_mid);
@@ -184,7 +184,7 @@ JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setFunctio
 /**
  * Gets the offset in complex space
  */
-JNIEXPORT jobject JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_getOffset(JNIEnv* env, jobject this) {
+JNIEXPORT jobject JNICALL Java_com_ijuru_refract_renderer_jni_NativeRenderer_getOffset(JNIEnv* env, jobject this) {
 	renderer_t* renderer = get_renderer(env, this);
 
 	return (*env)->NewObject(env, complex_class, complex_cid, (jdouble)renderer->params.offset.re, (jdouble)renderer->params.offset.im);
@@ -193,7 +193,7 @@ JNIEXPORT jobject JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_getOffs
 /**
  * Sets the offset in complex space
  */
-JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setOffset(JNIEnv* env, jobject this, jobject offset) {
+JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_jni_NativeRenderer_setOffset(JNIEnv* env, jobject this, jobject offset) {
 	renderer_t* renderer = get_renderer(env, this);
 
 	float_t re = (float_t)((*env)->GetDoubleField(env, offset, complex_re_fid));
@@ -206,7 +206,7 @@ JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setOffset(
 /**
  * Sets the iteration function
  */
-JNIEXPORT jdouble JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_getZoom(JNIEnv* env, jobject this) {
+JNIEXPORT jdouble JNICALL Java_com_ijuru_refract_renderer_jni_NativeRenderer_getZoom(JNIEnv* env, jobject this) {
 	renderer_t* renderer = get_renderer(env, this);
 
 	return (jdouble)renderer->params.zoom;
@@ -215,7 +215,7 @@ JNIEXPORT jdouble JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_getZoom
 /**
  * Sets the iteration function
  */
-JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setZoom(JNIEnv* env, jobject this, jdouble zoom) {
+JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_jni_NativeRenderer_setZoom(JNIEnv* env, jobject this, jdouble zoom) {
 	renderer_t* renderer = get_renderer(env, this);
 
 	refract_renderer_setzoom(renderer, (float_t)zoom);
@@ -224,7 +224,7 @@ JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setZoom(JN
 /**
  * Sets the palette
  */
-JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setPalette(JNIEnv* env, jobject this, jobject palette, jint size, jint set_color) {
+JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_jni_NativeRenderer_setPalette(JNIEnv* env, jobject this, jobject palette, jint size, jint set_color) {
 	renderer_t* renderer = get_renderer(env, this);
 
 	// Free existing palette
@@ -256,7 +256,7 @@ JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setPalette
 /**
  * Gets the palette mapping type
  */
-JNIEXPORT jobject JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_getPaletteMapping(JNIEnv* env, jobject this) {
+JNIEXPORT jobject JNICALL Java_com_ijuru_refract_renderer_jni_NativeRenderer_getPaletteMapping(JNIEnv* env, jobject this) {
 	renderer_t* renderer = get_renderer(env, this);
 
 	jobject values_obj = (*env)->CallStaticObjectMethod(env, mapping_class, mapping_values_mid);
@@ -266,7 +266,7 @@ JNIEXPORT jobject JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_getPale
 /**
  * Sets the palette mapping type
  */
-JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setPaletteMapping(JNIEnv* env, jobject this, jobject mapping) {
+JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_jni_NativeRenderer_setPaletteMapping(JNIEnv* env, jobject this, jobject mapping) {
 	renderer_t* renderer = get_renderer(env, this);
 
 	renderer->palette_mapping = (mapping_t)(*env)->CallIntMethod(env, mapping, mapping_ordinal_mid);
@@ -275,7 +275,7 @@ JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_setPalette
 /**
  * Iterates the renderer by the specified number of iterations
  */
-JNIEXPORT jint JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_iterate(JNIEnv* env, jobject this, jint iters) {
+JNIEXPORT jint JNICALL Java_com_ijuru_refract_renderer_jni_NativeRenderer_iterate(JNIEnv* env, jobject this, jint iters) {
 	renderer_t* renderer = get_renderer(env, this);
 
 	return (jint)refract_renderer_iterate(renderer, (iterc_t)iters);
@@ -284,7 +284,7 @@ JNIEXPORT jint JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_iterate(JN
 /**
  * Renders the iterations buffer to a pixel buffer
  */
-JNIEXPORT jboolean JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_render(JNIEnv* env, jobject this, jobject bitmap) {
+JNIEXPORT jboolean JNICALL Java_com_ijuru_refract_renderer_jni_NativeRenderer_render(JNIEnv* env, jobject this, jobject bitmap) {
 	renderer_t* renderer = get_renderer(env, this);
 
 	AndroidBitmapInfo info;
@@ -307,7 +307,7 @@ JNIEXPORT jboolean JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_render
 /**
  * Frees the renderer for the given renderer
  */
-JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_NativeRenderer_free(JNIEnv* env, jobject this) {
+JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_jni_NativeRenderer_free(JNIEnv* env, jobject this) {
 	renderer_t* renderer = get_renderer(env, this);
 
 	refract_renderer_free(renderer);
