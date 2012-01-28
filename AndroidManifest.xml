@@ -14,8 +14,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.SettingsActivity" android:label="@string/str_settings"></activity>
         <activity android:name=".activity.WallpaperActivity" android:label="@string/str_renderaswallpaper"></activity>
+        <activity android:name=".activity.BookmarksActivity" android:label="@string/str_bookmarks"></activity>
+        <activity android:name=".activity.SettingsActivity" android:label="@string/str_settings"></activity>
     </application>
 
 </manifest>

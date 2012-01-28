@@ -81,11 +81,14 @@ public class ExplorerActivity extends Activity implements RendererListener {
 		case R.id.menureset:
 			rendererView.reset();
 	    	break;
-		case R.id.menusettings:
-			startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
-	    	break;
 		case R.id.menuwallpaper:
 			onMenuWallpaper();
+	    	break;
+		case R.id.menubookmarks:
+			onMenuBookmarks();
+	    	break;	
+		case R.id.menusettings:
+			startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
 	    	break;
 	    case R.id.menuabout:
 	    	onMenuAbout();
@@ -95,10 +98,21 @@ public class ExplorerActivity extends Activity implements RendererListener {
 	}
 	
 	/**
-	 * Displays the 'set as' dialog
+	 * Displays the wallpaper activity
 	 */
 	private void onMenuWallpaper() {
 		Intent intent = new Intent(getApplicationContext(), WallpaperActivity.class);
+		Bundle bundle = new Bundle();
+		bundle.putParcelable("params", rendererView.getRendererParams());
+		intent.putExtras(bundle);
+		startActivity(intent);
+	}
+	
+	/**
+	 * Displays the bookmarks activity
+	 */
+	private void onMenuBookmarks() {
+		Intent intent = new Intent(getApplicationContext(), BookmarksActivity.class);
 		Bundle bundle = new Bundle();
 		bundle.putParcelable("params", rendererView.getRendererParams());
 		intent.putExtras(bundle);

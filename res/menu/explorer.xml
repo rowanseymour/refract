@@ -5,16 +5,15 @@
 		android:title="@string/str_reset" 
 		android:icon="@drawable/ic_menu_reset"
 	/>
-	<item 
-		android:id="@+id/menubookmarks" 
-		android:title="@string/str_bookmarks" 
-		android:icon="@drawable/ic_menu_bookmarks"
-		android:enabled="false"
-	/>
 	<item
 		android:id="@+id/menuwallpaper" 
 		android:title="@string/str_wallpaper" 
 		android:icon="@drawable/ic_menu_wallpaper"
+	/>
+	<item 
+		android:id="@+id/menubookmarks" 
+		android:title="@string/str_bookmarks" 
+		android:icon="@drawable/ic_menu_bookmarks"
 	/>
 	<item 
 		android:id="@+id/menusettings" 
