@@ -19,13 +19,13 @@
 
 package com.ijuru.refract.activity;
 
-import com.ijuru.refract.Complex;
-import com.ijuru.refract.Function;
-import com.ijuru.refract.Mapping;
-import com.ijuru.refract.Palette;
-import com.ijuru.refract.Parameters;
 import com.ijuru.refract.R;
 import com.ijuru.refract.RefractApplication;
+import com.ijuru.refract.renderer.Complex;
+import com.ijuru.refract.renderer.Function;
+import com.ijuru.refract.renderer.Mapping;
+import com.ijuru.refract.renderer.Palette;
+import com.ijuru.refract.renderer.RendererParams;
 import com.ijuru.refract.renderer.Renderer;
 import com.ijuru.refract.renderer.RendererListener;
 import com.ijuru.refract.ui.RendererView;
@@ -101,7 +101,7 @@ public class ExplorerActivity extends Activity implements RendererListener {
 	private void onMenuWallpaper() {
 		Intent intent = new Intent(getApplicationContext(), WallpaperActivity.class);
 		Bundle bundle = new Bundle();
-		bundle.putParcelable("params", new Parameters(rendererView.getOffset(), rendererView.getZoom()));
+		bundle.putParcelable("params", new RendererParams(rendererView.getOffset(), rendererView.getZoom()));
 		intent.putExtras(bundle);
 		startActivity(intent);
 	}
@@ -139,7 +139,7 @@ public class ExplorerActivity extends Activity implements RendererListener {
 		renderer.setPaletteMapping(paletteMapping);
 		
 		// Load renderer parameters from preferences
-		Parameters params = Preferences.getParametersPreference(this, "params");
+		RendererParams params = Preferences.getParametersPreference(this, "params");
 		renderer.setOffset(params.getOffset());
 		if (params.getZoom() > 0.0)
 			renderer.setZoom(params.getZoom());
@@ -181,7 +181,7 @@ public class ExplorerActivity extends Activity implements RendererListener {
 	@Override
 	public void onRendererDestroy(RendererView view, Renderer renderer) {
 		// Save renderer parameters to preferences
-		Parameters params = new Parameters(renderer.getOffset(), renderer.getZoom());
+		RendererParams params = new RendererParams(renderer.getOffset(), renderer.getZoom());
 		Preferences.setParametersPreference(this, "params", params);
 	}
 }

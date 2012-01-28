@@ -19,7 +19,7 @@
 
 package com.ijuru.refract.ui;
 
-import com.ijuru.refract.Palette;
+import com.ijuru.refract.renderer.Palette;
 
 import android.app.AlertDialog.Builder;
 import android.content.Context;

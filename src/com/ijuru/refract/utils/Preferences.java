@@ -19,10 +19,10 @@
 
 package com.ijuru.refract.utils;
 
-import com.ijuru.refract.Complex;
-import com.ijuru.refract.Function;
-import com.ijuru.refract.Mapping;
-import com.ijuru.refract.Parameters;
+import com.ijuru.refract.renderer.Complex;
+import com.ijuru.refract.renderer.Function;
+import com.ijuru.refract.renderer.Mapping;
+import com.ijuru.refract.renderer.RendererParams;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -93,12 +93,12 @@ public class Preferences {
 	 * @param def the default value
 	 * @return the preference value
 	 */
-	public static Parameters getParametersPreference(Context context, String key) {
+	public static RendererParams getParametersPreference(Context context, String key) {
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 		double offset_re = Double.parseDouble(preferences.getString(key + ".offset.re", "0.0"));
 		double offset_im = Double.parseDouble(preferences.getString(key + ".offset.im", "0.0"));
 		double zoom = Double.parseDouble(preferences.getString(key + ".zoom", "0.0"));
-		return new Parameters(new Complex(offset_re, offset_im), zoom);
+		return new RendererParams(new Complex(offset_re, offset_im), zoom);
 	}
 	
 	/**
@@ -107,7 +107,7 @@ public class Preferences {
 	 * @param key the preference key
 	 * @param params the parameters
 	 */
-	public static void setParametersPreference(Context context, String key, Parameters params) {
+	public static void setParametersPreference(Context context, String key, RendererParams params) {
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 		Editor editor = preferences.edit();
 		editor.putString(key + ".offset.re", "" + params.getOffset().re);

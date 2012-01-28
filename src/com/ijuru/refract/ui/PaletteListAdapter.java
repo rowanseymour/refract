@@ -19,8 +19,8 @@
 
 package com.ijuru.refract.ui;
 
-import com.ijuru.refract.Palette;
 import com.ijuru.refract.R;
+import com.ijuru.refract.renderer.Palette;
 
 import android.content.Context;
 import android.view.LayoutInflater;

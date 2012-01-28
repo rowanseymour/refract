@@ -17,25 +17,25 @@
  * along with Refract. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.ijuru.refract;
+package com.ijuru.refract.renderer;
 
 /**
- * Iteration function types
+ * Palette mapping options
  */
-public enum Function {
-	MANDELBROT,		// z = z^2 + c
-	MANDELBROT_3,	// z = z^3 + c
-	MANDELBROT_4;	// z = z^4 + c
+public enum Mapping {
+	REPEAT,
+	CLAMP,
+	SCALE_GLOBAL;
 	
 	/**
-	 * Parses a function from a string
+	 * Parses a mapping from a string
 	 * @param str the string to parse
-	 * @return the function or null
+	 * @return the mapping or null
 	 */
-	public static Function parseString(String str) {
-		for (Function function : values()) {
-			if (function.name().equalsIgnoreCase(str))
-				return function;
+	public static Mapping parseString(String str) {
+		for (Mapping mapping : values()) {
+			if (mapping.name().equalsIgnoreCase(str))
+				return mapping;
 		}
 		return null;
 	}

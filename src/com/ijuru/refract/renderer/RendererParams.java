@@ -17,7 +17,8 @@
  * along with Refract. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.ijuru.refract;
+package com.ijuru.refract.renderer;
+
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -25,7 +26,7 @@ import android.os.Parcelable;
 /**
  * Render parameters
  */
-public class Parameters implements Parcelable {
+public class RendererParams implements Parcelable {
 	
 	private Complex offset;
 	private double zoom;
@@ -35,7 +36,7 @@ public class Parameters implements Parcelable {
 	 * @param offset the offset
 	 * @param zoom the zoom
 	 */
-	public Parameters(Complex offset, double zoom) {
+	public RendererParams(Complex offset, double zoom) {
 		this.offset = offset;
 		this.zoom = zoom;
 	}
@@ -44,7 +45,7 @@ public class Parameters implements Parcelable {
 	 * Constructs new render parameters from a parcel
 	 * @param parcel the parcel
 	 */
-	public Parameters(Parcel parcel) {
+	public RendererParams(Parcel parcel) {
 		this.offset = new Complex(parcel.readDouble(), parcel.readDouble());
 		this.zoom = parcel.readDouble();
 	}
@@ -86,12 +87,12 @@ public class Parameters implements Parcelable {
 	/**
 	 * Required by Android to create instances from parcels
 	 */
-	public static final Parcelable.Creator<Parameters> CREATOR = new Parcelable.Creator<Parameters>() {
-		public Parameters createFromParcel(Parcel parcel) {
-			return new Parameters(parcel);
+	public static final Parcelable.Creator<RendererParams> CREATOR = new Parcelable.Creator<RendererParams>() {
+		public RendererParams createFromParcel(Parcel parcel) {
+			return new RendererParams(parcel);
 		}
-		public Parameters[] newArray(int size) {
-			return new Parameters[size];
+		public RendererParams[] newArray(int size) {
+			return new RendererParams[size];
 		}
 	};
 	
@@ -101,7 +102,7 @@ public class Parameters implements Parcelable {
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof Complex) {
-			Parameters p = (Parameters)obj;
+			RendererParams p = (RendererParams)obj;
 			return offset.equals(p.offset) && zoom == p.zoom;
 		}
 		return false;

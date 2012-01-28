@@ -19,10 +19,6 @@
 
 package com.ijuru.refract.renderer;
 
-import com.ijuru.refract.Complex;
-import com.ijuru.refract.Function;
-import com.ijuru.refract.Mapping;
-import com.ijuru.refract.Palette;
 
 import android.graphics.Bitmap;
 

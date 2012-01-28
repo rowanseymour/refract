@@ -21,12 +21,12 @@ package com.ijuru.refract.activity;
 
 import java.io.IOException;
 
-import com.ijuru.refract.Complex;
-import com.ijuru.refract.Function;
-import com.ijuru.refract.Mapping;
-import com.ijuru.refract.Palette;
-import com.ijuru.refract.Parameters;
 import com.ijuru.refract.R;
+import com.ijuru.refract.renderer.Complex;
+import com.ijuru.refract.renderer.Function;
+import com.ijuru.refract.renderer.Mapping;
+import com.ijuru.refract.renderer.Palette;
+import com.ijuru.refract.renderer.RendererParams;
 import com.ijuru.refract.renderer.Renderer;
 import com.ijuru.refract.renderer.RendererListener;
 import com.ijuru.refract.ui.RendererView;
@@ -104,7 +104,7 @@ public class WallpaperActivity extends Activity implements RendererListener {
 		// Set render parameters from intent if they exist
 		Intent intent = getIntent();
 		if (intent != null && intent.hasExtra("params")) {
-			Parameters params = (Parameters)intent.getParcelableExtra("params");
+			RendererParams params = (RendererParams)intent.getParcelableExtra("params");
 			renderer.setOffset(params.getOffset());
 			renderer.setZoom(params.getZoom());
 		}

@@ -17,12 +17,13 @@
  * along with Refract. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.ijuru.refract.renderer;
+package com.ijuru.refract.renderer.jni;
 
-import com.ijuru.refract.Complex;
-import com.ijuru.refract.Function;
-import com.ijuru.refract.Mapping;
-import com.ijuru.refract.Palette;
+import com.ijuru.refract.renderer.Complex;
+import com.ijuru.refract.renderer.Function;
+import com.ijuru.refract.renderer.Mapping;
+import com.ijuru.refract.renderer.Palette;
+import com.ijuru.refract.renderer.Renderer;
 
 import android.graphics.Bitmap;
 

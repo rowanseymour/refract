@@ -17,7 +17,7 @@
  * along with Refract. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.ijuru.refract;
+package com.ijuru.refract.renderer;
 
 import java.util.ArrayList;
 import java.util.List;

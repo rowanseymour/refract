@@ -19,6 +19,8 @@
 
 package com.ijuru.refract.renderer;
 
+import com.ijuru.refract.renderer.jni.NativeRenderer;
+
 /**
  * Factory class to create renderer instances
  */

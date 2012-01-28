@@ -19,8 +19,8 @@
 
 package com.ijuru.refract.ui;
 
-import com.ijuru.refract.Complex;
 import com.ijuru.refract.R;
+import com.ijuru.refract.renderer.Complex;
 import com.ijuru.refract.renderer.Renderer;
 import com.ijuru.refract.renderer.RendererFactory;
 import com.ijuru.refract.renderer.RendererListener;
