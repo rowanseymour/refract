@@ -24,6 +24,7 @@ import com.ijuru.refract.renderer.Complex;
 import com.ijuru.refract.renderer.Renderer;
 import com.ijuru.refract.renderer.RendererFactory;
 import com.ijuru.refract.renderer.RendererListener;
+import com.ijuru.refract.renderer.RendererParams;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -236,18 +237,18 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	}
 	
 	/**
-	 * Gets the offset of the renderer
-	 * @return the offset
+	 * Gets the current renderer parameters
+	 * @return the parameters
 	 */
-	public Complex getOffset() {
-		return renderer.getOffset();
+	public RendererParams getRendererParams() {
+		return new RendererParams(renderer.getFunction(), renderer.getOffset(), renderer.getZoom());
 	}
 	
 	/**
 	 * Sets the offset of the renderer
 	 * @param offset the offset
 	 */
-	public void setOffset(Complex offset) {
+	protected void setOffset(Complex offset) {
 		renderer.setOffset(offset);
 		
 		if (listener != null)
@@ -255,18 +256,10 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	}
 	
 	/**
-	 * Gets the zoom of the renderer
-	 * @return the zoom
-	 */
-	public double getZoom() {
-		return renderer.getZoom();
-	}
-	
-	/**
 	 * Sets the zoom of the renderer
 	 * @param zoom the zoom
 	 */
-	public void setZoom(double zoom) {
+	protected void setZoom(double zoom) {
 		renderer.setZoom(zoom);
 		
 		if (listener != null)
@@ -290,7 +283,7 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	}
 	
 	/**
-	 * Gets the offscreen bitmap
+	 * Gets the off-screen bitmap
 	 * @return the bitmap
 	 */
 	public Bitmap getBitmap() {

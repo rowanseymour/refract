@@ -91,4 +91,12 @@ public class Complex {
 	public int hashCode() {
 		return new Double(re).hashCode() + new Double(im).hashCode();
 	}
+
+	/**
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return re + "," + im;
+	}
 }

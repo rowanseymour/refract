@@ -22,7 +22,6 @@ package com.ijuru.refract.activity;
 import com.ijuru.refract.R;
 import com.ijuru.refract.RefractApplication;
 import com.ijuru.refract.renderer.Complex;
-import com.ijuru.refract.renderer.Function;
 import com.ijuru.refract.renderer.Mapping;
 import com.ijuru.refract.renderer.Palette;
 import com.ijuru.refract.renderer.RendererParams;
@@ -101,7 +100,7 @@ public class ExplorerActivity extends Activity implements RendererListener {
 	private void onMenuWallpaper() {
 		Intent intent = new Intent(getApplicationContext(), WallpaperActivity.class);
 		Bundle bundle = new Bundle();
-		bundle.putParcelable("params", new RendererParams(rendererView.getOffset(), rendererView.getZoom()));
+		bundle.putParcelable("params", rendererView.getRendererParams());
 		intent.putExtras(bundle);
 		startActivity(intent);
 	}
@@ -128,18 +127,17 @@ public class ExplorerActivity extends Activity implements RendererListener {
 	@Override
 	public void onRendererCreated(RendererView view, Renderer renderer) {
 		// Load renderer options from preferences
-		Function iterFunction = Preferences.getFunctionPreference(this, "iterfunction", Function.MANDELBROT);
 		Palette palette = Palette.getPresetByName(Preferences.getStringPreference(this, "palette", R.string.def_palette));
 		Mapping paletteMapping = Preferences.getMappingPreference(this, "palettemapping", Mapping.REPEAT);
 		int paletteSize = Preferences.getIntegerPreference(this, "palettesize", R.integer.def_palettesize);
 		int setColor = Preferences.getIntegerPreference(this, "setcolor", R.integer.def_setcolor);
 		
-		renderer.setFunction(iterFunction);
 		renderer.setPalette(palette, paletteSize, setColor);
 		renderer.setPaletteMapping(paletteMapping);
 		
 		// Load renderer parameters from preferences
 		RendererParams params = Preferences.getParametersPreference(this, "params");
+		renderer.setFunction(params.getFunction());
 		renderer.setOffset(params.getOffset());
 		if (params.getZoom() > 0.0)
 			renderer.setZoom(params.getZoom());
@@ -181,7 +179,6 @@ public class ExplorerActivity extends Activity implements RendererListener {
 	@Override
 	public void onRendererDestroy(RendererView view, Renderer renderer) {
 		// Save renderer parameters to preferences
-		RendererParams params = new RendererParams(renderer.getOffset(), renderer.getZoom());
-		Preferences.setParametersPreference(this, "params", params);
+		Preferences.setParametersPreference(this, "params", rendererView.getRendererParams());
 	}
 }

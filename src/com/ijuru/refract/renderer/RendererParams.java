@@ -19,24 +19,26 @@
 
 package com.ijuru.refract.renderer;
 
-
 import android.os.Parcel;
 import android.os.Parcelable;
 
 /**
- * Render parameters
+ * Renderer parameters
  */
 public class RendererParams implements Parcelable {
 	
+	private Function function;
 	private Complex offset;
 	private double zoom;
 	
 	/**
 	 * Constructs new render parameters
+	 * @param function the set function
 	 * @param offset the offset
 	 * @param zoom the zoom
 	 */
-	public RendererParams(Complex offset, double zoom) {
+	public RendererParams(Function function, Complex offset, double zoom) {
+		this.function = function;
 		this.offset = offset;
 		this.zoom = zoom;
 	}
@@ -46,8 +48,17 @@ public class RendererParams implements Parcelable {
 	 * @param parcel the parcel
 	 */
 	public RendererParams(Parcel parcel) {
+		this.function = Function.parseString(parcel.readString());
 		this.offset = new Complex(parcel.readDouble(), parcel.readDouble());
 		this.zoom = parcel.readDouble();
+	}
+
+	/**
+	 * Gets the set function
+	 * @return the function
+	 */
+	public Function getFunction() {
+		return function;
 	}
 
 	/**
@@ -79,6 +90,7 @@ public class RendererParams implements Parcelable {
 	 */
 	@Override
 	public void writeToParcel(Parcel parcel, int hint) {
+		parcel.writeString(function.toString());
 		parcel.writeDouble(offset.re);
 		parcel.writeDouble(offset.im);
 		parcel.writeDouble(zoom);
@@ -103,7 +115,7 @@ public class RendererParams implements Parcelable {
 	public boolean equals(Object obj) {
 		if (obj instanceof Complex) {
 			RendererParams p = (RendererParams)obj;
-			return offset.equals(p.offset) && zoom == p.zoom;
+			return function.equals(p.function) && offset.equals(p.offset) && zoom == p.zoom;
 		}
 		return false;
 	}
@@ -113,6 +125,6 @@ public class RendererParams implements Parcelable {
 	 */
 	@Override
 	public int hashCode() {
-		return offset.hashCode() + new Double(zoom).hashCode();
+		return function.hashCode() + offset.hashCode() + new Double(zoom).hashCode();
 	}
 }

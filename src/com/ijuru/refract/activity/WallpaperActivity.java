@@ -23,7 +23,6 @@ import java.io.IOException;
 
 import com.ijuru.refract.R;
 import com.ijuru.refract.renderer.Complex;
-import com.ijuru.refract.renderer.Function;
 import com.ijuru.refract.renderer.Mapping;
 import com.ijuru.refract.renderer.Palette;
 import com.ijuru.refract.renderer.RendererParams;
@@ -92,12 +91,10 @@ public class WallpaperActivity extends Activity implements RendererListener {
 	@Override
 	public void onRendererCreated(RendererView view, Renderer renderer) {
 		// Get renderer parameters from preferences
-		Function iterFunction = Preferences.getFunctionPreference(this, "iterfunction", Function.MANDELBROT);
 		Palette palette = Palette.getPresetByName(Preferences.getStringPreference(this, "palettepreset", R.string.def_palette));
 		int paletteSize = Preferences.getIntegerPreference(this, "palettesize", R.integer.def_palettesize);
 		int setColor = Preferences.getIntegerPreference(this, "setcolor", R.integer.def_setcolor);
 		
-		renderer.setFunction(iterFunction);
 		renderer.setPalette(palette, paletteSize, setColor);
 		renderer.setPaletteMapping(Mapping.SCALE_GLOBAL);
 			
@@ -105,6 +102,7 @@ public class WallpaperActivity extends Activity implements RendererListener {
 		Intent intent = getIntent();
 		if (intent != null && intent.hasExtra("params")) {
 			RendererParams params = (RendererParams)intent.getParcelableExtra("params");
+			renderer.setFunction(params.getFunction());
 			renderer.setOffset(params.getOffset());
 			renderer.setZoom(params.getZoom());
 		}

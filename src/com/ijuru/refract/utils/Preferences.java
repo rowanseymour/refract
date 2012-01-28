@@ -61,6 +61,34 @@ public class Preferences {
 	}
 	
 	/**
+	 * Gets a shared preference as a double
+	 * @param context the context
+	 * @param key the preference key
+	 * @param defResId the resource id of the default value
+	 * @return the preference value
+	 */
+	public static double getDoublePreference(Context context, String key, double defValue) {
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+		return parseDouble(preferences.getString(key, "" + defValue));
+	}
+	
+	/**
+	 * Gets a shared preference as a complex value
+	 * @param context the context
+	 * @param key the preference key
+	 * @param def the default value
+	 * @return the preference value
+	 */
+	public static Complex getComplexPreference(Context context, String key, Complex defValue) {
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+		String strValue = preferences.getString(key, defValue.toString());
+		String[] components = strValue.split(",");
+		double re = Double.parseDouble(components[0]);
+		double im = Double.parseDouble(components[1]);
+		return new Complex(re, im);
+	}
+	
+	/**
 	 * Gets a shared preference as a function value
 	 * @param context the context
 	 * @param key the preference key
@@ -94,11 +122,10 @@ public class Preferences {
 	 * @return the preference value
 	 */
 	public static RendererParams getParametersPreference(Context context, String key) {
-		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-		double offset_re = Double.parseDouble(preferences.getString(key + ".offset.re", "0.0"));
-		double offset_im = Double.parseDouble(preferences.getString(key + ".offset.im", "0.0"));
-		double zoom = Double.parseDouble(preferences.getString(key + ".zoom", "0.0"));
-		return new RendererParams(new Complex(offset_re, offset_im), zoom);
+		Function function = getFunctionPreference(context, ".function", Function.MANDELBROT);
+		Complex offset = getComplexPreference(context, key + ".offset", Complex.ORIGIN);
+		double zoom = getDoublePreference(context, key + ".zoom", 0.0);
+		return new RendererParams(function, offset, zoom);
 	}
 	
 	/**
@@ -110,8 +137,8 @@ public class Preferences {
 	public static void setParametersPreference(Context context, String key, RendererParams params) {
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 		Editor editor = preferences.edit();
-		editor.putString(key + ".offset.re", "" + params.getOffset().re);
-		editor.putString(key + ".offset.im", "" + params.getOffset().im);
+		editor.putString(key + ".function", params.getFunction().toString());
+		editor.putString(key + ".offset", params.getOffset().toString());
 		editor.putString(key + ".zoom", "" + params.getZoom());
 		editor.commit();
 	}
@@ -124,6 +151,20 @@ public class Preferences {
 	private static Integer parseInteger(String val) {
 		try {
 			return Integer.parseInt(val);
+		}
+		catch (NumberFormatException ex) {
+			return null;
+		}
+	}
+	
+	/**
+	 * Parses a string into a double
+	 * @param val the string
+	 * @return the double or null if not a valid double
+	 */
+	private static Double parseDouble(String val) {
+		try {
+			return Double.parseDouble(val);
 		}
 		catch (NumberFormatException ex) {
 			return null;

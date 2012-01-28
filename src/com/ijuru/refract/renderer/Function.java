@@ -34,9 +34,17 @@ public enum Function {
 	 */
 	public static Function parseString(String str) {
 		for (Function function : values()) {
-			if (function.name().equalsIgnoreCase(str))
+			if (function.name().toLowerCase().equals(str))
 				return function;
 		}
 		return null;
+	}
+
+	/**
+	 * @see java.lang.Enum#toString()
+	 */
+	@Override
+	public String toString() {
+		return name().toLowerCase();
 	}
 }
