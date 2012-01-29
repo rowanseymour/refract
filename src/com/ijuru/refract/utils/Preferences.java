@@ -57,7 +57,7 @@ public class Preferences {
 	public static int getIntegerPreference(Context context, String key, int defResId) {
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 		String defValue = "" + context.getResources().getInteger(defResId);
-		return Preferences.parseInteger(preferences.getString(key, defValue));
+		return Integer.parseInt(preferences.getString(key, defValue));
 	}
 	
 	/**
@@ -69,7 +69,7 @@ public class Preferences {
 	 */
 	public static double getDoublePreference(Context context, String key, double defValue) {
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-		return parseDouble(preferences.getString(key, "" + defValue));
+		return Double.parseDouble(preferences.getString(key, "" + defValue));
 	}
 	
 	/**
@@ -81,11 +81,7 @@ public class Preferences {
 	 */
 	public static Complex getComplexPreference(Context context, String key, Complex defValue) {
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-		String strValue = preferences.getString(key, defValue.toString());
-		String[] components = strValue.split(",");
-		double re = Double.parseDouble(components[0]);
-		double im = Double.parseDouble(components[1]);
-		return new Complex(re, im);
+		return Complex.parseComplex(preferences.getString(key, defValue.toString()));
 	}
 	
 	/**
@@ -141,33 +137,5 @@ public class Preferences {
 		editor.putString(key + ".offset", params.getOffset().toString());
 		editor.putString(key + ".zoom", "" + params.getZoom());
 		editor.commit();
-	}
-	
-	/**
-	 * Parses a string into an integer
-	 * @param val the string
-	 * @return the integer or null if not a valid integer
-	 */
-	private static Integer parseInteger(String val) {
-		try {
-			return Integer.parseInt(val);
-		}
-		catch (NumberFormatException ex) {
-			return null;
-		}
-	}
-	
-	/**
-	 * Parses a string into a double
-	 * @param val the string
-	 * @return the double or null if not a valid double
-	 */
-	private static Double parseDouble(String val) {
-		try {
-			return Double.parseDouble(val);
-		}
-		catch (NumberFormatException ex) {
-			return null;
-		}
 	}
 }

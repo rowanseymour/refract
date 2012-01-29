@@ -72,4 +72,20 @@ public class Bookmark {
 	public Date getTimestamp() {
 		return timestamp;
 	}
+	
+	/**
+	 * Gets the name of the renderer params file
+	 * @return the file name
+	 */
+	public String getParamsFilename() {
+		return timestamp.getTime() + ".dat";
+	}
+	
+	/**
+	 * Gets the name of the thumbnail image file
+	 * @return the file name
+	 */
+	public String getThumbnailFilename() {
+		return timestamp.getTime() + ".png";
+	}
 }

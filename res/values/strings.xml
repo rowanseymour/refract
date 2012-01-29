@@ -3,8 +3,12 @@
 	<string name="app_name">Refract</string>
 	<string name="str_add">Add</string>
 	<string name="str_about">About</string>
+	<string name="str_bookmark">Bookmark</string>
 	<string name="str_bookmarks">Bookmarks</string>
+	<string name="str_bookmarkdeleted">Bookmark deleted</string>
+	<string name="str_bookmarksaved">Bookmark saved</string>
 	<string name="str_coloring">Coloring</string>
+	<string name="str_delete">Delete</string>
 	<string name="str_function">Function</string>
 	<string name="str_itersperframe">Iterations per frame</string>
 	<string name="str_palette">Palette</string>

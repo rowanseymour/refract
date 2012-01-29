@@ -71,6 +71,22 @@ public class Complex {
 	public Complex conj() {
 		return new Complex(re, -im);
 	}
+	
+	/**
+	 * Parses a complex value from a string
+	 * @param str the string
+	 * @return the value
+	 * @throws NumberFormatException
+	 */
+	public static Complex parseComplex(String str) throws NumberFormatException {
+		String[] components = str.split(",");
+		if (components.length != 2)
+			throw new NumberFormatException();
+			
+		double re = Double.parseDouble(components[0]);
+		double im = Double.parseDouble(components[1]);
+		return new Complex(re, im);
+	}
 
 	/**
 	 * @see java.lang.Object#equals(Object)

@@ -28,18 +28,30 @@ import com.ijuru.refract.R;
 import com.ijuru.refract.RefractApplication;
 import com.ijuru.refract.renderer.RendererParams;
 import com.ijuru.refract.ui.BookmarkAdapter;
+import com.ijuru.refract.utils.Preferences;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
+import android.widget.Toast;
 
 /**
  * Activity to manage bookmarks
  */
-public class BookmarksActivity extends Activity {
+public class BookmarksActivity extends Activity implements OnItemClickListener {
 
+	private static final int MENU_DELETE = 1;
+	
+	private GridView gridview;
 	private BookmarkManager bookmarkManager;
 	private Bookmark newBookmark;
 	
@@ -61,33 +73,59 @@ public class BookmarksActivity extends Activity {
 		
 		// Get all existing bookmarks
 		bookmarkManager = ((RefractApplication)getApplication()).getBookmarkManager();
-		List<Bookmark> bookmarks = bookmarkManager.loadAllBookmarks();
+		List<Bookmark> bookmarks = bookmarkManager.loadBookmarks();
 		
 		// Insert current params as potential bookmark at beginning
 		if (newBookmark != null)
 			bookmarks.add(0, newBookmark);
 		
-		bookmarks.add(newBookmark);
-		bookmarks.add(newBookmark);
-		bookmarks.add(newBookmark);
-		bookmarks.add(newBookmark);
-		bookmarks.add(newBookmark);
-		bookmarks.add(newBookmark);bookmarks.add(newBookmark);
-		bookmarks.add(newBookmark);
-		bookmarks.add(newBookmark);bookmarks.add(newBookmark);
-		bookmarks.add(newBookmark);
-		bookmarks.add(newBookmark);bookmarks.add(newBookmark);
-		bookmarks.add(newBookmark);
-		bookmarks.add(newBookmark);bookmarks.add(newBookmark);
-		bookmarks.add(newBookmark);
-		bookmarks.add(newBookmark);
-		
-		GridView gridview = (GridView)findViewById(R.id.gridview);
+		gridview = (GridView)findViewById(R.id.gridview);
 	    gridview.setAdapter(new BookmarkAdapter(this, bookmarks));
+	    gridview.setOnItemClickListener(this);
+	    
+	    registerForContextMenu(gridview);
+	}
+
+	/**
+	 * @see android.widget.AdapterView.OnItemClickListener#onItemClick(AdapterView, View, int, long)
+	 */
+	@Override
+	public void onItemClick(AdapterView<?> adapterView, View itemView, int position, long id) {
+		if (newBookmark != null && position == 0) {
+			if (bookmarkManager.addBookmark(newBookmark))
+				Toast.makeText(this, R.string.str_bookmarksaved, Toast.LENGTH_SHORT).show();
+		} else {
+			Bookmark bookmark = (Bookmark)adapterView.getAdapter().getItem(position);
+			Preferences.setParametersPreference(this, "params", bookmark.getParams());
+		}
+		finish();
+	}
+
+	/**
+	 * @see android.app.Activity#onCreateContextMenu(ContextMenu, View, ContextMenuInfo)
+	 */
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
+		if (info.position != 0) {
+			menu.setHeaderTitle(R.string.str_bookmark);
+			menu.add(Menu.NONE, MENU_DELETE, 0, R.string.str_delete);
+		}
 	}
 	
-	public void onAdd() {
-		bookmarkManager.addBookmark(newBookmark);
-		finish();
+	/**
+	 * @see android.app.Activity#onContextItemSelected(android.view.MenuItem)
+	 */
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case MENU_DELETE:
+			Bookmark bookmark = (Bookmark)gridview.getSelectedItem();
+			if (bookmarkManager.deleteBookmark(bookmark))
+				Toast.makeText(this, R.string.str_bookmarkdeleted, Toast.LENGTH_SHORT);
+			break;
+		}
+		
+		return true;
 	}
 }

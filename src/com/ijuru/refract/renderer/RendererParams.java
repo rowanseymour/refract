@@ -19,6 +19,12 @@
 
 package com.ijuru.refract.renderer;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Reader;
+import java.io.Writer;
+
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -107,6 +113,31 @@ public class RendererParams implements Parcelable {
 			return new RendererParams[size];
 		}
 	};
+	
+	/**
+	 * Reads renderer params from the given reader
+	 * @param reader the reader
+	 * @return the params
+	 * @throws IOException
+	 */
+	public static RendererParams read(Reader reader) throws IOException {
+		BufferedReader in = new BufferedReader(reader);
+		Function function = Function.parseString(in.readLine());
+		Complex offset = Complex.parseComplex(in.readLine());
+		double zoom = Double.parseDouble(in.readLine());
+		return new RendererParams(function, offset, zoom);
+	}
+	
+	/**
+	 * Writes the parameters to the given writer
+	 * @param writer the writer
+	 */
+	public void write(Writer writer) {
+		PrintWriter printer = new PrintWriter(writer);
+		printer.println(function);
+		printer.println(offset);
+		printer.println(zoom);
+	}
 	
 	/**
 	 * @see java.lang.Object#equals(Object)
