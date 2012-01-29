@@ -34,14 +34,21 @@ import com.ijuru.refract.utils.Preferences;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.Toast;
 
 /**
  * Activity for exploring fractals
@@ -58,7 +65,7 @@ public class ExplorerActivity extends Activity implements RendererListener {
     public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		setContentView(R.layout.explorer);
+		setContentView(R.layout.activity_explorer);
 		
 		rendererView = (RendererView)findViewById(R.id.rendererView);
 		statusPanel = (StatusPanel)findViewById(R.id.statusPanel);
@@ -94,6 +101,9 @@ public class ExplorerActivity extends Activity implements RendererListener {
 		case R.id.menusettings:
 			startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
 	    	break;
+		case R.id.menugoto:
+			onMenuGoto();
+	    	break;
 	    case R.id.menuabout:
 	    	onMenuAbout();
 	    	break;
@@ -121,6 +131,47 @@ public class ExplorerActivity extends Activity implements RendererListener {
 	}
 	
 	/**
+	 * Displays the goto dialog
+	 */
+	private void onMenuGoto() {
+		// Get and inflate the dialog view
+		LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+		final View layout = inflater.inflate(R.layout.dialog_goto, (ViewGroup)findViewById(R.id.layout_root));
+		final EditText editReal = (EditText)layout.findViewById(R.id.realcoordinate);
+		final EditText editImag = (EditText)layout.findViewById(R.id.imaginarycoordinate);
+		final EditText editZoom = (EditText)layout.findViewById(R.id.zoomfactor);
+		
+		// Set controls to curent renderer parameters
+		RendererParams params = rendererView.getRendererParams();
+		editReal.setText("" + params.getOffset().re);
+		editImag.setText("" + params.getOffset().im);
+		editZoom.setText("" + params.getZoom());
+
+		// Construct the dialog
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setView(layout);
+		builder.setPositiveButton(android.R.string.ok, new OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int id) {
+				try {
+					double offset_re = Double.parseDouble(editReal.getText().toString());
+					double offset_im = Double.parseDouble(editImag.getText().toString());
+					double zoom = Double.parseDouble(editZoom.getText().toString());
+					rendererView.setOffset(new Complex(offset_re, offset_im));
+					rendererView.setZoom(zoom);
+				}
+				catch (NumberFormatException ex) {
+					Toast.makeText(ExplorerActivity.this, R.string.err_invalidnumber, Toast.LENGTH_SHORT).show();
+				}
+			}
+		});
+		builder.setNegativeButton(android.R.string.cancel, null);
+		
+		// Show it...
+		builder.show();
+	}
+	
+	/**
 	 * Displays the about dialog
 	 */
 	private void onMenuAbout() {
@@ -135,7 +186,7 @@ public class ExplorerActivity extends Activity implements RendererListener {
 		new AlertDialog.Builder(this).setTitle(title).setMessage(message)
 			.setPositiveButton(android.R.string.ok, null).show();
 	}
-	
+
 	/**
 	 * Captures a thumbnail image for a bookmark
 	 * @return the thumbnail image

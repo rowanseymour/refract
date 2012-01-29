@@ -50,7 +50,7 @@ public class BookmarkAdapter extends ArrayAdapter<Bookmark> {
 	 */
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		View view = (convertView == null) ? inflater.inflate(R.layout.bookmark_item, parent, false) : convertView;			
+		View view = (convertView == null) ? inflater.inflate(R.layout.item_bookmark, parent, false) : convertView;			
 		ImageView imageView = (ImageView)view.findViewById(R.id.thumbnail);
 		TextView textView = (TextView)view.findViewById(R.id.thumbtext);
 

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layout_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+	android:padding="10dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/str_realcoordinate"
+    />
+    <EditText
+        android:id="@+id/realcoordinate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:numeric="decimal|signed">
+        <requestFocus />
+    </EditText>
+    
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/str_imaginarycoordinate"
+    />
+    <EditText
+        android:id="@+id/imaginarycoordinate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:numeric="decimal|signed"
+    />
+    
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/str_zoomfactor"
+    />
+    <EditText
+        android:id="@+id/zoomfactor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:numeric="decimal"
+    />
+
+</LinearLayout>

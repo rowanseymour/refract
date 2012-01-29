@@ -41,6 +41,7 @@ import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.Toast;
 
@@ -52,8 +53,10 @@ public class BookmarksActivity extends Activity implements OnItemClickListener {
 	private static final int MENU_DELETE = 1;
 	
 	private GridView gridview;
+	private ArrayAdapter<Bookmark> adapter;
 	private BookmarkManager bookmarkManager;
 	private Bookmark newBookmark;
+	private int contextItemPosition;
 	
 	/**
 	 * @see android.app.Activity#onCreate(android.os.Bundle)
@@ -62,7 +65,7 @@ public class BookmarksActivity extends Activity implements OnItemClickListener {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		setContentView(R.layout.bookmarks);
+		setContentView(R.layout.activity_bookmarks);
 		
 		Intent intent = getIntent();
 		if (intent != null) {
@@ -79,8 +82,10 @@ public class BookmarksActivity extends Activity implements OnItemClickListener {
 		if (newBookmark != null)
 			bookmarks.add(0, newBookmark);
 		
+		adapter = new BookmarkAdapter(this, bookmarks);
+		
 		gridview = (GridView)findViewById(R.id.gridview);
-	    gridview.setAdapter(new BookmarkAdapter(this, bookmarks));
+	    gridview.setAdapter(adapter);
 	    gridview.setOnItemClickListener(this);
 	    
 	    registerForContextMenu(gridview);
@@ -108,6 +113,7 @@ public class BookmarksActivity extends Activity implements OnItemClickListener {
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
 		if (info.position != 0) {
+			contextItemPosition = info.position;
 			menu.setHeaderTitle(R.string.str_bookmark);
 			menu.add(Menu.NONE, MENU_DELETE, 0, R.string.str_delete);
 		}
@@ -118,14 +124,16 @@ public class BookmarksActivity extends Activity implements OnItemClickListener {
 	 */
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
+		Bookmark bookmark = (Bookmark)gridview.getItemAtPosition(contextItemPosition);
+		
 		switch (item.getItemId()) {
 		case MENU_DELETE:
-			Bookmark bookmark = (Bookmark)gridview.getSelectedItem();
-			if (bookmarkManager.deleteBookmark(bookmark))
-				Toast.makeText(this, R.string.str_bookmarkdeleted, Toast.LENGTH_SHORT);
+			if (bookmarkManager.deleteBookmark(bookmark)) {
+				adapter.remove(bookmark);
+				Toast.makeText(this, R.string.str_bookmarkdeleted, Toast.LENGTH_SHORT).show();
+			}
 			break;
-		}
-		
+		}	
 		return true;
 	}
 }

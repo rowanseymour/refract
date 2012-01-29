@@ -16,13 +16,25 @@
 		android:icon="@drawable/ic_menu_bookmarks"
 	/>
 	<item 
+		android:id="@+id/menushare" 
+		android:title="@string/str_share" 
+		android:icon="@drawable/ic_menu_share"
+		android:enabled="false"
+	/>
+	<item 
 		android:id="@+id/menusettings" 
 		android:title="@string/str_settings" 
 		android:icon="@drawable/ic_menu_settings"
 	/>
+	<!-- These items will appear on the overflow menu -->
+	<item 
+		android:id="@+id/menugoto" 
+		android:title="@string/str_goto" 
+		android:icon="@drawable/ic_menu_goto"
+	/>
 	<item 
 		android:id="@+id/menuabout" 
 		android:title="@string/str_about" 
-		android:icon="@drawable/ic_menu_about"
+		android:icon="@drawable/ic_menu_about" 
 	/>
 </menu>

@@ -248,7 +248,7 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	 * Sets the offset of the renderer
 	 * @param offset the offset
 	 */
-	protected void setOffset(Complex offset) {
+	public void setOffset(Complex offset) {
 		renderer.setOffset(offset);
 		
 		if (listener != null)
@@ -259,7 +259,7 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	 * Sets the zoom of the renderer
 	 * @param zoom the zoom
 	 */
-	protected void setZoom(double zoom) {
+	public void setZoom(double zoom) {
 		renderer.setZoom(zoom);
 		
 		if (listener != null)

@@ -30,7 +30,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 
 /**
- * List adapter for palette objects
+ * Adapter for palette objects
  */
 public class PaletteAdapter extends ArrayAdapter<Palette> implements OnClickListener {
 
@@ -49,7 +49,7 @@ public class PaletteAdapter extends ArrayAdapter<Palette> implements OnClickList
 	 */
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		View view = (convertView == null) ? inflater.inflate(R.layout.palette_item, parent, false) : convertView;	
+		View view = (convertView == null) ? inflater.inflate(R.layout.item_palette, parent, false) : convertView;	
 		view.setOnClickListener(this);
 		view.setId(position);
 
