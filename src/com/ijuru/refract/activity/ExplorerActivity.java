@@ -19,6 +19,7 @@
 
 package com.ijuru.refract.activity;
 
+import com.ijuru.refract.Bookmark;
 import com.ijuru.refract.R;
 import com.ijuru.refract.RefractApplication;
 import com.ijuru.refract.renderer.Complex;
@@ -34,6 +35,9 @@ import com.ijuru.refract.utils.Preferences;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -102,9 +106,7 @@ public class ExplorerActivity extends Activity implements RendererListener {
 	 */
 	private void onMenuWallpaper() {
 		Intent intent = new Intent(getApplicationContext(), WallpaperActivity.class);
-		Bundle bundle = new Bundle();
-		bundle.putParcelable("params", rendererView.getRendererParams());
-		intent.putExtras(bundle);
+		intent.putExtra("params", rendererView.getRendererParams());
 		startActivity(intent);
 	}
 	
@@ -113,9 +115,8 @@ public class ExplorerActivity extends Activity implements RendererListener {
 	 */
 	private void onMenuBookmarks() {
 		Intent intent = new Intent(getApplicationContext(), BookmarksActivity.class);
-		Bundle bundle = new Bundle();
-		bundle.putParcelable("params", rendererView.getRendererParams());
-		intent.putExtras(bundle);
+		intent.putExtra("params", rendererView.getRendererParams());
+		intent.putExtra("thumbnail", captureBookmarkThumbnail());
 		startActivity(intent);
 	}
 	
@@ -133,6 +134,29 @@ public class ExplorerActivity extends Activity implements RendererListener {
 		
 		new AlertDialog.Builder(this).setTitle(title).setMessage(message)
 			.setPositiveButton(android.R.string.ok, null).show();
+	}
+	
+	/**
+	 * Captures a thumbnail image for a bookmark
+	 * @return the thumbnail image
+	 */
+	private Bitmap captureBookmarkThumbnail() {
+		Bitmap srcBitmap = rendererView.getBitmap();	
+		Bitmap dstBitmap = Bitmap.createBitmap(Bookmark.THUMBNAIL_WIDTH, Bookmark.THUMBNAIL_HEIGHT, Bitmap.Config.ARGB_8888);
+		
+		// Calculated center cropped square from renderer image
+		double srcAspectRatio = srcBitmap.getWidth() / (double)srcBitmap.getHeight();	
+		int srcSize = (srcAspectRatio >= 1.0) ? srcBitmap.getHeight() : srcBitmap.getWidth();
+		int srcCenterX = srcBitmap.getWidth() / 2;
+		int srcCenterY = srcBitmap.getHeight() / 2;
+		Rect srcRect = new Rect(srcCenterX - srcSize / 2, srcCenterY - srcSize / 2, srcCenterX + srcSize / 2, srcCenterY + srcSize / 2);
+		
+		// Scale and draw into thumbnail bitmap
+		Canvas dstCanvas = new Canvas(dstBitmap);
+		Rect dstRect = new Rect(0, 0, Bookmark.THUMBNAIL_WIDTH, Bookmark.THUMBNAIL_HEIGHT);
+		dstCanvas.drawBitmap(srcBitmap, srcRect, dstRect, null);
+		
+		return dstBitmap;
 	}
 	
 	/**

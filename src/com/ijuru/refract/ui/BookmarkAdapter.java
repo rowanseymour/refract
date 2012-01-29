@@ -19,50 +19,53 @@
 
 package com.ijuru.refract.ui;
 
+import java.util.List;
+
+import com.ijuru.refract.Bookmark;
 import com.ijuru.refract.R;
-import com.ijuru.refract.renderer.Palette;
 
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 /**
- * List adapter for palette objects
+ * Adapter for bookmarks
  */
-public class PaletteListAdapter extends ArrayAdapter<Palette> implements OnClickListener {
-
-	private PalettePreference preference;
+public class BookmarkAdapter extends ArrayAdapter<Bookmark> {
+	
 	private LayoutInflater inflater;
 	
-	public PaletteListAdapter(Context context, PalettePreference preference) {
-		super(context, R.layout.palette_list_item, Palette.getPresets());
+	public BookmarkAdapter(Context context, List<Bookmark> bookmarks) {
+		super(context, 0, bookmarks);
 		
-		this.preference = preference;
 		this.inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 	}
-
+	
 	/**
 	 * @see android.widget.ArrayAdapter#getView(int, android.view.View, android.view.ViewGroup)
 	 */
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		View view = inflater.inflate(R.layout.palette_list_item, parent, false);
-		view.setOnClickListener(this);
-		view.setId(position);
+		View view = (convertView == null) ? inflater.inflate(R.layout.bookmark_item, parent, false) : convertView;			
+		ImageView imageView = (ImageView)view.findViewById(R.id.thumbnail);
+		TextView textView = (TextView)view.findViewById(R.id.thumbtext);
 
-		Palette palette = this.getItem(position);
-		PaletteView preview = (PaletteView)view.findViewById(R.id.preview);
-		preview.setPalette(palette);
-		
-		return view;
-	}
-
-	@Override
-	public void onClick(View itemView) {
-		preference.setValueIndex(itemView.getId());
-		preference.getDialog().dismiss();
+        imageView.setImageBitmap(getItem(position).getThumbnail());
+        
+        // First bookmark is special add function
+        if (position == 0) {
+        	textView.setVisibility(View.VISIBLE);
+        	imageView.setColorFilter(0xAA000000);
+        }
+        else {
+        	textView.setVisibility(View.INVISIBLE);
+        	imageView.setColorFilter(0);
+        }
+        
+        return view;
 	}
 }

@@ -52,7 +52,7 @@ public class WallpaperActivity extends Activity implements RendererListener {
     public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		setContentView(R.layout.set_as_wallpaper);
+		setContentView(R.layout.wallpaper);
 		
 		rendererView = (RendererView)findViewById(R.id.rendererView);
 		rendererView.setRendererListener(this);

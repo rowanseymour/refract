@@ -27,12 +27,22 @@ import android.content.pm.PackageManager.NameNotFoundException;
  */
 public class RefractApplication extends Application {
 	
+	private BookmarkManager bookmarkManager = new BookmarkManager(this);
+	
 	/**
 	 * Load the native library
 	 */
 	static {
         System.loadLibrary("refract");
     }
+	
+	/**
+	 * Gets the bookmark manager
+	 * @return the manager
+	 */
+	public BookmarkManager getBookmarkManager() {
+		return bookmarkManager;
+	}
 	
 	/**
 	 * Gets the version name from the manifest

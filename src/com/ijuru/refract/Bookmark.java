@@ -17,7 +17,11 @@
  * along with Refract. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.ijuru.refract.renderer;
+package com.ijuru.refract;
+
+import java.util.Date;
+
+import com.ijuru.refract.renderer.RendererParams;
 
 import android.graphics.Bitmap;
 
@@ -26,17 +30,23 @@ import android.graphics.Bitmap;
  */
 public class Bookmark {
 
+	public static final int THUMBNAIL_WIDTH = 128;
+	public static final int THUMBNAIL_HEIGHT = 128;
+	
 	private RendererParams params;
-	private Bitmap image;
+	private Bitmap thumbnail;
+	private Date timestamp;
 	
 	/**
 	 * Constructs a new bookmark
-	 * @param params
-	 * @param image
+	 * @param params the renderer parameters
+	 * @param thumbnail the thumbnail image
+	 * @param timestamp the creation timestamp
 	 */
-	public Bookmark(RendererParams params, Bitmap image) {
+	public Bookmark(RendererParams params, Bitmap thumbnail, Date timestamp) {
 		this.params = params;
-		this.image = image;
+		this.thumbnail = thumbnail;
+		this.timestamp = timestamp;
 	}
 
 	/**
@@ -48,10 +58,18 @@ public class Bookmark {
 	}
 
 	/**
-	 * Gets the preview image
-	 * @return the image
+	 * Gets the thumbnail image
+	 * @return the thumbnail
 	 */
-	public Bitmap getImage() {
-		return image;
+	public Bitmap getThumbnail() {
+		return thumbnail;
+	}
+
+	/**
+	 * Gets the creation timestamp
+	 * @return the timestamp
+	 */
+	public Date getTimestamp() {
+		return timestamp;
 	}
 }

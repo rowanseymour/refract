@@ -54,7 +54,7 @@ public class PalettePreference extends ListPreference {
 	 */
 	@Override
 	protected void onPrepareDialogBuilder(Builder builder) {
-		PaletteListAdapter adapter = new PaletteListAdapter(getContext(), this);
+		PaletteAdapter adapter = new PaletteAdapter(getContext(), this);
 		
 		builder.setAdapter(adapter, this);
 
