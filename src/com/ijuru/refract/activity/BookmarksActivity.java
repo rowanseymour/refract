@@ -99,6 +99,8 @@ public class BookmarksActivity extends Activity implements OnItemClickListener {
 		if (newBookmark != null && position == 0) {
 			if (bookmarkManager.addBookmark(newBookmark))
 				Toast.makeText(this, R.string.str_bookmarksaved, Toast.LENGTH_SHORT).show();
+			else
+				Toast.makeText(this, R.string.err_unabletosave, Toast.LENGTH_SHORT).show();
 		} else {
 			Bookmark bookmark = (Bookmark)adapterView.getAdapter().getItem(position);
 			Preferences.setParametersPreference(this, "params", bookmark.getParams());

@@ -11,6 +11,7 @@
 	<string name="str_delete">Delete</string>
 	<string name="str_function">Function</string>
 	<string name="str_goto">Go to</string>
+	<string name="str_imagesaved">Image saved</string>
 	<string name="str_imaginarycoordinate">Imaginary coordinate</string>
 	<string name="str_itersperframe">Iterations per frame</string>
 	<string name="str_palette">Palette</string>
@@ -20,12 +21,13 @@
 	<string name="str_realcoordinate">Real coordinate</string>
 	<string name="str_reset">Reset</string>
 	<string name="str_renderaswallpaper">Render as wallpaper</string>
+	<string name="str_save">Save</string>
 	<string name="str_settings">Settings</string>
-	<string name="str_share">Share</string>
 	<string name="str_wallpaper">Wallpaper</string>
 	<string name="str_zoomfactor">Zoom factor</string>
 	<string name="err_invalidnumber">Invalid number</string>
 	<string name="err_numberrange">Must be between %1$d and %2$d</string>
+	<string name="err_unabletosave">Unable to save</string>
 	<string-array name="arr_iterfunctionlabels">
 		<item>z = z\u00B2 + c</item>
 		<item>z = z\u00B3 + c</item>

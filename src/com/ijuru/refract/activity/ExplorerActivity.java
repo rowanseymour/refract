@@ -19,6 +19,11 @@
 
 package com.ijuru.refract.activity;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.util.Date;
+
 import com.ijuru.refract.Bookmark;
 import com.ijuru.refract.R;
 import com.ijuru.refract.RefractApplication;
@@ -40,6 +45,8 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Rect;
+import android.graphics.Bitmap.CompressFormat;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -98,9 +105,12 @@ public class ExplorerActivity extends Activity implements RendererListener {
 		case R.id.menubookmarks:
 			onMenuBookmarks();
 	    	break;	
+		case R.id.menusave:
+			onMenuSave();
+	    	break;
 		case R.id.menusettings:
 			startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
-	    	break;
+	    	break;	
 		case R.id.menugoto:
 			onMenuGoto();
 	    	break;
@@ -128,6 +138,31 @@ public class ExplorerActivity extends Activity implements RendererListener {
 		intent.putExtra("params", rendererView.getRendererParams());
 		intent.putExtra("thumbnail", captureBookmarkThumbnail());
 		startActivity(intent);
+	}
+	
+	/**
+	 * Saves the current render to the gallery
+	 */
+	private void onMenuSave() {
+		File saveDir = ((RefractApplication)getApplication()).getSaveDirectory();
+		File saveFile = new File(saveDir, new Date().getTime() + ".png");
+		Bitmap bitmap = rendererView.getBitmap();
+		
+		try {
+			OutputStream stream = new FileOutputStream(saveFile);
+			bitmap.compress(CompressFormat.PNG, 80, stream);
+			stream.close();
+			
+			// Tell the media scanner about the new file
+			Uri contentUri = Uri.fromFile(saveFile);
+		    Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+		    mediaScanIntent.setData(contentUri);
+		    sendBroadcast(mediaScanIntent);
+			
+			Toast.makeText(this, R.string.str_imagesaved, Toast.LENGTH_SHORT).show();
+		} catch (Exception e) {
+			Toast.makeText(this, R.string.err_unabletosave, Toast.LENGTH_SHORT).show();
+		}
 	}
 	
 	/**

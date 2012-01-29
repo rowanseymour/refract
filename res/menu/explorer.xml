@@ -16,10 +16,9 @@
 		android:icon="@drawable/ic_menu_bookmarks"
 	/>
 	<item 
-		android:id="@+id/menushare" 
-		android:title="@string/str_share" 
-		android:icon="@drawable/ic_menu_share"
-		android:enabled="false"
+		android:id="@+id/menusave" 
+		android:title="@string/str_save"
+		android:icon="@drawable/ic_menu_save"
 	/>
 	<item 
 		android:id="@+id/menusettings" 

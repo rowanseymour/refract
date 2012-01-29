@@ -19,13 +19,18 @@
 
 package com.ijuru.refract;
 
+import java.io.File;
+
 import android.app.Application;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.os.Environment;
 
 /**
  * Application class
  */
 public class RefractApplication extends Application {
+	
+	private static final String RENDER_SAVE_FOLDER = "Refract";
 	
 	private BookmarkManager bookmarkManager = new BookmarkManager(this);
 	
@@ -42,6 +47,20 @@ public class RefractApplication extends Application {
 	 */
 	public BookmarkManager getBookmarkManager() {
 		return bookmarkManager;
+	}
+	
+	/**
+	 * Gets the directory for saving renders
+	 * @return the directory
+	 */
+	public File getSaveDirectory() {
+		File picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+		
+		File rendersDir = new File(picturesDir, RENDER_SAVE_FOLDER);
+		if (!rendersDir.exists())
+			rendersDir.mkdirs();
+		
+		return rendersDir;
 	}
 	
 	/**
