@@ -26,8 +26,8 @@ void refract_renderer_iterate_m2(renderer_t* renderer, complex_t offset, float_t
 	// Calculate screen dimensions
 	const int half_cx = renderer->width / 2;
 	const int half_cy = renderer->height / 2;
-	const float_t offset_x = offset.re;
-	const float_t offset_y = offset.im;
+	const float_t offset_re = offset.re;
+	const float_t offset_im = offset.im;
 	const float_t inv_zoom = 1 / zoom;
 	const iterc_t cache_max_iters = renderer->cache_max_iters;
 
@@ -53,8 +53,8 @@ void refract_renderer_iterate_m2(renderer_t* renderer, complex_t offset, float_t
 			}
 
 			// Convert from pixel space to complex space
-			float_t cr = (x - half_cx) * inv_zoom + offset_x;
-			float_t ci = (y - half_cy) * inv_zoom - offset_y;
+			float_t cr = (x - half_cx) * inv_zoom + offset_re;
+			float_t ci = (half_cy - y) * inv_zoom + offset_im;
 
 			// If not doing refinement then initialize values
 			if (!use_cache) {
@@ -93,8 +93,8 @@ void refract_renderer_iterate_m3(renderer_t* renderer, complex_t offset, float_t
 	// Calculate screen dimensions
 	const int half_cx = renderer->width / 2;
 	const int half_cy = renderer->height / 2;
-	const float_t offset_x = offset.re;
-	const float_t offset_y = offset.im;
+	const float_t offset_re = offset.re;
+	const float_t offset_im = offset.im;
 	const float_t inv_zoom = 1 / zoom;
 	const iterc_t cache_max_iters = renderer->cache_max_iters;
 
@@ -120,8 +120,8 @@ void refract_renderer_iterate_m3(renderer_t* renderer, complex_t offset, float_t
 			}
 
 			// Convert from pixel space to complex space
-			float_t cr = (x - half_cx) * inv_zoom + offset_x;
-			float_t ci = (y - half_cy) * inv_zoom - offset_y;
+			float_t cr = (x - half_cx) * inv_zoom + offset_re;
+			float_t ci = (half_cy - y) * inv_zoom + offset_im;
 
 			// If not doing refinement then initialize values
 			if (!use_cache) {
@@ -160,8 +160,8 @@ void refract_renderer_iterate_m4(renderer_t* renderer, complex_t offset, float_t
 	// Calculate screen dimensions
 	const int half_cx = renderer->width / 2;
 	const int half_cy = renderer->height / 2;
-	const float_t offset_x = offset.re;
-	const float_t offset_y = offset.im;
+	const float_t offset_re = offset.re;
+	const float_t offset_im = offset.im;
 	const float_t inv_zoom = 1 / zoom;
 	const iterc_t cache_max_iters = renderer->cache_max_iters;
 
@@ -187,8 +187,8 @@ void refract_renderer_iterate_m4(renderer_t* renderer, complex_t offset, float_t
 			}
 
 			// Convert from pixel space to complex space
-			float_t cr = (x - half_cx) * inv_zoom + offset_x;
-			float_t ci = (y - half_cy) * inv_zoom - offset_y;
+			float_t cr = (x - half_cx) * inv_zoom + offset_re;
+			float_t ci = (half_cy - y) * inv_zoom + offset_im;
 
 			// If not doing refinement then initialize values
 			if (!use_cache) {
