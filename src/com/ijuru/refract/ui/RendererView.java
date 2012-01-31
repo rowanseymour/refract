@@ -31,10 +31,9 @@ import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Bitmap.Config;
-import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -173,21 +172,25 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	 */
 	@Override
 	protected synchronized void onDraw(Canvas canvas) {
-		// Are the params rendered in the bitmap the same as the renderer's params?
-		boolean bitmapUpToDate = getRendererParams().equals(bitmapParams);
+		RendererParams rendererParams = getRendererParams();
 		
-		if (!bitmapUpToDate) {
-			// Calculate pixel space difference between renderer and bitmap
-			Point p_start = complexToPixels(bitmapParams.getOffset());
-			Point p_now = complexToPixels(renderer.getOffset());
+		// Are the params rendered in the bitmap the same as the renderer's params?
+		if (rendererParams.equals(bitmapParams)) {
+			canvas.drawBitmap(bitmap, 0, 0, null);
+		}
+		else {
+			// Calculate the complex space covered by the bitmap
+			Complex bitmap_c1 = pixelsToComplex(bitmapParams, new Point(0, 0));
+			Complex bitmap_c2 = pixelsToComplex(bitmapParams, new Point(bitmap.getWidth(), bitmap.getHeight()));
+			
+			// Map those complex points back into pixel space according to the current renderer params
+			Point bitmap_p1 = complexToPixels(rendererParams, bitmap_c1);
+			Point bitmap_p2 = complexToPixels(rendererParams, bitmap_c2);
 			
 			// Draw pre-navigation bitmap where render would be
-			// TODO scale bitmap for zoom
 			canvas.drawARGB(255, 0, 0, 0);
-			canvas.drawBitmap(bitmap, p_start.x - p_now.x, p_start.y - p_now.y, null);
+			canvas.drawBitmap(bitmap, null, new Rect(bitmap_p1.x, bitmap_p1.y, bitmap_p2.x, bitmap_p2.y), null);
 		}
-		else
-			canvas.drawBitmap(bitmap, 0, 0, null);
 	}
 	
 	/**
@@ -356,12 +359,13 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	
 	/**
 	 * Converts the pixel space point to coordinate in complex-space
+	 * @param params the renderer params
 	 * @param p the point in pixel space
 	 * @return the coordinate in complex space
 	 */
-	protected Complex pixelsToComplex(Point p) {
-		Complex offset = renderer.getOffset();
-		double inv_zoom = 1 / renderer.getZoom();
+	protected Complex pixelsToComplex(RendererParams params, Point p) {
+		Complex offset = params.getOffset();
+		double inv_zoom = 1 / params.getZoom();
 		int half_w = getWidth() / 2;
 		int half_h = getHeight() / 2;
 		double re = (p.x - half_w) * inv_zoom + offset.re;
@@ -371,12 +375,13 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	
 	/**
 	 * Converts the pixel space point to coordinate in complex space
+	 * @param params the renderer params
 	 * @param c the coordinate in complex space
 	 * @return the point in pixel space
 	 */
-	private Point complexToPixels(Complex c) {
-		Complex offset = renderer.getOffset();
-		double zoom = renderer.getZoom();
+	private Point complexToPixels(RendererParams params, Complex c) {
+		Complex offset = params.getOffset();
+		double zoom = params.getZoom();
 		int half_w = getWidth() / 2;
 		int half_h = getHeight() / 2;
 		double x = (c.re - offset.re) * zoom + half_w;
