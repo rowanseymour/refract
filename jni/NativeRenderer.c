@@ -212,7 +212,7 @@ JNIEXPORT jint JNICALL Java_com_ijuru_refract_renderer_jni_NativeRenderer_iterat
 JNIEXPORT jboolean JNICALL Java_com_ijuru_refract_renderer_jni_NativeRenderer_render(JNIEnv* env, jobject this, jobject bitmap, jobject mapping) {
 	renderer_t* renderer = get_renderer(env, this);
 
-	mapping_t mapping = (mapping_t)(*env)->CallIntMethod(env, mapping, mapping_ordinal_mid);
+	mapping_t pal_mapping = (mapping_t)(*env)->CallIntMethod(env, mapping, mapping_ordinal_mid);
 
 	AndroidBitmapInfo info;
 	AndroidBitmap_getInfo(env, bitmap, &info);
@@ -225,7 +225,7 @@ JNIEXPORT jboolean JNICALL Java_com_ijuru_refract_renderer_jni_NativeRenderer_re
 		return (jboolean)false;
 	}
 
-	refract_renderer_render(renderer, pixels, info.stride, mapping);
+	refract_renderer_render(renderer, pixels, info.stride, pal_mapping);
 
 	AndroidBitmap_unlockPixels(env, bitmap);
 	return (jboolean)true;

@@ -256,17 +256,16 @@ public class ExplorerActivity extends Activity implements RendererListener {
 		Mapping paletteMapping = Preferences.getMappingPreference(this, Constants.PREF_PALETTE_MAPPING, Mapping.REPEAT);
 		int paletteSize = Preferences.getIntegerPreference(this, Constants.PREF_PALETTE_SIZE, R.integer.def_palettesize);
 		int setColor = Preferences.getIntegerPreference(this, Constants.PREF_PALETTE_SETCOLOR, R.integer.def_palettesetcolor);
-		
-		renderer.setPalette(palette, paletteSize, setColor);
-		view.setPaletteMapping(paletteMapping);
-		
-		// Load renderer parameters from preferences
 		RendererParams params = Preferences.getParametersPreference(this, Constants.PREF_PARAMS);
 		
 		// If zoom is 0, default to half the width of the screen
 		if (params.getZoom() == 0.0)
 			params.setZoom(view.getWidth() / 2);
+		
+		view.setPaletteMapping(paletteMapping);
 		view.setRendererParams(params);
+		
+		renderer.setPalette(palette, paletteSize, setColor);
 		
 		// Load renderer view options from preferences
 		int itersPerFrame = Preferences.getIntegerPreference(this, Constants.PREF_ITERS_PERFRAME, R.integer.def_itersperframe);

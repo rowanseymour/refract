@@ -91,13 +91,13 @@ public class WallpaperActivity extends Activity implements RendererListener {
 	 */
 	@Override
 	public void onRendererCreated(RendererView view, Renderer renderer) {
-		// Get renderer parameters from preferences
+		// Get renderer options from preferences
+		int itersPerFrame = Preferences.getIntegerPreference(this, Constants.PREF_ITERS_PERFRAME, R.integer.def_itersperframe);
 		Palette palette = Palette.getPresetByName(Preferences.getStringPreference(this, Constants.PREF_PALETTE_PRESET, R.string.def_palettepreset));
 		int paletteSize = Preferences.getIntegerPreference(this, Constants.PREF_PALETTE_SIZE, R.integer.def_palettesize);
 		int setColor = Preferences.getIntegerPreference(this, Constants.PREF_PALETTE_SETCOLOR, R.integer.def_palettesetcolor);
 		
 		renderer.setPalette(palette, paletteSize, setColor);
-		rendererView.setPaletteMapping(Mapping.SCALE_GLOBAL);
 			
 		// Set render parameters from intent if they exist
 		Intent intent = getIntent();
@@ -106,8 +106,7 @@ public class WallpaperActivity extends Activity implements RendererListener {
 			view.setRendererParams(params);
 		}
 		
-		// Load renderer view options from preferences
-		int itersPerFrame = Preferences.getIntegerPreference(this, Constants.PREF_ITERS_PERFRAME, R.integer.def_itersperframe);
+		view.setPaletteMapping(Mapping.SCALE_GLOBAL);
 		view.setIterationsPerFrame(itersPerFrame);
 	}
 
