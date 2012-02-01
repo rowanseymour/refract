@@ -31,10 +31,10 @@ import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Bitmap.Config;
-import android.graphics.Point;
 import android.graphics.PointF;
-import android.graphics.Rect;
+import android.graphics.RectF;
 import android.util.AttributeSet;
+import android.util.FloatMath;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -175,16 +175,16 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 		}
 		else {
 			// Calculate the complex space covered by the bitmap
-			Complex bitmap_c1 = pixelsToComplex(bitmapParams, new Point(0, 0));
-			Complex bitmap_c2 = pixelsToComplex(bitmapParams, new Point(bitmap.getWidth(), bitmap.getHeight()));
+			Complex bitmap_c1 = pixelsToComplex(bitmapParams, new PointF(0, 0));
+			Complex bitmap_c2 = pixelsToComplex(bitmapParams, new PointF(bitmap.getWidth(), bitmap.getHeight()));
 			
 			// Map those complex points back into pixel space according to the current renderer params
-			Point bitmap_p1 = complexToPixels(rendererParams, bitmap_c1);
-			Point bitmap_p2 = complexToPixels(rendererParams, bitmap_c2);
+			PointF bitmap_p1 = complexToPixels(rendererParams, bitmap_c1);
+			PointF bitmap_p2 = complexToPixels(rendererParams, bitmap_c2);
 			
 			// Draw pre-navigation bitmap where render would be
 			canvas.drawARGB(255, 0, 0, 0);
-			canvas.drawBitmap(bitmap, null, new Rect(bitmap_p1.x, bitmap_p1.y, bitmap_p2.x, bitmap_p2.y), null);
+			canvas.drawBitmap(bitmap, null, new RectF(bitmap_p1.x, bitmap_p1.y, bitmap_p2.x, bitmap_p2.y), null);
 		}
 	}
 	
@@ -223,6 +223,9 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	 */
 	private class NavigationListener implements MultiTouchGestureDetector.OnMultiTouchGestureListener {
 		
+		/**
+		 * @see com.ijuru.refract.ui.MultiTouchGestureDetector.OnMultiTouchGestureListener#onMultiTouchGesture(PointF[], PointF[])
+		 */
 		@Override
 		public void onMultiTouchGesture(PointF[] prevPoints, PointF[] currPoints) {
 			if (prevPoints.length == 1)
@@ -232,22 +235,40 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 		}
 		
 		private void panGesture(PointF prevPoint, PointF currPoint) {
-			float deltaX = prevPoint.x - currPoint.x;
-			float deltaY = prevPoint.y - currPoint.y;
-			double zoom = renderer.getZoom();
-			Complex offset = renderer.getOffset();
-			Complex delta = new Complex(deltaX / zoom, - deltaY / zoom);
-			setOffset(offset.add(delta));
+			RendererParams params = getRendererParams();
+			Complex prevC = pixelsToComplex(params, prevPoint);
+			Complex currC = pixelsToComplex(params, currPoint);
+			Complex diff = currC.sub(prevC);
+			setOffset(renderer.getOffset().sub(diff));
 		}
 		
-		private void zoomGesture(PointF prevPoint1, PointF currPoint1, PointF prevPoint2, PointF currPoint2) {				
-			float prevDistX = prevPoint2.x - prevPoint1.x;
-			float prevDistY = prevPoint2.y - prevPoint1.y;
-			float currDistX = currPoint2.x - currPoint1.x;
-			float currDistY = currPoint2.y - currPoint1.y;
-			double prevDist = Math.sqrt(prevDistX * prevDistX + prevDistY * prevDistY);
-			double currDist = Math.sqrt(currDistX * currDistX + currDistY * currDistY);
-			double scaleFactor = currDist / prevDist;
+		private void zoomGesture(PointF prevPoint1, PointF currPoint1, PointF prevPoint2, PointF currPoint2) {
+			float prevDistX = prevPoint1.x - prevPoint2.x;
+			float prevDistY = prevPoint1.y - prevPoint2.y;
+			float currDistX = currPoint1.x - currPoint2.x;
+			float currDistY = currPoint1.y - currPoint2.y;
+			float prevDist = FloatMath.sqrt(prevDistX * prevDistX + prevDistY * prevDistY);
+			float currDist = FloatMath.sqrt(currDistX * currDistX + currDistY * currDistY);
+			float scaleFactor = currDist / prevDist;
+			
+			// Map previous points into complex space using current params
+			RendererParams prevParams = getRendererParams();
+			Complex prevC1 = pixelsToComplex(prevParams, prevPoint1);
+			Complex prevC2 = pixelsToComplex(prevParams, prevPoint2);
+			
+			// Map current points into complex space using params with new scale applied
+			double newZoom = prevParams.getZoom() * scaleFactor;
+			RendererParams currParams = new RendererParams(prevParams.getFunction(), prevParams.getOffset(), newZoom);
+			Complex currC1 = pixelsToComplex(currParams, currPoint1);
+			Complex currC2 = pixelsToComplex(currParams, currPoint2);
+			
+			// Calculate mid-points and their diff
+			Complex prevMP = prevC1.add(prevC2).scale(0.5);
+			Complex currMP = currC1.add(currC2).scale(0.5);
+			Complex diff = currMP.sub(prevMP);
+			
+			// Update renderer offset and zoom
+			setOffset(renderer.getOffset().sub(diff));
 			setZoom(renderer.getZoom() * scaleFactor);
 		}
 	}
@@ -354,7 +375,7 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	 * @param p the point in pixel space
 	 * @return the coordinate in complex space
 	 */
-	protected Complex pixelsToComplex(RendererParams params, Point p) {
+	protected Complex pixelsToComplex(RendererParams params, PointF p) {
 		Complex offset = params.getOffset();
 		double inv_zoom = 1 / params.getZoom();
 		int half_w = getWidth() / 2;
@@ -370,13 +391,13 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	 * @param c the coordinate in complex space
 	 * @return the point in pixel space
 	 */
-	private Point complexToPixels(RendererParams params, Complex c) {
+	private PointF complexToPixels(RendererParams params, Complex c) {
 		Complex offset = params.getOffset();
 		double zoom = params.getZoom();
 		int half_w = getWidth() / 2;
 		int half_h = getHeight() / 2;
 		double x = (c.re - offset.re) * zoom + half_w;
 		double y = half_h - (c.im - offset.im) * zoom;
-		return new Point((int)x, (int)y);
+		return new PointF((float)x, (float)y);
 	}
 }
