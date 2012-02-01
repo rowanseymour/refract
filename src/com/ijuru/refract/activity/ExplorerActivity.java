@@ -271,22 +271,16 @@ public class ExplorerActivity extends Activity implements RendererListener {
 		// Load renderer view options from preferences
 		int itersPerFrame = Preferences.getIntegerPreference(this, Constants.PREF_ITERS_PERFRAME, R.integer.def_itersperframe);
 		view.setIterationsPerFrame(itersPerFrame);
+		
+		statusPanel.setParams(params);
 	}
 
 	/**
-	 * @see com.ijuru.refract.ui.RendererView.RendererListener#onOffsetChanged(RendererView, Renderer, Complex)
+	 * @see com.ijuru.refract.ui.RendererView.RendererListener#onRendererParamsChanged(RendererView, Renderer)
 	 */
 	@Override
-	public void onRendererOffsetChanged(RendererView view, Renderer renderer, Complex offset) {
-		statusPanel.setCoords(offset.re, offset.im);
-	}
-
-	/**
-	 * @see com.ijuru.refract.ui.RendererView.RendererListener#onZoomChanged(RendererView, Renderer, double)
-	 */
-	@Override
-	public void onRendererZoomChanged(RendererView view, Renderer renderer, double zoom) {
-		statusPanel.setZoom(zoom);
+	public void onRendererParamsChanged(RendererView view, Renderer renderer) {
+		statusPanel.setParams(view.getRendererParams());
 	}
 
 	/**

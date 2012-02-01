@@ -19,6 +19,8 @@
 
 package com.ijuru.refract.ui;
 
+import com.ijuru.refract.renderer.RendererParams;
+
 import android.app.Activity;
 import android.content.Context;
 import android.util.AttributeSet;
@@ -68,21 +70,13 @@ public class StatusPanel extends TableLayout {
 	}
 	
 	/**
-	 * Sets the render coordinates
-	 * @param real the real component
-	 * @param imag the imaginary component
+	 * Sets the renderer params
+	 * @param params the params
 	 */
-	public void setCoords(double real, double imag) {
-		updateField(txtReal, String.format("%.5g", real));
-		updateField(txtImag, String.format("%.5gi", imag));
-	}
-	
-	/**
-	 * Sets the zoom factor
-	 * @param zoom the zoom factor
-	 */
-	public void setZoom(double zoom) {
-		updateField(txtZoom, String.format("%.5g", zoom));
+	public void setParams(RendererParams params) {
+		updateField(txtReal, String.format("%.5g", params.getOffset().re));
+		updateField(txtImag, String.format("%.5gi", params.getOffset().im));
+		updateField(txtZoom, String.format("%.5g", params.getZoom()));
 	}
 	
 	/**

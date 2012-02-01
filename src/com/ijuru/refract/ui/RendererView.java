@@ -27,6 +27,7 @@ import com.ijuru.refract.renderer.Renderer;
 import com.ijuru.refract.renderer.RendererFactory;
 import com.ijuru.refract.renderer.RendererListener;
 import com.ijuru.refract.renderer.RendererParams;
+import com.ijuru.refract.utils.Utils;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -36,7 +37,6 @@ import android.graphics.Bitmap.Config;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.util.AttributeSet;
-import android.util.FloatMath;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -44,7 +44,7 @@ import android.view.SurfaceView;
 /**
  * View which displays a rendering
  */
-public class RendererView extends SurfaceView implements SurfaceHolder.Callback {
+public class RendererView extends SurfaceView implements SurfaceHolder.Callback, MultiTouchGestureDetector.OnMultiTouchGestureListener {
 	
 	private Bitmap bitmap;
 	private Renderer renderer;
@@ -52,7 +52,7 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	private RendererListener listener;
 
 	// Rendering parameters
-	private RendererParams rendererParams = new RendererParams(Function.MANDELBROT, Complex.ORIGIN, 200);
+	private RendererParams params = new RendererParams(Function.MANDELBROT, Complex.ORIGIN, 200);
 	private int itersPerFrame = 5;
 	private Mapping paletteMapping;
 
@@ -78,7 +78,7 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 		
 		// Optionally enable touch based navigation
 		if (navigationEnabled)
-			navigationDetector = new MultiTouchGestureDetector(new NavigationListener());
+			navigationDetector = new MultiTouchGestureDetector(this);
 	}
 	
 	/**
@@ -89,7 +89,7 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 		int rendererWidth = getDesiredRendererWidth(getWidth());
 		int rendererHeight = getDesiredRendererHeight(getHeight());
 		
-		rendererParams.setZoom(getWidth() / 2);
+		params.setZoom(getWidth() / 2);
 		bitmap = Bitmap.createBitmap(rendererWidth, rendererHeight, Config.ARGB_8888);
 		renderer = RendererFactory.createRenderer();
 		
@@ -141,7 +141,7 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 		if (navigationDetector == null || !navigationDetector.isInProgress()) {
 			
 			// Copy params so that we know exactly what params have been iterated
-			bitmapParams = (RendererParams)rendererParams.clone();
+			bitmapParams = (RendererParams)params.clone();
 			int iters = renderer.iterate(bitmapParams.getFunction(), bitmapParams.getOffset(), bitmapParams.getZoom(), itersPerFrame);
 			
 			if (listener != null)
@@ -171,7 +171,7 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	@Override
 	protected void onDraw(Canvas canvas) {		
 		// Are the params rendered in the bitmap the same as the renderer's params?
-		if (rendererParams.equals(bitmapParams)) {
+		if (params.equals(bitmapParams)) {
 			canvas.drawBitmap(bitmap, 0, 0, null);
 		}
 		else {
@@ -180,8 +180,8 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 			Complex bitmap_c2 = pixelsToComplex(bitmapParams, new PointF(bitmap.getWidth(), bitmap.getHeight()));
 			
 			// Map those complex points back into pixel space according to the current renderer params
-			PointF bitmap_p1 = complexToPixels(rendererParams, bitmap_c1);
-			PointF bitmap_p2 = complexToPixels(rendererParams, bitmap_c2);
+			PointF bitmap_p1 = complexToPixels(params, bitmap_c1);
+			PointF bitmap_p2 = complexToPixels(params, bitmap_c2);
 			
 			// Draw pre-navigation bitmap where render would be
 			canvas.drawARGB(255, 0, 0, 0);
@@ -218,66 +218,75 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 		
 		return false;
 	}
+		
+	/**
+	 * @see com.ijuru.refract.ui.MultiTouchGestureDetector.OnMultiTouchGestureListener#onMultiTouchGesture(PointF[], PointF[])
+	 */
+	@Override
+	public void onMultiTouchGesture(PointF[] prevPoints, PointF[] currPoints) {
+		if (prevPoints.length == 1)
+			panGesture(prevPoints[0], currPoints[0]);
+		else if (prevPoints.length == 2)
+			zoomGesture(prevPoints[0], currPoints[0], prevPoints[1], currPoints[1]);
+		
+		if (listener != null)
+			listener.onRendererParamsChanged(this, renderer);
+	}
 	
 	/**
-	 * Listener for panning and zooming gestures
+	 * Handles single finger pan gesture
+	 * @param startPoint the start point
+	 * @param endPoint the end point
 	 */
-	private class NavigationListener implements MultiTouchGestureDetector.OnMultiTouchGestureListener {
+	private void panGesture(PointF startPoint, PointF endPoint) {
+		Complex startC = pixelsToComplex(params, startPoint);
+		Complex endC = pixelsToComplex(params, endPoint);
+		Complex diff = endC.sub(startC);
+		params.setOffset(params.getOffset().sub(diff));
+	}
+	
+	/**
+	 * Handles two finger pan and zoom gesture
+	 * @param startPoint1 the start point of first finger
+	 * @param endPoint1 the end point of first finger
+	 * @param startPoint2 the start point of second finger
+	 * @param endPoint2 the end point of second finger
+	 */
+	private void zoomGesture(PointF startPoint1, PointF endPoint1, PointF startPoint2, PointF endPoint2) {
+		float startDist = Utils.distanceBetween(startPoint1, startPoint2);
+		float endDist = Utils.distanceBetween(endPoint1, endPoint2);
 		
-		/**
-		 * @see com.ijuru.refract.ui.MultiTouchGestureDetector.OnMultiTouchGestureListener#onMultiTouchGesture(PointF[], PointF[])
-		 */
-		@Override
-		public void onMultiTouchGesture(PointF[] prevPoints, PointF[] currPoints) {
-			if (prevPoints.length == 1)
-				panGesture(prevPoints[0], currPoints[0]);
-			else if (prevPoints.length == 2)
-				zoomGesture(prevPoints[0], currPoints[0], prevPoints[1], currPoints[1]);
-		}
+		float scaleFactor = endDist / startDist;
 		
-		private void panGesture(PointF prevPoint, PointF currPoint) {
-			Complex prevC = pixelsToComplex(rendererParams, prevPoint);
-			Complex currC = pixelsToComplex(rendererParams, currPoint);
-			Complex diff = currC.sub(prevC);
-			setOffset(rendererParams.getOffset().sub(diff));
-		}
+		// Map previous points into complex space using current params
+		Complex prevC1 = pixelsToComplex(params, startPoint1);
+		Complex prevC2 = pixelsToComplex(params, startPoint2);
 		
-		private void zoomGesture(PointF prevPoint1, PointF currPoint1, PointF prevPoint2, PointF currPoint2) {
-			float prevDistX = prevPoint1.x - prevPoint2.x;
-			float prevDistY = prevPoint1.y - prevPoint2.y;
-			float currDistX = currPoint1.x - currPoint2.x;
-			float currDistY = currPoint1.y - currPoint2.y;
-			float prevDist = FloatMath.sqrt(prevDistX * prevDistX + prevDistY * prevDistY);
-			float currDist = FloatMath.sqrt(currDistX * currDistX + currDistY * currDistY);
-			float scaleFactor = currDist / prevDist;
-			
-			// Map previous points into complex space using current params
-			Complex prevC1 = pixelsToComplex(rendererParams, prevPoint1);
-			Complex prevC2 = pixelsToComplex(rendererParams, prevPoint2);
-			
-			// Update params zoom factor
-			setZoom(rendererParams.getZoom() * scaleFactor);
-			
-			// Map current points into complex space using updated params
-			Complex currC1 = pixelsToComplex(rendererParams, currPoint1);
-			Complex currC2 = pixelsToComplex(rendererParams, currPoint2);
-			
-			// Calculate mid-points and their diff
-			Complex prevMP = prevC1.add(prevC2).scale(0.5);
-			Complex currMP = currC1.add(currC2).scale(0.5);
-			Complex diff = currMP.sub(prevMP);
-			
-			// Update params offset
-			setOffset(rendererParams.getOffset().sub(diff));
-		}
+		// Update params zoom factor
+		params.setZoom(params.getZoom() * scaleFactor);
+		
+		// Map current points into complex space using updated params
+		Complex currC1 = pixelsToComplex(params, endPoint1);
+		Complex currC2 = pixelsToComplex(params, endPoint2);
+		
+		// Calculate mid-points and their diff
+		Complex prevMP = prevC1.add(prevC2).scale(0.5);
+		Complex currMP = currC1.add(currC2).scale(0.5);
+		Complex diff = currMP.sub(prevMP);
+		
+		// Update params offset
+		params.setOffset(params.getOffset().sub(diff));
 	}
 	
 	/**
 	 * Resets this view so that it is centered on the origin
 	 */
 	public void reset() {
-		setOffset(Complex.ORIGIN);
-		setZoom(renderer.getWidth() / 2);
+		params.setOffset(Complex.ORIGIN);
+		params.setZoom(renderer.getWidth() / 2);
+		
+		if (listener != null)
+			listener.onRendererParamsChanged(this, renderer);
 	}
 	
 	/**
@@ -285,7 +294,7 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	 * @return the parameters
 	 */
 	public RendererParams getRendererParams() {
-		return rendererParams;
+		return params;
 	}
 	
 	/**
@@ -293,29 +302,7 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	 * @return the parameters
 	 */
 	public void setRendererParams(RendererParams params) {
-		this.rendererParams = params;
-	}
-	
-	/**
-	 * Sets the offset of the renderer
-	 * @param offset the offset
-	 */
-	protected void setOffset(Complex offset) {
-		rendererParams.setOffset(offset);
-		
-		if (listener != null)
-			listener.onRendererOffsetChanged(this, renderer, offset);
-	}
-	
-	/**
-	 * Sets the zoom of the renderer
-	 * @param zoom the zoom
-	 */
-	protected void setZoom(double zoom) {
-		rendererParams.setZoom(zoom);
-		
-		if (listener != null)
-			listener.onRendererZoomChanged(this, renderer, zoom);
+		this.params = params;
 	}
 	
 	/**

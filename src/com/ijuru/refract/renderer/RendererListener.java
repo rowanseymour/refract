@@ -34,20 +34,11 @@ public interface RendererListener {
 	public void onRendererCreated(RendererView view, Renderer renderer);
 	
 	/**
-	 * Called when renderer offset has been changed
+	 * Called when renderer parameters have been changed
 	 * @param view the view holding the renderer
 	 * @param renderer the renderer
-	 * @param offset the offset
 	 */
-	public void onRendererOffsetChanged(RendererView view, Renderer renderer, Complex offset);
-	
-	/**
-	 * Called when renderer zoom factor has been changed
-	 * @param view the view holding the renderer
-	 * @param renderer the renderer
-	 * @param zoom the zoom factor
-	 */
-	public void onRendererZoomChanged(RendererView view, Renderer renderer, double zoom);
+	public void onRendererParamsChanged(RendererView view, Renderer renderer);
 	
 	/**
 	 * Called when renderer has been iterated

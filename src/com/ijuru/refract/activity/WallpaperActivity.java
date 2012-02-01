@@ -23,7 +23,6 @@ import java.io.IOException;
 
 import com.ijuru.refract.Constants;
 import com.ijuru.refract.R;
-import com.ijuru.refract.renderer.Complex;
 import com.ijuru.refract.renderer.Mapping;
 import com.ijuru.refract.renderer.Palette;
 import com.ijuru.refract.renderer.RendererParams;
@@ -113,17 +112,10 @@ public class WallpaperActivity extends Activity implements RendererListener {
 	}
 
 	/**
-	 * @see com.ijuru.refract.ui.RendererView.RendererListener#onRendererOffsetChanged(RendererView, Renderer, Complex)
+	 * @see com.ijuru.refract.ui.RendererView.RendererListener#onRendererParamsChanged(RendererView, Renderer)
 	 */
 	@Override
-	public void onRendererOffsetChanged(RendererView view, Renderer renderer, Complex offset) {	
-	}
-
-	/**
-	 * @see com.ijuru.refract.ui.RendererView.RendererListener#onRendererZoomChanged(RendererView, Renderer, double)
-	 */
-	@Override
-	public void onRendererZoomChanged(RendererView view, Renderer renderer, double zoom) {	
+	public void onRendererParamsChanged(RendererView view, Renderer renderer) {	
 	}
 
 	/**
