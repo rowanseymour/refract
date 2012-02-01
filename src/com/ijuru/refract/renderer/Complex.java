@@ -22,9 +22,9 @@ package com.ijuru.refract.renderer;
 /**
  * Double precision complex number
  */
-public class Complex {
-	public double re;
-	public double im;
+public final class Complex {
+	public final double re;
+	public final double im;
 	
 	public static final Complex ORIGIN = new Complex(0.0, 0.0);
 	
@@ -62,6 +62,15 @@ public class Complex {
 	 */
 	public double abs() {
 		return Math.sqrt(re * re + im * im);
+	}
+	
+	/**
+	 * Scales the complex number
+	 * @param s the scalar
+	 * @return the result
+	 */
+	public Complex scale(double s) {
+		return new Complex(this.re * s, this.im * s);
 	}
 	
 	/**
