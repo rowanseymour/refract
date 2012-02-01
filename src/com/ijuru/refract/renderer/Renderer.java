@@ -42,18 +42,22 @@ public interface Renderer {
 	public boolean resize(int width, int height);
 	
 	/**
-	 * Sets the number of iterations per frame
-	 * @param iters the number of iterations
-	 * @return the accumulative number of iterations used
+	 * Iterates the renderer
+	 * @param function the function
+	 * @param offset the offset in complex space
+	 * @param zoom the zoom factor
+	 * @param iters the number of iterations to perform
+	 * @return the overall number of iterations performed on the current render
 	 */
-	public int iterate(int iters);
+	public int iterate(Function function, Complex offset, double zoom, int iters);
 
 	/**
 	 * Renders a fractal to the given bitmap
 	 * @param bitmap the bitmap to render to
+	 * @param mapping the palette mapping mode
 	 * @return true if successful
 	 */
-	public boolean render(Bitmap bitmap);
+	public boolean render(Bitmap bitmap, Mapping mapping);
 
 	/**
 	 * Frees resources
@@ -73,58 +77,10 @@ public interface Renderer {
 	public int getHeight();
 	
 	/**
-	 * Gets the function
-	 * @return the function
-	 */
-	public Function getFunction();
-	
-	/**
-	 * Sets the function
-	 * @param function the function
-	 */
-	public void setFunction(Function function);
-	
-	/**
-	 * Gets the offset in complex space
-	 * @return the offset
-	 */
-	public Complex getOffset();
-	
-	/**
-	 * Sets the offset in complex space
-	 * @param offset the offset
-	 */
-	public void setOffset(Complex offset);
-	
-	/**
-	 * Gets the zoom factor in complex space
-	 * @return the zoom factor
-	 */
-	public double getZoom();
-	
-	/**
-	 * Sets the zoom factor in complex space
-	 * @param zoom the zoom factor
-	 */
-	public void setZoom(double zoom);
-	
-	/**
 	 * Sets the palette for renders
 	 * @param palette the palette
 	 * @param size the size
 	 * @param the RGB color of the set
 	 */
 	public void setPalette(Palette palette, int size, int setColor);
-	
-	/**
-	 * Gets the palette mapping type
-	 * @return the mapping
-	 */
-	public Mapping getPaletteMapping();
-	
-	/**
-	 * Sets the palette mapping type
-	 * @param mapping the mapping
-	 */
-	public void setPaletteMapping(Mapping mapping);
 }

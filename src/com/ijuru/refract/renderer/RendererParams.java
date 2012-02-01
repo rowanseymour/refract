@@ -66,6 +66,14 @@ public class RendererParams implements Parcelable {
 	public Function getFunction() {
 		return function;
 	}
+	
+	/**
+	 * Sets the set function
+	 * @param function the function
+	 */
+	public void setFunction(Function function) {
+		this.function = function;
+	}
 
 	/**
 	 * Gets the offset
@@ -74,6 +82,14 @@ public class RendererParams implements Parcelable {
 	public Complex getOffset() {
 		return offset;
 	}
+	
+	/**
+	 * Sets the offset
+	 * @param offset the offset
+	 */
+	public void setOffset(Complex offset) {
+		this.offset = offset;
+	}
 
 	/**
 	 * Gets the zoom
@@ -81,6 +97,14 @@ public class RendererParams implements Parcelable {
 	 */
 	public double getZoom() {
 		return zoom;
+	}
+	
+	/**
+	 * Sets the zoom
+	 * @param zoom the zoom
+	 */
+	public void setZoom(double zoom) {
+		this.zoom = zoom;
 	}
 
 	/**
@@ -139,6 +163,14 @@ public class RendererParams implements Parcelable {
 		printer.println(zoom);
 	}
 	
+	/**
+	 * @see java.lang.Object#clone()
+	 */
+	@Override
+	public Object clone() {
+		return new RendererParams(function, offset, zoom);
+	}
+
 	/**
 	 * @see java.lang.Object#equals(Object)
 	 */

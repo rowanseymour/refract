@@ -29,16 +29,19 @@ void refract_renderer_iterate_m3(renderer_t* renderer, complex_t offset, float_t
 void refract_renderer_iterate_m4(renderer_t* renderer, complex_t offset, float_t zoom, iterc_t max_iters, bool use_cache);
 
 /**
+ * Checks if two params objects are equal
+ */
+bool params_equal(params_t* p1, params_t* p2) {
+	return p1->func == p2->func && p1->offset.re == p2->offset.re && p1->offset.im == p2->offset.im && p1->zoom == p2->zoom;
+}
+
+/**
  * Allocates a renderer
  */
 bool refract_renderer_init(renderer_t* renderer, int width, int height) {
 	// Initialize renderer
 	memset(renderer, 0, sizeof (renderer_t));
 	renderer->id = ++g_last_renderer_id;
-	renderer->params.func = MANDELBROT;
-	renderer->params.offset.re = 0;
-	renderer->params.offset.im = 0;
-	renderer->params.zoom = width / 2;
 
 	// Allocate palette index buffer
 	if ((renderer->palette_indexes = malloc(ITERC_MAX * sizeof (int))) == NULL)
@@ -49,7 +52,6 @@ bool refract_renderer_init(renderer_t* renderer, int width, int height) {
 		return false;
 
 	// Initialize mutexes
-	pthread_mutex_init(&renderer->params_mutex, NULL);
 	pthread_mutex_init(&renderer->buffers_mutex, NULL);
 
 	return true;
@@ -81,10 +83,6 @@ bool refract_renderer_resize(renderer_t* renderer, int width, int height) {
 		return false;
 	}
 
-	// Zeroize cache buffers
-	//memset(renderer->iter_buffer, 0, sizeof (iterc_t) * width * height);
-	//memset(renderer->z_cache, 0, sizeof (complex_t) * width * height);
-
 	// Unlock access to buffers
 	pthread_mutex_unlock(&renderer->buffers_mutex);
 
@@ -92,54 +90,11 @@ bool refract_renderer_resize(renderer_t* renderer, int width, int height) {
 }
 
 /**
- * Sets the function which invalidates the caches
- */
-void refract_renderer_setfunction(renderer_t* renderer, func_t func) {
-	pthread_mutex_lock(&renderer->params_mutex);
-
-	renderer->params.func = func;
-	renderer->cache_valid = false;
-
-	pthread_mutex_unlock(&renderer->params_mutex);
-}
-
-/**
- * Sets the offset which invalidates the caches
- */
-void refract_renderer_setoffset(renderer_t* renderer, complex_t offset) {
-	pthread_mutex_lock(&renderer->params_mutex);
-
-	renderer->params.offset = offset;
-	renderer->cache_valid = false;
-
-	pthread_mutex_unlock(&renderer->params_mutex);
-}
-
-/**
- * Sets the zoom factor which invalidates the caches
- */
-void refract_renderer_setzoom(renderer_t* renderer, float_t zoom) {
-	pthread_mutex_lock(&renderer->params_mutex);
-
-	renderer->params.zoom = zoom;
-	renderer->cache_valid = false;
-
-	pthread_mutex_unlock(&renderer->params_mutex);
-}
-
-/**
  * Iterates the renderer by the given number of iterations
  */
-iterc_t refract_renderer_iterate(renderer_t* renderer, iterc_t iters) {
-	// Another thread might try to change the render parameters
-	pthread_mutex_lock(&renderer->params_mutex);
+iterc_t refract_renderer_iterate(renderer_t* renderer, params_t* params, iterc_t iters) {
 
-	// Gather the parameters for these iterations while we have exclusive access
-	params_t params = renderer->params;
-	bool use_cache = renderer->cache_valid;
-	renderer->cache_valid = true;
-
-	pthread_mutex_unlock(&renderer->params_mutex);
+	bool use_cache = params_equal(&renderer->cache_params, params) && renderer->cache_valid;
 
 	// Lock access to buffers so they can't be resized or freed while we're iterating
 	pthread_mutex_lock(&renderer->buffers_mutex);
@@ -147,20 +102,22 @@ iterc_t refract_renderer_iterate(renderer_t* renderer, iterc_t iters) {
 	// Increment or reset max-iters depending on whether we'll be using the cache
 	iterc_t max_iters = use_cache ? (renderer->cache_max_iters + iters) : iters;
 
-	switch (params.func) {
+	switch (params->func) {
 	case MANDELBROT:
-		refract_renderer_iterate_m2(renderer, params.offset, params.zoom, max_iters, use_cache);
+		refract_renderer_iterate_m2(renderer, params->offset, params->zoom, max_iters, use_cache);
 		break;
 	case MANDELBROT_3:
-		refract_renderer_iterate_m3(renderer, params.offset, params.zoom, max_iters, use_cache);
+		refract_renderer_iterate_m3(renderer, params->offset, params->zoom, max_iters, use_cache);
 		break;
 	case MANDELBROT_4:
-		refract_renderer_iterate_m4(renderer, params.offset, params.zoom, max_iters, use_cache);
+		refract_renderer_iterate_m4(renderer, params->offset, params->zoom, max_iters, use_cache);
 		break;
 	}
 
 	// Update cache status
 	renderer->cache_max_iters = max_iters;
+	renderer->cache_params = *params;
+	renderer->cache_valid = true;
 
 	// Unlock access to buffers
 	pthread_mutex_unlock(&renderer->buffers_mutex);
@@ -171,7 +128,7 @@ iterc_t refract_renderer_iterate(renderer_t* renderer, iterc_t iters) {
 /**
  * Renders a renderer to the given pixel buffer
  */
-void refract_renderer_render(renderer_t* renderer, color_t* pixels, int stride) {
+void refract_renderer_render(renderer_t* renderer, color_t* pixels, int stride, mapping_t mapping) {
 	// Lock access to buffers
 	pthread_mutex_lock(&renderer->buffers_mutex);
 
@@ -184,7 +141,7 @@ void refract_renderer_render(renderer_t* renderer, color_t* pixels, int stride) 
 	const int pal_index_max = pal_size - 1;
 	int* restrict indexes = renderer->palette_indexes;
 
-	switch (renderer->palette_mapping) {
+	switch (mapping) {
 	case REPEAT:
 		for (int i = 0; i < max_iters; ++i)
 			indexes[i] = i % pal_size;
@@ -246,6 +203,5 @@ void refract_renderer_free(renderer_t* renderer) {
 	pthread_mutex_unlock(&renderer->buffers_mutex);
 
 	// Free mutexes
-	pthread_mutex_destroy(&renderer->params_mutex);
 	pthread_mutex_destroy(&renderer->buffers_mutex);
 }

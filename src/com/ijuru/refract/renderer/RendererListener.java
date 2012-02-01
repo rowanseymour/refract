@@ -63,4 +63,11 @@ public interface RendererListener {
 	 * @param renderer the renderer
 	 */
 	public void onRendererDestroy(RendererView view, Renderer renderer);
+	
+	/**
+	 * Called when renderer allocation fails
+	 * @param view the view holding the renderer
+	 * @param renderer the renderer
+	 */
+	public void onRendererAllocationFailed(RendererView view, Renderer renderer);
 }

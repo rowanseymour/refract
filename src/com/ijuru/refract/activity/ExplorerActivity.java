@@ -25,6 +25,7 @@ import java.io.OutputStream;
 import java.util.Date;
 
 import com.ijuru.refract.Bookmark;
+import com.ijuru.refract.Constants;
 import com.ijuru.refract.R;
 import com.ijuru.refract.RefractApplication;
 import com.ijuru.refract.renderer.Complex;
@@ -192,8 +193,8 @@ public class ExplorerActivity extends Activity implements RendererListener {
 					double offset_re = Double.parseDouble(editReal.getText().toString());
 					double offset_im = Double.parseDouble(editImag.getText().toString());
 					double zoom = Double.parseDouble(editZoom.getText().toString());
-					rendererView.setOffset(new Complex(offset_re, offset_im));
-					rendererView.setZoom(zoom);
+					rendererView.getRendererParams().setOffset(new Complex(offset_re, offset_im));
+					rendererView.getRendererParams().setZoom(zoom);
 				}
 				catch (NumberFormatException ex) {
 					Toast.makeText(ExplorerActivity.this, R.string.err_invalidnumber, Toast.LENGTH_SHORT).show();
@@ -251,23 +252,20 @@ public class ExplorerActivity extends Activity implements RendererListener {
 	@Override
 	public void onRendererCreated(RendererView view, Renderer renderer) {
 		// Load renderer options from preferences
-		Palette palette = Palette.getPresetByName(Preferences.getStringPreference(this, "palette", R.string.def_palette));
-		Mapping paletteMapping = Preferences.getMappingPreference(this, "palettemapping", Mapping.REPEAT);
-		int paletteSize = Preferences.getIntegerPreference(this, "palettesize", R.integer.def_palettesize);
-		int setColor = Preferences.getIntegerPreference(this, "setcolor", R.integer.def_setcolor);
+		Palette palette = Palette.getPresetByName(Preferences.getStringPreference(this, Constants.PREF_PALETTE_PRESET, R.string.def_palette));
+		Mapping paletteMapping = Preferences.getMappingPreference(this, Constants.PREF_PALETTE_MAPPING, Mapping.REPEAT);
+		int paletteSize = Preferences.getIntegerPreference(this, Constants.PREF_PALETTE_SIZE, R.integer.def_palettesize);
+		int setColor = Preferences.getIntegerPreference(this, Constants.PREF_PALETTE_SETCOLOR, R.integer.def_setcolor);
 		
 		renderer.setPalette(palette, paletteSize, setColor);
-		renderer.setPaletteMapping(paletteMapping);
+		view.setPaletteMapping(paletteMapping);
 		
 		// Load renderer parameters from preferences
 		RendererParams params = Preferences.getParametersPreference(this, "params");
-		renderer.setFunction(params.getFunction());
-		renderer.setOffset(params.getOffset());
-		if (params.getZoom() > 0.0)
-			renderer.setZoom(params.getZoom());
+		view.setRendererParams(params);
 		
 		// Load renderer view options from preferences
-		int itersPerFrame = Preferences.getIntegerPreference(this, "itersperframe", R.integer.def_itersperframe);
+		int itersPerFrame = Preferences.getIntegerPreference(this, Constants.PREF_ITERS_PERFRAME, R.integer.def_itersperframe);
 		view.setIterationsPerFrame(itersPerFrame);
 	}
 
@@ -304,5 +302,13 @@ public class ExplorerActivity extends Activity implements RendererListener {
 	public void onRendererDestroy(RendererView view, Renderer renderer) {
 		// Save renderer parameters to preferences
 		Preferences.setParametersPreference(this, "params", rendererView.getRendererParams());
+	}
+	
+	/**
+	 * @see com.ijuru.refract.ui.RendererView.RendererListener#onRendererAllocationFailed(RendererView, Renderer)
+	 */
+	@Override
+	public void onRendererAllocationFailed(RendererView view, Renderer renderer) {
+		Toast.makeText(this, "Unable to allocate renderer resources", Toast.LENGTH_LONG).show();
 	}
 }

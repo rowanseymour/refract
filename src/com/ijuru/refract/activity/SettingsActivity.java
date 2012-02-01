@@ -19,6 +19,7 @@
 
 package com.ijuru.refract.activity;
 
+import com.ijuru.refract.Constants;
 import com.ijuru.refract.R;
 
 import android.content.res.Resources;
@@ -49,13 +50,13 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 		iterFunctionPref = (ListPreference)getPreferenceScreen().findPreference("iterfunction");
 		iterFunctionPref.setOnPreferenceChangeListener(this);
 		
-		itersPerFramePref = (EditTextPreference)getPreferenceScreen().findPreference("itersperframe");
+		itersPerFramePref = (EditTextPreference)getPreferenceScreen().findPreference(Constants.PREF_ITERS_PERFRAME);
 		itersPerFramePref.setOnPreferenceChangeListener(this);
 		
-		paletteMappingPref = (ListPreference)getPreferenceScreen().findPreference("palettemapping");
+		paletteMappingPref = (ListPreference)getPreferenceScreen().findPreference(Constants.PREF_PALETTE_MAPPING);
 		paletteMappingPref.setOnPreferenceChangeListener(this);
 		
-		paletteSizePref = (EditTextPreference)getPreferenceScreen().findPreference("palettesize");
+		paletteSizePref = (EditTextPreference)getPreferenceScreen().findPreference(Constants.PREF_PALETTE_SIZE);
 		paletteSizePref.setOnPreferenceChangeListener(this);
 		
 		updatePreferenceSummary(iterFunctionPref, iterFunctionPref.getValue());

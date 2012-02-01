@@ -21,6 +21,7 @@ package com.ijuru.refract.activity;
 
 import java.io.IOException;
 
+import com.ijuru.refract.Constants;
 import com.ijuru.refract.R;
 import com.ijuru.refract.renderer.Complex;
 import com.ijuru.refract.renderer.Mapping;
@@ -37,6 +38,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
 /**
  * Activity to set fractal rendering as device wallpaper
@@ -91,21 +93,23 @@ public class WallpaperActivity extends Activity implements RendererListener {
 	@Override
 	public void onRendererCreated(RendererView view, Renderer renderer) {
 		// Get renderer parameters from preferences
-		Palette palette = Palette.getPresetByName(Preferences.getStringPreference(this, "palettepreset", R.string.def_palette));
-		int paletteSize = Preferences.getIntegerPreference(this, "palettesize", R.integer.def_palettesize);
-		int setColor = Preferences.getIntegerPreference(this, "setcolor", R.integer.def_setcolor);
+		Palette palette = Palette.getPresetByName(Preferences.getStringPreference(this, Constants.PREF_PALETTE_PRESET, R.string.def_palette));
+		int paletteSize = Preferences.getIntegerPreference(this, Constants.PREF_PALETTE_SIZE, R.integer.def_palettesize);
+		int setColor = Preferences.getIntegerPreference(this, Constants.PREF_PALETTE_SETCOLOR, R.integer.def_setcolor);
 		
 		renderer.setPalette(palette, paletteSize, setColor);
-		renderer.setPaletteMapping(Mapping.SCALE_GLOBAL);
+		rendererView.setPaletteMapping(Mapping.SCALE_GLOBAL);
 			
 		// Set render parameters from intent if they exist
 		Intent intent = getIntent();
 		if (intent != null && intent.hasExtra("params")) {
 			RendererParams params = (RendererParams)intent.getParcelableExtra("params");
-			renderer.setFunction(params.getFunction());
-			renderer.setOffset(params.getOffset());
-			renderer.setZoom(params.getZoom());
+			view.setRendererParams(params);
 		}
+		
+		// Load renderer view options from preferences
+		int itersPerFrame = Preferences.getIntegerPreference(this, Constants.PREF_ITERS_PERFRAME, R.integer.def_itersperframe);
+		view.setIterationsPerFrame(itersPerFrame);
 	}
 
 	/**
@@ -135,5 +139,13 @@ public class WallpaperActivity extends Activity implements RendererListener {
 	 */
 	@Override
 	public void onRendererDestroy(RendererView view, Renderer renderer) {
+	}
+	
+	/**
+	 * @see com.ijuru.refract.ui.RendererView.RendererListener#onRendererAllocationFailed(RendererView, Renderer)
+	 */
+	@Override
+	public void onRendererAllocationFailed(RendererView view, Renderer renderer) {
+		Toast.makeText(this, "Unable to allocate renderer resources", Toast.LENGTH_LONG).show();
 	}
 }

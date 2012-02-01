@@ -20,19 +20,19 @@
 	</PreferenceCategory>
 	<PreferenceCategory android:title="@string/str_coloring">  
 		<com.ijuru.refract.ui.PalettePreference
-	        android:key="palette" 
+	        android:key="palette.preset" 
 	        android:title="@string/str_palette"
 	        android:defaultValue="@string/def_palette"
 	    />
 		<ListPreference 
-		    android:key="palettemapping"
+		    android:key="palette.mapping"
 		    android:title="@string/str_mapping"
 		    android:defaultValue="@string/def_palettemapping"
 		    android:entries="@array/arr_palettemappinglabels"
 		    android:entryValues="@array/arr_palettemappingkeys"
 		/>
 		<EditTextPreference 
-	    	android:key="palettesize" 
+	    	android:key="palette.size" 
 	    	android:title="@string/str_palettesize"
 	    	android:defaultValue="@integer/def_palettesize"
 	    	android:numeric="integer"

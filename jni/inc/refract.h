@@ -101,19 +101,16 @@ typedef struct {
 	int width;
 	int height;
 
-	params_t params;
-
 	palette_t palette;
-	mapping_t palette_mapping;
 	int* palette_indexes;
 
 	iterc_t* iter_buffer;
 
 	bool cache_valid;
+	params_t cache_params;
 	iterc_t cache_max_iters;
 	complex_t* z_cache;
 
-	pthread_mutex_t params_mutex;
 	pthread_mutex_t buffers_mutex;
 
 } renderer_t;
@@ -123,11 +120,8 @@ typedef struct {
  */
 bool refract_renderer_init(renderer_t* renderer, int width, int height);
 bool refract_renderer_resize(renderer_t* renderer, int width, int height);
-void refract_renderer_setfunction(renderer_t* renderer, func_t func);
-void refract_renderer_setoffset(renderer_t* renderer, complex_t offset);
-void refract_renderer_setzoom(renderer_t* renderer, float_t zoom);
-iterc_t refract_renderer_iterate(renderer_t* renderer, iterc_t iters);
-void refract_renderer_render(renderer_t* renderer, color_t* pixels, int stride);
+iterc_t refract_renderer_iterate(renderer_t* renderer, params_t* params, iterc_t iters);
+void refract_renderer_render(renderer_t* renderer, color_t* pixels, int stride, mapping_t mapping);
 void refract_renderer_free(renderer_t* renderer);
 
 /**

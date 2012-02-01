@@ -39,18 +39,10 @@ public class NativeRenderer implements Renderer {
 	
 	@Override public native boolean allocate(int width, int height);
 	@Override public native boolean resize(int width, int height);
-	@Override public native int iterate(int iters);
-	@Override public native boolean render(Bitmap bitmap);
+	@Override public native int iterate(Function function, Complex offset, double zoom, int iters);
+	@Override public native boolean render(Bitmap bitmap, Mapping mapping);
 	@Override public native void free();
 	@Override public native int getWidth();
 	@Override public native int getHeight();
-	@Override public native Function getFunction();
-	@Override public native void setFunction(Function function);
-	@Override public native Complex getOffset();
-	@Override public native void setOffset(Complex offset);
-	@Override public native double getZoom();
-	@Override public native void setZoom(double zoom);
 	@Override public native void setPalette(Palette palette, int size, int setColor);
-	@Override public native Mapping getPaletteMapping();
-	@Override public native void setPaletteMapping(Mapping mapping);
 }

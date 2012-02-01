@@ -21,6 +21,8 @@ package com.ijuru.refract.ui;
 
 import com.ijuru.refract.R;
 import com.ijuru.refract.renderer.Complex;
+import com.ijuru.refract.renderer.Function;
+import com.ijuru.refract.renderer.Mapping;
 import com.ijuru.refract.renderer.Renderer;
 import com.ijuru.refract.renderer.RendererFactory;
 import com.ijuru.refract.renderer.RendererListener;
@@ -38,7 +40,6 @@ import android.util.FloatMath;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.widget.Toast;
 
 /**
  * View which displays a rendering
@@ -51,7 +52,9 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	private RendererListener listener;
 
 	// Rendering parameters
+	private RendererParams rendererParams = new RendererParams(Function.MANDELBROT, Complex.ORIGIN, 200);
 	private int itersPerFrame = 5;
+	private Mapping paletteMapping;
 
 	// For panning and zooming
 	private boolean navigationEnabled;
@@ -86,14 +89,14 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 		int rendererWidth = getDesiredRendererWidth(getWidth());
 		int rendererHeight = getDesiredRendererHeight(getHeight());
 		
+		rendererParams.setZoom(getWidth() / 2);
 		bitmap = Bitmap.createBitmap(rendererWidth, rendererHeight, Config.ARGB_8888);
 		renderer = RendererFactory.createRenderer();
 		
-		/**
-		 * TODO do something appropriate if renderer allocation fails
-		 */
+		// Allocate resources for renderer
 		if (!renderer.allocate(rendererWidth, rendererHeight)) {
-			Toast.makeText(getContext(), "Unable to allocate resources", Toast.LENGTH_LONG).show();
+			if (listener != null)
+				listener.onRendererAllocationFailed(this, renderer);
 			return;
 		}
 		
@@ -133,19 +136,19 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	/**
 	 * Updates the renderer
 	 */
-	public void update() {
+	public void update() {	
 		// Only iterate if we're not panning/zooming
-		if (!navigationDetector.isInProgress()) {
-			int iters = renderer.iterate(itersPerFrame);
+		if (navigationDetector == null || !navigationDetector.isInProgress()) {
+			
+			// Copy params so that we know exactly what params have been iterated
+			bitmapParams = (RendererParams)rendererParams.clone();
+			int iters = renderer.iterate(bitmapParams.getFunction(), bitmapParams.getOffset(), bitmapParams.getZoom(), itersPerFrame);
 			
 			if (listener != null)
 				listener.onRendererIterated(this, renderer, iters);
 			
 			// Render into off screen bitmap
-			synchronized (this) {
-				renderer.render(bitmap);
-				bitmapParams = getRendererParams();
-			}
+			renderer.render(bitmap, paletteMapping);
 		}
 		
 		// Lock canvas to draw to it
@@ -166,9 +169,7 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	 * @see android.view.View#onDraw(Canvas)
 	 */
 	@Override
-	protected synchronized void onDraw(Canvas canvas) {
-		RendererParams rendererParams = getRendererParams();
-		
+	protected void onDraw(Canvas canvas) {		
 		// Are the params rendered in the bitmap the same as the renderer's params?
 		if (rendererParams.equals(bitmapParams)) {
 			canvas.drawBitmap(bitmap, 0, 0, null);
@@ -235,11 +236,10 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 		}
 		
 		private void panGesture(PointF prevPoint, PointF currPoint) {
-			RendererParams params = getRendererParams();
-			Complex prevC = pixelsToComplex(params, prevPoint);
-			Complex currC = pixelsToComplex(params, currPoint);
+			Complex prevC = pixelsToComplex(rendererParams, prevPoint);
+			Complex currC = pixelsToComplex(rendererParams, currPoint);
 			Complex diff = currC.sub(prevC);
-			setOffset(renderer.getOffset().sub(diff));
+			setOffset(rendererParams.getOffset().sub(diff));
 		}
 		
 		private void zoomGesture(PointF prevPoint1, PointF currPoint1, PointF prevPoint2, PointF currPoint2) {
@@ -252,24 +252,23 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 			float scaleFactor = currDist / prevDist;
 			
 			// Map previous points into complex space using current params
-			RendererParams prevParams = getRendererParams();
-			Complex prevC1 = pixelsToComplex(prevParams, prevPoint1);
-			Complex prevC2 = pixelsToComplex(prevParams, prevPoint2);
+			Complex prevC1 = pixelsToComplex(rendererParams, prevPoint1);
+			Complex prevC2 = pixelsToComplex(rendererParams, prevPoint2);
 			
-			// Map current points into complex space using params with new scale applied
-			double newZoom = prevParams.getZoom() * scaleFactor;
-			RendererParams currParams = new RendererParams(prevParams.getFunction(), prevParams.getOffset(), newZoom);
-			Complex currC1 = pixelsToComplex(currParams, currPoint1);
-			Complex currC2 = pixelsToComplex(currParams, currPoint2);
+			// Update params zoom factor
+			setZoom(rendererParams.getZoom() * scaleFactor);
+			
+			// Map current points into complex space using updated params
+			Complex currC1 = pixelsToComplex(rendererParams, currPoint1);
+			Complex currC2 = pixelsToComplex(rendererParams, currPoint2);
 			
 			// Calculate mid-points and their diff
 			Complex prevMP = prevC1.add(prevC2).scale(0.5);
 			Complex currMP = currC1.add(currC2).scale(0.5);
 			Complex diff = currMP.sub(prevMP);
 			
-			// Update renderer offset and zoom
-			setOffset(renderer.getOffset().sub(diff));
-			setZoom(renderer.getZoom() * scaleFactor);
+			// Update params offset
+			setOffset(rendererParams.getOffset().sub(diff));
 		}
 	}
 	
@@ -282,19 +281,27 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	}
 	
 	/**
-	 * Gets the current renderer parameters
+	 * Gets the renderer parameters
 	 * @return the parameters
 	 */
 	public RendererParams getRendererParams() {
-		return new RendererParams(renderer.getFunction(), renderer.getOffset(), renderer.getZoom());
+		return rendererParams;
+	}
+	
+	/**
+	 * Sets the renderer parameters
+	 * @return the parameters
+	 */
+	public void setRendererParams(RendererParams params) {
+		this.rendererParams = params;
 	}
 	
 	/**
 	 * Sets the offset of the renderer
 	 * @param offset the offset
 	 */
-	public void setOffset(Complex offset) {
-		renderer.setOffset(offset);
+	protected void setOffset(Complex offset) {
+		rendererParams.setOffset(offset);
 		
 		if (listener != null)
 			listener.onRendererOffsetChanged(this, renderer, offset);
@@ -304,8 +311,8 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	 * Sets the zoom of the renderer
 	 * @param zoom the zoom
 	 */
-	public void setZoom(double zoom) {
-		renderer.setZoom(zoom);
+	protected void setZoom(double zoom) {
+		rendererParams.setZoom(zoom);
 		
 		if (listener != null)
 			listener.onRendererZoomChanged(this, renderer, zoom);
@@ -369,6 +376,22 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 		this.itersPerFrame = itersPerFrame;
 	}
 	
+	/**
+	 * Gets the palette mapping mode
+	 * @return the mapping
+	 */
+	public Mapping getPaletteMapping() {
+		return paletteMapping;
+	}
+
+	/**
+	 * Sets the palette mapping mode
+	 * @param paletteMapping the mapping
+	 */
+	public void setPaletteMapping(Mapping mapping) {
+		this.paletteMapping = mapping;
+	}
+
 	/**
 	 * Converts the pixel space point to coordinate in complex-space
 	 * @param params the renderer params

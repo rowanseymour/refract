@@ -61,18 +61,15 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* jvm, void* reserved)
 	cls = (*env)->FindClass(env, FUNCTION_CLASS);
 	function_class = (*env)->NewGlobalRef(env, cls);
 	function_ordinal_mid = (*env)->GetMethodID(env, function_class, "ordinal", "()I");
-	function_values_mid = (*env)->GetStaticMethodID(env, function_class, "values", "()[L" FUNCTION_CLASS ";");
 
 	cls = (*env)->FindClass(env, COMPLEX_CLASS);
 	complex_class = (*env)->NewGlobalRef(env, cls);
-	complex_cid = (*env)->GetMethodID(env, complex_class, "<init>", "(DD)V");
 	complex_re_fid = (*env)->GetFieldID(env, complex_class, "re", "D");
 	complex_im_fid = (*env)->GetFieldID(env, complex_class, "im", "D");
 
 	cls = (*env)->FindClass(env, MAPPING_CLASS);
 	mapping_class = (*env)->NewGlobalRef(env, cls);
 	mapping_ordinal_mid = (*env)->GetMethodID(env, mapping_class, "ordinal", "()I");
-	mapping_values_mid = (*env)->GetStaticMethodID(env, mapping_class, "values", "()[L" MAPPING_CLASS ";");
 
 	LOG_D("Loaded library");
 
@@ -162,66 +159,6 @@ JNIEXPORT jint JNICALL Java_com_ijuru_refract_renderer_jni_NativeRenderer_getHei
 }
 
 /**
- * Gets the iteration function
- */
-JNIEXPORT jobject JNICALL Java_com_ijuru_refract_renderer_jni_NativeRenderer_getFunction(JNIEnv* env, jobject this) {
-	renderer_t* renderer = get_renderer(env, this);
-
-	jobject values_obj = (*env)->CallStaticObjectMethod(env, function_class, function_values_mid);
-	return (*env)->GetObjectArrayElement(env, values_obj, (int)renderer->params.func);
-}
-
-/**
- * Sets the iteration function
- */
-JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_jni_NativeRenderer_setFunction(JNIEnv* env, jobject this, jobject function) {
-	renderer_t* renderer = get_renderer(env, this);
-
-	func_t func = (func_t)(*env)->CallIntMethod(env, function, function_ordinal_mid);
-	refract_renderer_setfunction(renderer, func);
-}
-
-/**
- * Gets the offset in complex space
- */
-JNIEXPORT jobject JNICALL Java_com_ijuru_refract_renderer_jni_NativeRenderer_getOffset(JNIEnv* env, jobject this) {
-	renderer_t* renderer = get_renderer(env, this);
-
-	return (*env)->NewObject(env, complex_class, complex_cid, (jdouble)renderer->params.offset.re, (jdouble)renderer->params.offset.im);
-}
-
-/**
- * Sets the offset in complex space
- */
-JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_jni_NativeRenderer_setOffset(JNIEnv* env, jobject this, jobject offset) {
-	renderer_t* renderer = get_renderer(env, this);
-
-	float_t re = (float_t)((*env)->GetDoubleField(env, offset, complex_re_fid));
-	float_t im = (float_t)((*env)->GetDoubleField(env, offset, complex_im_fid));
-	complex_t o = { re, im };
-
-	refract_renderer_setoffset(renderer, o);
-}
-
-/**
- * Sets the iteration function
- */
-JNIEXPORT jdouble JNICALL Java_com_ijuru_refract_renderer_jni_NativeRenderer_getZoom(JNIEnv* env, jobject this) {
-	renderer_t* renderer = get_renderer(env, this);
-
-	return (jdouble)renderer->params.zoom;
-}
-
-/**
- * Sets the iteration function
- */
-JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_jni_NativeRenderer_setZoom(JNIEnv* env, jobject this, jdouble zoom) {
-	renderer_t* renderer = get_renderer(env, this);
-
-	refract_renderer_setzoom(renderer, (float_t)zoom);
-}
-
-/**
  * Sets the palette
  */
 JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_jni_NativeRenderer_setPalette(JNIEnv* env, jobject this, jobject palette, jint size, jint set_color) {
@@ -254,38 +191,28 @@ JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_jni_NativeRenderer_setPal
 }
 
 /**
- * Gets the palette mapping type
- */
-JNIEXPORT jobject JNICALL Java_com_ijuru_refract_renderer_jni_NativeRenderer_getPaletteMapping(JNIEnv* env, jobject this) {
-	renderer_t* renderer = get_renderer(env, this);
-
-	jobject values_obj = (*env)->CallStaticObjectMethod(env, mapping_class, mapping_values_mid);
-	return (*env)->GetObjectArrayElement(env, values_obj, (int)renderer->palette_mapping);
-}
-
-/**
- * Sets the palette mapping type
- */
-JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_jni_NativeRenderer_setPaletteMapping(JNIEnv* env, jobject this, jobject mapping) {
-	renderer_t* renderer = get_renderer(env, this);
-
-	renderer->palette_mapping = (mapping_t)(*env)->CallIntMethod(env, mapping, mapping_ordinal_mid);
-}
-
-/**
  * Iterates the renderer by the specified number of iterations
  */
-JNIEXPORT jint JNICALL Java_com_ijuru_refract_renderer_jni_NativeRenderer_iterate(JNIEnv* env, jobject this, jint iters) {
+JNIEXPORT jint JNICALL Java_com_ijuru_refract_renderer_jni_NativeRenderer_iterate(JNIEnv* env, jobject this, jobject function, jobject offset, jdouble zoom, jint iters) {
 	renderer_t* renderer = get_renderer(env, this);
 
-	return (jint)refract_renderer_iterate(renderer, (iterc_t)iters);
+	// Gather parameters from Java objects
+	params_t params;
+	params.func = (func_t)(*env)->CallIntMethod(env, function, function_ordinal_mid);
+	params.offset.re = (float_t)((*env)->GetDoubleField(env, offset, complex_re_fid));
+	params.offset.im = (float_t)((*env)->GetDoubleField(env, offset, complex_im_fid));
+	params.zoom = (float_t)zoom;
+
+	return (jint)refract_renderer_iterate(renderer, &params, (iterc_t)iters);
 }
 
 /**
  * Renders the iterations buffer to a pixel buffer
  */
-JNIEXPORT jboolean JNICALL Java_com_ijuru_refract_renderer_jni_NativeRenderer_render(JNIEnv* env, jobject this, jobject bitmap) {
+JNIEXPORT jboolean JNICALL Java_com_ijuru_refract_renderer_jni_NativeRenderer_render(JNIEnv* env, jobject this, jobject bitmap, jobject mapping) {
 	renderer_t* renderer = get_renderer(env, this);
+
+	mapping_t mapping = (mapping_t)(*env)->CallIntMethod(env, mapping, mapping_ordinal_mid);
 
 	AndroidBitmapInfo info;
 	AndroidBitmap_getInfo(env, bitmap, &info);
@@ -298,7 +225,7 @@ JNIEXPORT jboolean JNICALL Java_com_ijuru_refract_renderer_jni_NativeRenderer_re
 		return (jboolean)false;
 	}
 
-	refract_renderer_render(renderer, pixels, info.stride);
+	refract_renderer_render(renderer, pixels, info.stride, mapping);
 
 	AndroidBitmap_unlockPixels(env, bitmap);
 	return (jboolean)true;
