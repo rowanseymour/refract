@@ -32,11 +32,10 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Bitmap.Config;
 import android.graphics.Point;
+import android.graphics.PointF;
 import android.graphics.Rect;
 import android.util.AttributeSet;
-import android.view.GestureDetector;
 import android.view.MotionEvent;
-import android.view.ScaleGestureDetector;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.widget.Toast;
@@ -46,7 +45,6 @@ import android.widget.Toast;
  */
 public class RendererView extends SurfaceView implements SurfaceHolder.Callback {
 	
-	private boolean navigationEnabled;
 	private Bitmap bitmap;
 	private Renderer renderer;
 	private RendererThread rendererThread;
@@ -56,9 +54,8 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	private int itersPerFrame = 5;
 
 	// For panning and zooming
-	private GestureDetector panDetector;
-	private ScaleGestureDetector scaleDetector;
-	private boolean navigationInProgress;
+	private boolean navigationEnabled;
+	private MultiTouchGestureDetector navigationDetector;
 	private RendererParams bitmapParams;
 	
 	/**
@@ -77,10 +74,8 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 		arrAttrs.recycle();
 		
 		// Optionally enable touch based navigation
-		if (navigationEnabled) {
-			panDetector = new GestureDetector(context, new PanListener());
-			scaleDetector = new ScaleGestureDetector(context, new ZoomListener());
-		}
+		if (navigationEnabled)
+			navigationDetector = new MultiTouchGestureDetector(new NavigationListener());
 	}
 	
 	/**
@@ -140,7 +135,7 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	 */
 	public void update() {
 		// Only iterate if we're not panning/zooming
-		if (!navigationInProgress) {
+		if (!navigationDetector.isInProgress()) {
 			int iters = renderer.iterate(itersPerFrame);
 			
 			if (listener != null)
@@ -216,48 +211,44 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback 
 	 */
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
-		if (navigationEnabled) {
-			// Let the gesture detectors handle the event
-			panDetector.onTouchEvent(event);
-			scaleDetector.onTouchEvent(event);
-			
-			if (event.getAction() == MotionEvent.ACTION_DOWN)
-				navigationInProgress = true;
-			if (event.getAction() == MotionEvent.ACTION_UP)
-				navigationInProgress = false;
+		if (navigationEnabled)
+			// Let the gesture detector handle the event
+			return navigationDetector.onTouchEvent(event);
+		
+		return false;
+	}
+	
+	/**
+	 * Listener for panning and zooming gestures
+	 */
+	private class NavigationListener implements MultiTouchGestureDetector.OnMultiTouchGestureListener {
+		
+		@Override
+		public void onMultiTouchGesture(PointF[] prevPoints, PointF[] currPoints) {
+			if (prevPoints.length == 1)
+				panGesture(prevPoints[0], currPoints[0]);
+			else if (prevPoints.length == 2)
+				zoomGesture(prevPoints[0], currPoints[0], prevPoints[1], currPoints[1]);
 		}
 		
-		return true;
-	}
-	
-	/**
-	 * Listener for drag-pan gestures
-	 */
-	private class PanListener extends GestureDetector.SimpleOnGestureListener {	
-		/**
-		 * @see GestureDetector.SimpleOnGestureListener#onScroll(MotionEvent, MotionEvent, float, float)
-		 */
-		@Override
-		public boolean onScroll(MotionEvent event1, MotionEvent event2, float distanceX, float distanceY) {
+		private void panGesture(PointF prevPoint, PointF currPoint) {
+			float deltaX = prevPoint.x - currPoint.x;
+			float deltaY = prevPoint.y - currPoint.y;
 			double zoom = renderer.getZoom();
 			Complex offset = renderer.getOffset();
-			Complex delta = new Complex(distanceX / zoom, -distanceY / zoom);
-			setOffset(offset.add(delta));		
-			return true;
-		}	
-	}
-	
-	/**
-	 * Listener for pinch-zoom gestures
-	 */
-	private class ZoomListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
-		/**
-		 * @see ScaleGestureDetector.SimpleOnScaleGestureListener#onScale(ScaleGestureDetector)
-		 */
-		@Override
-		public boolean onScale(ScaleGestureDetector detector) {		
-			setZoom(renderer.getZoom() * detector.getScaleFactor());			
-			return true;
+			Complex delta = new Complex(deltaX / zoom, - deltaY / zoom);
+			setOffset(offset.add(delta));
+		}
+		
+		private void zoomGesture(PointF prevPoint1, PointF currPoint1, PointF prevPoint2, PointF currPoint2) {				
+			float prevDistX = prevPoint2.x - prevPoint1.x;
+			float prevDistY = prevPoint2.y - prevPoint1.y;
+			float currDistX = currPoint2.x - currPoint1.x;
+			float currDistY = currPoint2.y - currPoint1.y;
+			double prevDist = Math.sqrt(prevDistX * prevDistX + prevDistY * prevDistY);
+			double currDist = Math.sqrt(currDistX * currDistX + currDistY * currDistY);
+			double scaleFactor = currDist / prevDist;
+			setZoom(renderer.getZoom() * scaleFactor);
 		}
 	}
 	
