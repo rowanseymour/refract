@@ -47,7 +47,7 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.xml.preferences);
 		
-		iterFunctionPref = (ListPreference)getPreferenceScreen().findPreference("iterfunction");
+		iterFunctionPref = (ListPreference)getPreferenceScreen().findPreference(Constants.PREF_PARAMS_FUNCTION);
 		iterFunctionPref.setOnPreferenceChangeListener(this);
 		
 		itersPerFramePref = (EditTextPreference)getPreferenceScreen().findPreference(Constants.PREF_ITERS_PERFRAME);

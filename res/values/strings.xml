@@ -28,7 +28,7 @@
 	<string name="err_invalidnumber">Invalid number</string>
 	<string name="err_numberrange">Must be between %1$d and %2$d</string>
 	<string name="err_unabletosave">Unable to save</string>
-	<string-array name="arr_iterfunctionlabels">
+	<string-array name="arr_paramsfunctionlabels">
 		<item>z = z\u00B2 + c</item>
 		<item>z = z\u00B3 + c</item>
 		<item>z = z\u2074 + c</item>

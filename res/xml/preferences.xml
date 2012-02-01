@@ -5,11 +5,11 @@
     >
 	<PreferenceCategory android:title="@string/str_iterating">  
 		<ListPreference 
-		    android:key="iterfunction"
+		    android:key="params.function"
 		    android:title="@string/str_function"
-		    android:defaultValue="@string/def_iterfunction"
-		    android:entries="@array/arr_iterfunctionlabels"
-		    android:entryValues="@array/arr_iterfunctionkeys"
+		    android:defaultValue="@string/def_paramsfunction"
+		    android:entries="@array/arr_paramsfunctionlabels"
+		    android:entryValues="@array/arr_paramsfunctionkeys"
 		/>
 		<EditTextPreference 
 	    	android:key="itersperframe" 
@@ -22,7 +22,7 @@
 		<com.ijuru.refract.ui.PalettePreference
 	        android:key="palette.preset" 
 	        android:title="@string/str_palette"
-	        android:defaultValue="@string/def_palette"
+	        android:defaultValue="@string/def_palettepreset"
 	    />
 		<ListPreference 
 		    android:key="palette.mapping"

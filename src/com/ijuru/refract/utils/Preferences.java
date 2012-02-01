@@ -118,7 +118,7 @@ public class Preferences {
 	 * @return the preference value
 	 */
 	public static RendererParams getParametersPreference(Context context, String key) {
-		Function function = getFunctionPreference(context, ".function", Function.MANDELBROT);
+		Function function = getFunctionPreference(context, key + ".function", Function.MANDELBROT);
 		Complex offset = getComplexPreference(context, key + ".offset", Complex.ORIGIN);
 		double zoom = getDoublePreference(context, key + ".zoom", 0.0);
 		return new RendererParams(function, offset, zoom);

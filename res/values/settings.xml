@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="def_iterfunction">mandelbrot</string>
-    <string-array name="arr_iterfunctionkeys">
+    <string name="def_paramsfunction">mandelbrot</string>
+    <string-array name="arr_paramsfunctionkeys">
 		<item>mandelbrot</item>
 		<item>mandelbrot_3</item>
 		<item>mandelbrot_4</item>
@@ -11,7 +11,7 @@
     <integer name="def_itersperframe">5</integer>
     <integer name="max_itersperframe">50</integer>
     
-    <string name="def_palette">sunset</string>   
+    <string name="def_palettepreset">sunset</string>   
     
     <string name="def_palettemapping">repeat</string>
     <string-array name="arr_palettemappingkeys">
@@ -24,5 +24,5 @@
     <integer name="def_palettesize">128</integer>
     <integer name="max_palettesize">1024</integer>
     
-    <integer name="def_setcolor">0xFF000000</integer>
+    <integer name="def_palettesetcolor">0xFF000000</integer>
 </resources>

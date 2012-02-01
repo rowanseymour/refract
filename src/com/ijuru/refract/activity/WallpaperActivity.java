@@ -93,17 +93,17 @@ public class WallpaperActivity extends Activity implements RendererListener {
 	@Override
 	public void onRendererCreated(RendererView view, Renderer renderer) {
 		// Get renderer parameters from preferences
-		Palette palette = Palette.getPresetByName(Preferences.getStringPreference(this, Constants.PREF_PALETTE_PRESET, R.string.def_palette));
+		Palette palette = Palette.getPresetByName(Preferences.getStringPreference(this, Constants.PREF_PALETTE_PRESET, R.string.def_palettepreset));
 		int paletteSize = Preferences.getIntegerPreference(this, Constants.PREF_PALETTE_SIZE, R.integer.def_palettesize);
-		int setColor = Preferences.getIntegerPreference(this, Constants.PREF_PALETTE_SETCOLOR, R.integer.def_setcolor);
+		int setColor = Preferences.getIntegerPreference(this, Constants.PREF_PALETTE_SETCOLOR, R.integer.def_palettesetcolor);
 		
 		renderer.setPalette(palette, paletteSize, setColor);
 		rendererView.setPaletteMapping(Mapping.SCALE_GLOBAL);
 			
 		// Set render parameters from intent if they exist
 		Intent intent = getIntent();
-		if (intent != null && intent.hasExtra("params")) {
-			RendererParams params = (RendererParams)intent.getParcelableExtra("params");
+		if (intent != null && intent.hasExtra(Constants.EXTRA_PARAMS)) {
+			RendererParams params = (RendererParams)intent.getParcelableExtra(Constants.EXTRA_PARAMS);
 			view.setRendererParams(params);
 		}
 		

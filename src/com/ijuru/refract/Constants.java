@@ -25,8 +25,15 @@ package com.ijuru.refract;
 public class Constants {
 	
 	/**
+	 * Extras keys
+	 */
+	public static final String EXTRA_PARAMS = "params";
+	
+	/**
 	 * Preference keys
 	 */
+	public static final String PREF_PARAMS = "params";
+	public static final String PREF_PARAMS_FUNCTION = "params.function";
 	public static final String PREF_ITERS_PERFRAME = "itersperframe";
 	public static final String PREF_PALETTE_PRESET = "palette.preset";
 	public static final String PREF_PALETTE_MAPPING = "palette.mapping";

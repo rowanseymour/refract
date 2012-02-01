@@ -24,6 +24,7 @@ import java.util.List;
 
 import com.ijuru.refract.Bookmark;
 import com.ijuru.refract.BookmarkManager;
+import com.ijuru.refract.Constants;
 import com.ijuru.refract.R;
 import com.ijuru.refract.RefractApplication;
 import com.ijuru.refract.renderer.RendererParams;
@@ -69,9 +70,9 @@ public class BookmarksActivity extends Activity implements OnItemClickListener {
 		
 		Intent intent = getIntent();
 		if (intent != null) {
-			RendererParams newBookmarkParams = (RendererParams)(intent.hasExtra("params") ? intent.getExtras().getParcelable("params") : null);
-			Bitmap newBookmarkThumbnail = (Bitmap)(intent.hasExtra("thumbnail") ? intent.getExtras().getParcelable("thumbnail") : null);
-			newBookmark = new Bookmark(newBookmarkParams, newBookmarkThumbnail, new Date());
+			RendererParams newParams = (RendererParams)(intent.hasExtra(Constants.EXTRA_PARAMS) ? intent.getExtras().getParcelable(Constants.EXTRA_PARAMS) : null);
+			Bitmap newThumbnail = (Bitmap)(intent.hasExtra("thumbnail") ? intent.getExtras().getParcelable("thumbnail") : null);
+			newBookmark = new Bookmark(newParams, newThumbnail, new Date());
 		}
 		
 		// Get all existing bookmarks
@@ -103,7 +104,7 @@ public class BookmarksActivity extends Activity implements OnItemClickListener {
 				Toast.makeText(this, R.string.err_unabletosave, Toast.LENGTH_SHORT).show();
 		} else {
 			Bookmark bookmark = (Bookmark)adapterView.getAdapter().getItem(position);
-			Preferences.setParametersPreference(this, "params", bookmark.getParams());
+			Preferences.setParametersPreference(this, Constants.PREF_PARAMS, bookmark.getParams());
 		}
 		finish();
 	}

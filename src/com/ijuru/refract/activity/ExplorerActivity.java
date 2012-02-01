@@ -127,7 +127,7 @@ public class ExplorerActivity extends Activity implements RendererListener {
 	 */
 	private void onMenuWallpaper() {
 		Intent intent = new Intent(getApplicationContext(), WallpaperActivity.class);
-		intent.putExtra("params", rendererView.getRendererParams());
+		intent.putExtra(Constants.EXTRA_PARAMS, rendererView.getRendererParams());
 		startActivity(intent);
 	}
 	
@@ -136,7 +136,7 @@ public class ExplorerActivity extends Activity implements RendererListener {
 	 */
 	private void onMenuBookmarks() {
 		Intent intent = new Intent(getApplicationContext(), BookmarksActivity.class);
-		intent.putExtra("params", rendererView.getRendererParams());
+		intent.putExtra(Constants.EXTRA_PARAMS, rendererView.getRendererParams());
 		intent.putExtra("thumbnail", captureBookmarkThumbnail());
 		startActivity(intent);
 	}
@@ -252,16 +252,16 @@ public class ExplorerActivity extends Activity implements RendererListener {
 	@Override
 	public void onRendererCreated(RendererView view, Renderer renderer) {
 		// Load renderer options from preferences
-		Palette palette = Palette.getPresetByName(Preferences.getStringPreference(this, Constants.PREF_PALETTE_PRESET, R.string.def_palette));
+		Palette palette = Palette.getPresetByName(Preferences.getStringPreference(this, Constants.PREF_PALETTE_PRESET, R.string.def_palettepreset));
 		Mapping paletteMapping = Preferences.getMappingPreference(this, Constants.PREF_PALETTE_MAPPING, Mapping.REPEAT);
 		int paletteSize = Preferences.getIntegerPreference(this, Constants.PREF_PALETTE_SIZE, R.integer.def_palettesize);
-		int setColor = Preferences.getIntegerPreference(this, Constants.PREF_PALETTE_SETCOLOR, R.integer.def_setcolor);
+		int setColor = Preferences.getIntegerPreference(this, Constants.PREF_PALETTE_SETCOLOR, R.integer.def_palettesetcolor);
 		
 		renderer.setPalette(palette, paletteSize, setColor);
 		view.setPaletteMapping(paletteMapping);
 		
 		// Load renderer parameters from preferences
-		RendererParams params = Preferences.getParametersPreference(this, "params");
+		RendererParams params = Preferences.getParametersPreference(this, Constants.PREF_PARAMS);
 		view.setRendererParams(params);
 		
 		// Load renderer view options from preferences
@@ -301,7 +301,7 @@ public class ExplorerActivity extends Activity implements RendererListener {
 	@Override
 	public void onRendererDestroy(RendererView view, Renderer renderer) {
 		// Save renderer parameters to preferences
-		Preferences.setParametersPreference(this, "params", rendererView.getRendererParams());
+		Preferences.setParametersPreference(this, Constants.PREF_PARAMS, rendererView.getRendererParams());
 	}
 	
 	/**
