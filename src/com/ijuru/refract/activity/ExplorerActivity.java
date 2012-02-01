@@ -262,6 +262,10 @@ public class ExplorerActivity extends Activity implements RendererListener {
 		
 		// Load renderer parameters from preferences
 		RendererParams params = Preferences.getParametersPreference(this, Constants.PREF_PARAMS);
+		
+		// If zoom is 0, default to half the width of the screen
+		if (params.getZoom() == 0.0)
+			params.setZoom(view.getWidth() / 2);
 		view.setRendererParams(params);
 		
 		// Load renderer view options from preferences
