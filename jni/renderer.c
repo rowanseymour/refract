@@ -171,7 +171,7 @@ void refract_renderer_render(renderer_t* renderer, color_t* pixels, int stride, 
 			refract_renderer_analyze_histogram(renderer, &min, &max);
 			int range = max - min;
 			for (int i = min; i < max_iters; ++i)
-				indexes[i] = pal_size * (i - min) / range;
+				indexes[i] = MIN(pal_size * (i - min) / range, pal_size);
 			break;
 		}
 	}
