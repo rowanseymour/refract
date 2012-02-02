@@ -20,6 +20,7 @@
 #include "inc/refract.h"
 
 static int g_last_renderer_id = 0;
+static int g_pal_cycle_offset = 0;
 
 /**
  * Iteration functions from iterate.h
@@ -139,6 +140,7 @@ void refract_renderer_render(renderer_t* renderer, color_t* pixels, int stride, 
 	const iterc_t* restrict iter_buffer = renderer->iter_buffer;
 	const int pal_size = renderer->palette.size;
 	const int pal_index_max = pal_size - 1;
+	const int pal_offset = g_pal_cycle_offset++;
 	int* restrict indexes = renderer->palette_indexes;
 
 	switch (mapping) {
@@ -146,6 +148,10 @@ void refract_renderer_render(renderer_t* renderer, color_t* pixels, int stride, 
 		for (int i = 0; i < max_iters; ++i)
 			indexes[i] = i % pal_size;
 		break;
+	case REPEAT_CYCLE:
+			for (int i = 0; i < max_iters; ++i)
+				indexes[i] = (i + pal_offset) % pal_size;
+			break;
 	case CLAMP:
 		for (int i = 0; i < max_iters; ++i)
 			indexes[i] = MIN(i, pal_index_max); // TODO optimize?
