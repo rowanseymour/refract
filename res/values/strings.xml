@@ -38,5 +38,6 @@
 		<item>Repeat with cycling</item>
 		<item>Clamp</item>
 		<item>Scale global</item>
+		<item>Scale local</item>
 	</string-array>
 </resources>

@@ -29,6 +29,7 @@
  */
 #define MAX(a, b) ((a) > (b) ? a : b)
 #define MIN(a, b) ((a) < (b) ? a : b)
+#define FREE(p) if (p) { free(p); p = NULL; }
 
 /**
  * Counts of iterations
@@ -90,7 +91,8 @@ typedef enum {
 	REPEAT,
 	REPEAT_CYCLE,
 	CLAMP,
-	SCALE_GLOBAL
+	SCALE_GLOBAL,
+	SCALE_LOCAL
 
 } mapping_t;
 
@@ -106,6 +108,7 @@ typedef struct {
 	int* palette_indexes;
 
 	iterc_t* iter_buffer;
+	int* iter_histogram;
 
 	bool cache_valid;
 	params_t cache_params;

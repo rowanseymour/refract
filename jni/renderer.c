@@ -29,6 +29,9 @@ void refract_renderer_iterate_m2(renderer_t* renderer, complex_t offset, float_t
 void refract_renderer_iterate_m3(renderer_t* renderer, complex_t offset, float_t zoom, iterc_t max_iters, bool use_cache);
 void refract_renderer_iterate_m4(renderer_t* renderer, complex_t offset, float_t zoom, iterc_t max_iters, bool use_cache);
 
+void refract_renderer_calc_histogram(renderer_t* renderer);
+void refract_renderer_analyze_histogram(renderer_t* renderer, iterc_t* min, iterc_t* max);
+
 /**
  * Checks if two params objects are equal
  */
@@ -48,6 +51,10 @@ bool refract_renderer_init(renderer_t* renderer, int width, int height) {
 	if ((renderer->palette_indexes = malloc(ITERC_MAX * sizeof (int))) == NULL)
 		return false;
 
+	// Allocate iters histogram buffer
+	if ((renderer->iter_histogram = malloc((ITERC_MAX + 1) * sizeof (int))) == NULL)
+		return false;
+
 	// Allocate screen buffers
 	if (!refract_renderer_resize(renderer, width, height))
 		return false;
@@ -65,11 +72,9 @@ bool refract_renderer_resize(renderer_t* renderer, int width, int height) {
 	// Lock access to buffers so they can't be drawn on or freed while we're iterating
 	pthread_mutex_lock(&renderer->buffers_mutex);
 
-	// Free buffers
-	if (renderer->iter_buffer)
-		free(renderer->iter_buffer);
-	if (renderer->z_cache)
-		free(renderer->z_cache);
+	// Free screen buffers
+	FREE(renderer->iter_buffer);
+	FREE(renderer->z_cache);
 
 	renderer->width = width;
 	renderer->height = height;
@@ -160,6 +165,15 @@ void refract_renderer_render(renderer_t* renderer, color_t* pixels, int stride, 
 		for (int i = 0; i < max_iters; ++i)
 			indexes[i] = pal_size * i / max_iters;
 		break;
+	case SCALE_LOCAL: {
+			iterc_t min, max;
+			refract_renderer_calc_histogram(renderer);
+			refract_renderer_analyze_histogram(renderer, &min, &max);
+			int range = max - min;
+			for (int i = min; i < max_iters; ++i)
+				indexes[i] = pal_size * (i - min) / range;
+			break;
+		}
 	}
 
 	const color_t* restrict colors = renderer->palette.colors;
@@ -190,24 +204,57 @@ void refract_renderer_free(renderer_t* renderer) {
 	refract_palette_free(&renderer->palette);
 
 	// Free palette indexes
-	if (renderer->palette_indexes) {
-		free(renderer->palette_indexes);
-		renderer->palette_indexes = NULL;
-	}
+	FREE(renderer->palette_indexes);
+
+	// Free iters histogram
+	FREE(renderer->iter_histogram);
 
 	// Free screen buffers
-	if (renderer->iter_buffer) {
-		free(renderer->iter_buffer);
-		renderer->iter_buffer = NULL;
-	}
-	if (renderer->z_cache) {
-		free(renderer->z_cache);
-		renderer->z_cache = NULL;
-	}
+	FREE(renderer->iter_buffer);
+	FREE(renderer->z_cache);
 
 	// Unlock access to buffers
 	pthread_mutex_unlock(&renderer->buffers_mutex);
 
 	// Free mutexes
 	pthread_mutex_destroy(&renderer->buffers_mutex);
+}
+
+/**
+ * Calculates a histogram of iteration values
+ */
+void refract_renderer_calc_histogram(renderer_t* renderer) {
+	const iterc_t* restrict iters = renderer->iter_buffer;
+	int* restrict histo = renderer->iter_histogram;
+
+	for (int c = 0; c <= ITERC_MAX; ++c)
+		histo[c] = 0;
+
+	for (int i = 0; i < (renderer->width * renderer->height); ++i)
+		++histo[iters[i]];
+}
+
+void refract_renderer_analyze_histogram(renderer_t* renderer, iterc_t* min, iterc_t* max) {
+	const int* restrict histo = renderer->iter_histogram;
+
+	// Find minimum iteration value
+	for (int i = 0; i <= ITERC_MAX; ++i) {
+		if (histo[i] > 0) {
+			*min = i;
+			break;
+		}
+	}
+
+	// Find value that covers all but top 0.5% of remaining iteration values for palette end
+	int cumul_histo = 0;
+	int threshold = (5 * renderer->width * renderer->height) / 1000;
+
+	// Don't include pixels which are in the set
+	for (int i = renderer->cache_max_iters - 1; i >= 0; --i) {
+		cumul_histo += histo[i];
+		if (cumul_histo >= threshold) {
+			*max = i;
+			break;
+		}
+	}
 }

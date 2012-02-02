@@ -63,8 +63,5 @@ bool refract_palette_init(palette_t* palette, color_t* colors, float* anchors, i
 }
 
 void refract_palette_free(palette_t* palette) {
-	if (palette->colors)
-		free(palette->colors);
-
-	palette->colors = NULL;
+	FREE(palette->colors);
 }
