@@ -16,12 +16,13 @@
     <string name="def_palettemapping">repeat</string>
     <string-array name="arr_palettemappingkeys">
 		<item>repeat</item>
+		<item>repeat_cycle</item>
 		<item>clamp</item>
 		<item>scale_global</item>
 	</string-array>
 	
 	<integer name="min_palettesize">16</integer>
-    <integer name="def_palettesize">128</integer>
+    <integer name="def_palettesize">256</integer>
     <integer name="max_palettesize">1024</integer>
     
     <integer name="def_palettesetcolor">0xFF000000</integer>
