@@ -29,7 +29,7 @@
  */
 #define MAX(a, b) ((a) > (b) ? a : b)
 #define MIN(a, b) ((a) < (b) ? a : b)
-#define FREE(p) if (p) { free(p); p = NULL; }
+#define SAFE_FREE(p) if (p) { free(p); p = NULL; }
 
 /**
  * Counts of iterations
@@ -92,7 +92,7 @@ typedef enum {
 	REPEAT_CYCLE,
 	CLAMP,
 	SCALE_GLOBAL,
-	SCALE_LOCAL
+	SCALE_AUTO
 
 } mapping_t;
 

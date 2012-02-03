@@ -79,9 +79,11 @@ public class Preferences {
 	 * @param def the default value
 	 * @return the preference value
 	 */
-	public static Complex getComplexPreference(Context context, String key, Complex defValue) {
+	public static Complex getComplexPreference(Context context, String key, Complex def) {
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-		return Complex.parseComplex(preferences.getString(key, defValue.toString()));
+		String str = preferences.getString(key, def.toString());
+		Complex complex = Complex.parseComplex(str);
+		return complex != null ? complex : def;
 	}
 	
 	/**
@@ -94,7 +96,8 @@ public class Preferences {
 	public static Function getFunctionPreference(Context context, String key, Function def) {
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 		String str = preferences.getString(key, def.name().toLowerCase());
-		return Function.parseString(str);
+		Function function = Function.parseString(str);
+		return function != null ? function : def;
 	}
 	
 	/**
@@ -107,7 +110,8 @@ public class Preferences {
 	public static Mapping getMappingPreference(Context context, String key, Mapping def) {
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 		String str = preferences.getString(key, def.name().toLowerCase());
-		return Mapping.parseString(str);
+		Mapping mapping = Mapping.parseString(str);
+		return mapping != null ? mapping : def;
 	}
 	
 	/**

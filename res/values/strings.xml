@@ -38,6 +38,6 @@
 		<item>Repeat with cycling</item>
 		<item>Clamp</item>
 		<item>Scale global</item>
-		<item>Scale local</item>
+		<item>Scale auto (slower)</item>
 	</string-array>
 </resources>

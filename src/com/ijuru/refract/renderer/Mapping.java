@@ -27,7 +27,7 @@ public enum Mapping {
 	REPEAT_CYCLE,
 	CLAMP,
 	SCALE_GLOBAL,
-	SCALE_LOCAL;
+	SCALE_AUTO;
 	
 	/**
 	 * Parses a mapping from a string

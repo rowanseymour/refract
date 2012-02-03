@@ -73,8 +73,8 @@ bool refract_renderer_resize(renderer_t* renderer, int width, int height) {
 	pthread_mutex_lock(&renderer->buffers_mutex);
 
 	// Free screen buffers
-	FREE(renderer->iter_buffer);
-	FREE(renderer->z_cache);
+	SAFE_FREE(renderer->iter_buffer);
+	SAFE_FREE(renderer->z_cache);
 
 	renderer->width = width;
 	renderer->height = height;
@@ -165,7 +165,7 @@ void refract_renderer_render(renderer_t* renderer, color_t* pixels, int stride, 
 		for (int i = 0; i < max_iters; ++i)
 			indexes[i] = pal_size * i / max_iters;
 		break;
-	case SCALE_LOCAL: {
+	case SCALE_AUTO: {
 			iterc_t min, max;
 			refract_renderer_calc_histogram(renderer);
 			refract_renderer_analyze_histogram(renderer, &min, &max);
@@ -204,14 +204,14 @@ void refract_renderer_free(renderer_t* renderer) {
 	refract_palette_free(&renderer->palette);
 
 	// Free palette indexes
-	FREE(renderer->palette_indexes);
+	SAFE_FREE(renderer->palette_indexes);
 
 	// Free iters histogram
-	FREE(renderer->iter_histogram);
+	SAFE_FREE(renderer->iter_histogram);
 
 	// Free screen buffers
-	FREE(renderer->iter_buffer);
-	FREE(renderer->z_cache);
+	SAFE_FREE(renderer->iter_buffer);
+	SAFE_FREE(renderer->z_cache);
 
 	// Unlock access to buffers
 	pthread_mutex_unlock(&renderer->buffers_mutex);

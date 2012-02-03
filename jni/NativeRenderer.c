@@ -242,7 +242,7 @@ JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_jni_NativeRenderer_free(J
 	LOG_D("Renderer #%d: freed resources", renderer->id);
 
 	// Free renderer object itself
-	free(renderer);
+	SAFE_FREE(renderer);
 
 	set_renderer(env, this, NULL);
 }
