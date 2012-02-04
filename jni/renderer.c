@@ -29,15 +29,10 @@ void refract_renderer_iterate_m2(renderer_t* renderer, complex_t offset, float_t
 void refract_renderer_iterate_m3(renderer_t* renderer, complex_t offset, float_t zoom, iterc_t max_iters, bool use_cache);
 void refract_renderer_iterate_m4(renderer_t* renderer, complex_t offset, float_t zoom, iterc_t max_iters, bool use_cache);
 
-void refract_renderer_calc_histogram(renderer_t* renderer);
-void refract_renderer_analyze_histogram(renderer_t* renderer, iterc_t* min, iterc_t* max);
-
-/**
- * Checks if two params objects are equal
- */
-bool params_equal(params_t* p1, params_t* p2) {
-	return p1->func == p2->func && p1->offset.re == p2->offset.re && p1->offset.im == p2->offset.im && p1->zoom == p2->zoom;
-}
+bool refract_params_equal(params_t* p1, params_t* p2);
+void refract_renderer_histogram(renderer_t* renderer);
+void refract_renderer_histogram_autoscale(renderer_t* renderer, iterc_t* min, iterc_t* max);
+uint32_t refract_histogram_total(const int* histo);
 
 /**
  * Allocates a renderer
@@ -100,7 +95,7 @@ bool refract_renderer_resize(renderer_t* renderer, int width, int height) {
  */
 iterc_t refract_renderer_iterate(renderer_t* renderer, params_t* params, iterc_t iters) {
 
-	bool use_cache = params_equal(&renderer->cache_params, params) && renderer->cache_valid;
+	bool use_cache = refract_params_equal(&renderer->cache_params, params) && renderer->cache_valid;
 
 	// Lock access to buffers so they can't be resized or freed while we're iterating
 	pthread_mutex_lock(&renderer->buffers_mutex);
@@ -167,12 +162,23 @@ void refract_renderer_render(renderer_t* renderer, color_t* pixels, int stride, 
 		break;
 	case SCALE_AUTO: {
 			iterc_t min, max;
-			refract_renderer_calc_histogram(renderer);
-			refract_renderer_analyze_histogram(renderer, &min, &max);
+			refract_renderer_histogram(renderer);
+			refract_renderer_histogram_autoscale(renderer, &min, &max);
 			int range = max - min;
 			for (int i = min; i < max_iters; ++i)
 				indexes[i] = MIN(pal_size * (i - min) / range, pal_size);
 			break;
+		}
+	case HISTOGRAM: {
+			refract_renderer_histogram(renderer);
+			const int* restrict histo = renderer->iter_histogram;
+			uint32_t total = refract_histogram_total(histo);
+			uint32_t pal_item_size = total / pal_size;
+			uint32_t histo_acc = 0;
+			for (int i = 0; i < max_iters; ++i) {
+				histo_acc += histo[i];
+				indexes[i] = histo_acc / pal_item_size;
+			}
 		}
 	}
 
@@ -221,9 +227,16 @@ void refract_renderer_free(renderer_t* renderer) {
 }
 
 /**
+ * Checks if two params objects are equal
+ */
+bool refract_params_equal(params_t* p1, params_t* p2) {
+	return p1->func == p2->func && p1->offset.re == p2->offset.re && p1->offset.im == p2->offset.im && p1->zoom == p2->zoom;
+}
+
+/**
  * Calculates a histogram of iteration values
  */
-void refract_renderer_calc_histogram(renderer_t* renderer) {
+void refract_renderer_histogram(renderer_t* renderer) {
 	const iterc_t* restrict iters = renderer->iter_buffer;
 	int* restrict histo = renderer->iter_histogram;
 
@@ -234,7 +247,10 @@ void refract_renderer_calc_histogram(renderer_t* renderer) {
 		++histo[iters[i]];
 }
 
-void refract_renderer_analyze_histogram(renderer_t* renderer, iterc_t* min, iterc_t* max) {
+/**
+ * Analyzes a histogram to find minimum, maximum
+ */
+void refract_renderer_histogram_autoscale(renderer_t* renderer, iterc_t* min, iterc_t* max) {
 	const int* restrict histo = renderer->iter_histogram;
 
 	// Find minimum iteration value
@@ -257,4 +273,16 @@ void refract_renderer_analyze_histogram(renderer_t* renderer, iterc_t* min, iter
 			break;
 		}
 	}
+}
+
+/**
+ * Calculates the total of a histogram
+ */
+uint32_t refract_histogram_total(const int* histo) {
+	uint32_t total = 0;
+
+	for (int i = 0; i <= ITERC_MAX; ++i)
+		total += histo[i];
+
+	return total;
 }

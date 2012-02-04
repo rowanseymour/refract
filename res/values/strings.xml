@@ -39,5 +39,6 @@
 		<item>Clamp</item>
 		<item>Scale global</item>
 		<item>Scale auto (slower)</item>
+		<item>Histogram (slower)</item>
 	</string-array>
 </resources>

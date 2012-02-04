@@ -20,6 +20,7 @@
 		<item>clamp</item>
 		<item>scale_global</item>
 		<item>scale_auto</item>
+		<item>histogram</item>
 	</string-array>
 	
 	<integer name="min_palettesize">16</integer>

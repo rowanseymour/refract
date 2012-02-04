@@ -92,7 +92,8 @@ typedef enum {
 	REPEAT_CYCLE,
 	CLAMP,
 	SCALE_GLOBAL,
-	SCALE_AUTO
+	SCALE_AUTO,
+	HISTOGRAM
 
 } mapping_t;
 
