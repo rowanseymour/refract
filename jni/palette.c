@@ -22,18 +22,23 @@
 /**
  * Initializes a palette
  */
-bool refract_palette_init(palette_t* palette, color_t* colors, float* anchors, int points, int size, color_t set_color) {
+bool refract_palette_init(palette_t* palette, int size, color_t set_color) {
+	palette->set_color = set_color;
 	palette->size = size;
 	palette->colors = malloc(sizeof (color_t) * size);
-	palette->set_color = set_color;
+	return palette->colors != NULL;
+}
 
-	if (!colors)
-		return false;
-
+/**
+ * Fills a palette with a linear gradient
+ */
+bool refract_palette_gradient(palette_t* palette, color_t* colors, float* anchors, int points) {
 	int index = -1;
 
-	for (int i = 0; i < size; ++i) {
-		float ipos = (float)i / (size - 1); // palette index 0.0...1.0
+	for (int i = 0; i < palette->size; ++i) {
+		float ipos = (float)i / (palette->size - 1); // palette index 0.0...1.0
+
+		//ipos = powf(ipos, 3.0f);
 
 		if ((index < points - 1) && (ipos > anchors[index + 1]))
 			++index;

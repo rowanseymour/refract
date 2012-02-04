@@ -109,7 +109,7 @@ typedef struct {
 	int* palette_indexes;
 
 	iterc_t* iter_buffer;
-	int* iter_histogram;
+	uint32_t* iter_histogram;
 
 	bool cache_valid;
 	params_t cache_params;
@@ -132,5 +132,6 @@ void refract_renderer_free(renderer_t* renderer);
 /**
  * Palette functions
  */
-bool refract_palette_init(palette_t* palette, color_t* colors, float* anchors, int points, int size, color_t set_color);
+bool refract_palette_init(palette_t* palette, int size, color_t set_color);
+bool refract_palette_gradient(palette_t* palette, color_t* colors, float* anchors, int points);
 void refract_palette_free(palette_t* palette);

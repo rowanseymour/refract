@@ -182,7 +182,8 @@ JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_jni_NativeRenderer_setPal
 	jfloat* anchorvals = (*env)->GetFloatArrayElements(env, *anchors, NULL);
 	int points = (*env)->GetArrayLength(env, *colors);
 
-	refract_palette_init(&renderer->palette, (color_t*)colorvals, (float*)anchorvals, points, size, RGB_TO_ABGR((int)set_color));
+	refract_palette_init(&renderer->palette, size, RGB_TO_ABGR((int)set_color));
+	refract_palette_gradient(&renderer->palette, (color_t*)colorvals, (float*)anchorvals, points);
 
 	(*env)->ReleaseIntArrayElements(env, *colors, colorvals, 0);
 	(*env)->ReleaseFloatArrayElements(env, *anchors, anchorvals, 0);
