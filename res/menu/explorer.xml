@@ -1,10 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
-	<item 
-		android:id="@+id/menureset" 
-		android:title="@string/str_reset" 
-		android:icon="@drawable/ic_menu_reset"
-	/>
 	<item
 		android:id="@+id/menuwallpaper" 
 		android:title="@string/str_wallpaper" 
@@ -25,7 +20,6 @@
 		android:title="@string/str_settings" 
 		android:icon="@drawable/ic_menu_settings"
 	/>
-	<!-- These items will appear on the overflow menu -->
 	<item 
 		android:id="@+id/menugoto" 
 		android:title="@string/str_goto" 

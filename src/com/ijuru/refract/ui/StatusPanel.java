@@ -43,7 +43,6 @@ public class StatusPanel extends TableLayout {
 	public StatusPanel(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		
-		setBackgroundColor(0x55000000);
 		setColumnStretchable(1, true);
 		setColumnStretchable(3, true);
 		

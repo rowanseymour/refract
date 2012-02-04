@@ -75,8 +75,8 @@ public class ExplorerActivity extends Activity implements RendererListener {
 		
 		setContentView(R.layout.activity_explorer);
 		
-		rendererView = (RendererView)findViewById(R.id.rendererView);
-		statusPanel = (StatusPanel)findViewById(R.id.statusPanel);
+		rendererView = (RendererView)findViewById(R.id.renderer_view);
+		statusPanel = (StatusPanel)findViewById(R.id.status_panel);
 		
 		rendererView.setRendererListener(this);
     }
@@ -97,9 +97,6 @@ public class ExplorerActivity extends Activity implements RendererListener {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.menureset:
-			rendererView.reset();
-	    	break;
 		case R.id.menuwallpaper:
 			onMenuWallpaper();
 	    	break;
@@ -221,6 +218,33 @@ public class ExplorerActivity extends Activity implements RendererListener {
 		
 		new AlertDialog.Builder(this).setTitle(title).setMessage(message)
 			.setPositiveButton(android.R.string.ok, null).show();
+	}
+	
+	/**
+	 * Handles reset button
+	 * @param view the button
+	 */
+	public void onButtonReset(View view) {
+		rendererView.getRendererParams().setOffset(Complex.ORIGIN);
+		rendererView.getRendererParams().setZoom(rendererView.getWidth() / 2);
+	}
+	
+	/**
+	 * Handles zoom-in button
+	 * @param view the button
+	 */
+	public void onButtonZoomIn(View view) {
+		double zoom = rendererView.getRendererParams().getZoom() * 2;
+		rendererView.getRendererParams().setZoom(zoom);
+	}
+	
+	/**
+	 * Handles zoom-out button
+	 * @param view the button
+	 */
+	public void onButtonZoomOut(View view) {
+		double zoom = rendererView.getRendererParams().getZoom() / 2;
+		rendererView.getRendererParams().setZoom(zoom);
 	}
 
 	/**

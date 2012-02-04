@@ -4,27 +4,52 @@
     xmlns:refract="http://schemas.android.com/apk/res/com.ijuru.refract"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
-	<com.ijuru.refract.ui.RendererView
-	    android:id="@+id/rendererView"
+    
+    <com.ijuru.refract.ui.RendererView
+	    android:id="@+id/renderer_view"
 	    android:layout_width="match_parent"
 	    android:layout_height="match_parent"
 	    refract:navigationEnabled="true"
 	/>
-	
-	<LinearLayout 
+    
+    <LinearLayout
 	    android:layout_width="match_parent"
-	    android:layout_height="match_parent"
-	    android:gravity="bottom"
-	    android:orientation="vertical"
-	    android:padding="5dp">
-	    
-		<com.ijuru.refract.ui.StatusPanel 
-		    android:id="@+id/statusPanel"
-		    android:layout_width="match_parent"
-	    	android:layout_height="wrap_content"
-	    	android:padding="5dp"
-		/>
-	</LinearLayout>
+    	android:layout_height="wrap_content"
+    	android:layout_gravity="top"
+    	android:orientation="horizontal"
+    	android:padding="5dp"
+    	android:background="#66000000">
+    	
+        <ImageView
+            android:id="@+id/btn_reset"
+            android:onClick="onButtonReset"
+            android:layout_width="wrap_content"
+    		android:layout_height="wrap_content"
+    		android:src="@drawable/ic_button_reset"
+    	/>
+        <ImageView
+            android:id="@+id/btn_zoom_in"
+            android:onClick="onButtonZoomIn"
+            android:layout_width="wrap_content"
+    		android:layout_height="wrap_content"
+    		android:src="@drawable/ic_button_zoomin"
+    	/>
+        <ImageView 
+            android:id="@+id/btn_zoom_out"
+            android:onClick="onButtonZoomOut"
+            android:layout_width="wrap_content"
+    		android:layout_height="wrap_content"
+    		android:src="@drawable/ic_button_zoomout"
+    	/>
+    </LinearLayout>
+	
+	<com.ijuru.refract.ui.StatusPanel 
+	    android:id="@+id/status_panel"
+	    android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:layout_gravity="bottom"
+    	android:padding="5dp"
+    	android:background="#66000000"
+	/>
 
 </FrameLayout>
