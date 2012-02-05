@@ -192,6 +192,7 @@ public class ExplorerActivity extends Activity implements RendererListener {
 					double zoom = Double.parseDouble(editZoom.getText().toString());
 					rendererView.getRendererParams().setOffset(new Complex(offset_re, offset_im));
 					rendererView.getRendererParams().setZoom(zoom);
+					statusPanel.setParams(rendererView.getRendererParams());
 				}
 				catch (NumberFormatException ex) {
 					Toast.makeText(ExplorerActivity.this, R.string.err_invalidnumber, Toast.LENGTH_SHORT).show();
@@ -227,6 +228,7 @@ public class ExplorerActivity extends Activity implements RendererListener {
 	public void onButtonReset(View view) {
 		rendererView.getRendererParams().setOffset(Complex.ORIGIN);
 		rendererView.getRendererParams().setZoom(rendererView.getWidth() / 2);
+		statusPanel.setParams(rendererView.getRendererParams());
 	}
 	
 	/**
@@ -236,6 +238,7 @@ public class ExplorerActivity extends Activity implements RendererListener {
 	public void onButtonZoomIn(View view) {
 		double zoom = rendererView.getRendererParams().getZoom() * 2;
 		rendererView.getRendererParams().setZoom(zoom);
+		statusPanel.setParams(rendererView.getRendererParams());
 	}
 	
 	/**
@@ -245,6 +248,7 @@ public class ExplorerActivity extends Activity implements RendererListener {
 	public void onButtonZoomOut(View view) {
 		double zoom = rendererView.getRendererParams().getZoom() / 2;
 		rendererView.getRendererParams().setZoom(zoom);
+		statusPanel.setParams(rendererView.getRendererParams());
 	}
 
 	/**
