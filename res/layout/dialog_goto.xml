@@ -15,7 +15,8 @@
         android:id="@+id/realcoordinate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:numeric="decimal|signed">
+        android:numeric="decimal|signed"
+        android:inputType="numberDecimal">
         <requestFocus />
     </EditText>
     
@@ -29,6 +30,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:numeric="decimal|signed"
+        android:inputType="numberDecimal"
     />
     
     <TextView
@@ -41,6 +43,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:numeric="decimal"
+        android:inputType="numberDecimal"
     />
 
 </LinearLayout>
