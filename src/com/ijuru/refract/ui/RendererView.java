@@ -156,12 +156,12 @@ public class RendererView extends SurfaceView implements SurfaceHolder.Callback,
 		try {
 			canvas = getHolder().lockCanvas();
 			synchronized (getHolder()) {
-				onDraw(canvas);
+				if (canvas != null)
+					onDraw(canvas);
 			}
 		} finally {
-			if (canvas != null) {
+			if (canvas != null)
 				getHolder().unlockCanvasAndPost(canvas);
-			}
 		}
 	}
 
