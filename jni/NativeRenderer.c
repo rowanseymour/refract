@@ -161,7 +161,7 @@ JNIEXPORT jint JNICALL Java_com_ijuru_refract_renderer_jni_NativeRenderer_getHei
 /**
  * Sets the palette
  */
-JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_jni_NativeRenderer_setPalette(JNIEnv* env, jobject this, jobject palette, jint size, jint set_color) {
+JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_jni_NativeRenderer_setPalette(JNIEnv* env, jobject this, jobject palette, jint size, jfloat bias, jint set_color) {
 	renderer_t* renderer = get_renderer(env, this);
 
 	// Free existing palette
@@ -183,7 +183,7 @@ JNIEXPORT void JNICALL Java_com_ijuru_refract_renderer_jni_NativeRenderer_setPal
 	int points = (*env)->GetArrayLength(env, *colors);
 
 	refract_palette_init(&renderer->palette, size, RGB_TO_ABGR((int)set_color));
-	refract_palette_gradient(&renderer->palette, (color_t*)colorvals, (float*)anchorvals, points);
+	refract_palette_gradient(&renderer->palette, (color_t*)colorvals, (float*)anchorvals, points, (float)bias);
 
 	(*env)->ReleaseIntArrayElements(env, *colors, colorvals, 0);
 	(*env)->ReleaseFloatArrayElements(env, *anchors, anchorvals, 0);

@@ -82,5 +82,5 @@ public interface Renderer {
 	 * @param size the size
 	 * @param the RGB color of the set
 	 */
-	public void setPalette(Palette palette, int size, int setColor);
+	public void setPalette(Palette palette, int size, float bias, int setColor);
 }

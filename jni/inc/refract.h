@@ -129,5 +129,5 @@ void refract_renderer_free(renderer_t* renderer);
  * Palette functions
  */
 bool refract_palette_init(palette_t* palette, int size, color_t set_color);
-bool refract_palette_gradient(palette_t* palette, color_t* colors, float* anchors, int points);
+bool refract_palette_gradient(palette_t* palette, color_t* colors, float* anchors, int points, float bias);
 void refract_palette_free(palette_t* palette);

@@ -32,13 +32,14 @@ bool refract_palette_init(palette_t* palette, int size, color_t set_color) {
 /**
  * Fills a palette with a linear gradient
  */
-bool refract_palette_gradient(palette_t* palette, color_t* colors, float* anchors, int points) {
+bool refract_palette_gradient(palette_t* palette, color_t* colors, float* anchors, int points, float bias) {
 	int index = -1;
 
 	for (int i = 0; i < palette->size; ++i) {
 		float ipos = (float)i / (palette->size - 1); // palette index 0.0...1.0
 
-		//ipos = powf(ipos, 3.0f);
+		// Apply bias as power to emphasize low or high
+		ipos = powf(ipos, bias);
 
 		if ((index < points - 1) && (ipos > anchors[index + 1]))
 			++index;

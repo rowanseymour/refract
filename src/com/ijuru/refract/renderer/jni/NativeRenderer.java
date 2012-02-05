@@ -44,5 +44,5 @@ public class NativeRenderer implements Renderer {
 	@Override public native void free();
 	@Override public native int getWidth();
 	@Override public native int getHeight();
-	@Override public native void setPalette(Palette palette, int size, int setColor);
+	@Override public native void setPalette(Palette palette, int size, float bias, int setColor);
 }

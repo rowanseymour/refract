@@ -284,6 +284,7 @@ public class ExplorerActivity extends Activity implements RendererListener {
 		Mapping paletteMapping = Preferences.getMappingPreference(this, Constants.PREF_PALETTE_MAPPING, Mapping.REPEAT);
 		int paletteSize = Preferences.getIntegerPreference(this, Constants.PREF_PALETTE_SIZE, R.integer.def_palettesize);
 		int setColor = Preferences.getIntegerPreference(this, Constants.PREF_PALETTE_SETCOLOR, R.integer.def_palettesetcolor);
+		int itersPerFrame = Preferences.getIntegerPreference(this, Constants.PREF_ITERS_PERFRAME, R.integer.def_itersperframe);
 		RendererParams params = Preferences.getParametersPreference(this, Constants.PREF_PARAMS);
 		
 		// If zoom is 0, default to half the width of the screen
@@ -292,12 +293,11 @@ public class ExplorerActivity extends Activity implements RendererListener {
 		
 		view.setPaletteMapping(paletteMapping);
 		view.setRendererParams(params);
-		
-		renderer.setPalette(palette, paletteSize, setColor);
-		
-		// Load renderer view options from preferences
-		int itersPerFrame = Preferences.getIntegerPreference(this, Constants.PREF_ITERS_PERFRAME, R.integer.def_itersperframe);
 		view.setIterationsPerFrame(itersPerFrame);
+		
+		float bias = (paletteMapping == Mapping.HISTOGRAM) ? 5.0f : 1.0f;
+		
+		renderer.setPalette(palette, paletteSize, bias, setColor);
 		
 		statusPanel.setParams(params);
 	}
