@@ -29,7 +29,7 @@ void refract_renderer_iterate_m2(renderer_t* renderer, complex_t offset, float_t
 void refract_renderer_iterate_m3(renderer_t* renderer, complex_t offset, float_t zoom, iterc_t max_iters, bool use_cache);
 void refract_renderer_iterate_m4(renderer_t* renderer, complex_t offset, float_t zoom, iterc_t max_iters, bool use_cache);
 
-void refract_renderer_histogram(renderer_t* renderer);
+uint32_t* refract_renderer_histogram(renderer_t* renderer);
 void refract_renderer_histogram_autoscale(renderer_t* renderer, iterc_t* min, iterc_t* max);
 uint32_t refract_renderer_histogram_total(renderer_t* renderer);
 
@@ -55,9 +55,6 @@ bool refract_renderer_init(renderer_t* renderer, int width, int height) {
 	if (!refract_renderer_resize(renderer, width, height))
 		return false;
 
-	// Initialize mutexes
-	pthread_mutex_init(&renderer->buffers_mutex, NULL);
-
 	return true;
 }
 
@@ -65,9 +62,6 @@ bool refract_renderer_init(renderer_t* renderer, int width, int height) {
  * Resizes a renderer
  */
 bool refract_renderer_resize(renderer_t* renderer, int width, int height) {
-	// Lock access to buffers so they can't be drawn on or freed while we're iterating
-	pthread_mutex_lock(&renderer->buffers_mutex);
-
 	// Free screen buffers
 	SAFE_FREE(renderer->iter_buffer);
 	SAFE_FREE(renderer->z_cache);
@@ -85,9 +79,6 @@ bool refract_renderer_resize(renderer_t* renderer, int width, int height) {
 		return false;
 	}
 
-	// Unlock access to buffers
-	pthread_mutex_unlock(&renderer->buffers_mutex);
-
 	return true;
 }
 
@@ -96,10 +87,8 @@ bool refract_renderer_resize(renderer_t* renderer, int width, int height) {
  */
 iterc_t refract_renderer_iterate(renderer_t* renderer, params_t* params, iterc_t iters) {
 
-	bool use_cache = refract_params_equal(&renderer->cache_params, params) && renderer->cache_valid;
-
-	// Lock access to buffers so they can't be resized or freed while we're iterating
-	pthread_mutex_lock(&renderer->buffers_mutex);
+	// Has the the renderer been iterated previously with these parameters?
+	bool use_cache = refract_params_equal(&renderer->cache_params, params) && (renderer->cache_max_iters > 0);
 
 	// Increment or reset max-iters depending on whether we'll be using the cache
 	iterc_t max_iters = use_cache ? (renderer->cache_max_iters + iters) : iters;
@@ -119,10 +108,6 @@ iterc_t refract_renderer_iterate(renderer_t* renderer, params_t* params, iterc_t
 	// Update cache status
 	renderer->cache_max_iters = max_iters;
 	renderer->cache_params = *params;
-	renderer->cache_valid = true;
-
-	// Unlock access to buffers
-	pthread_mutex_unlock(&renderer->buffers_mutex);
 
 	return renderer->cache_max_iters;
 }
@@ -130,15 +115,16 @@ iterc_t refract_renderer_iterate(renderer_t* renderer, params_t* params, iterc_t
 /**
  * Renders a renderer to the given pixel buffer
  */
-void refract_renderer_render(renderer_t* renderer, color_t* pixels, int stride, mapping_t mapping) {
-	// Lock access to buffers
-	pthread_mutex_lock(&renderer->buffers_mutex);
+bool refract_renderer_render(renderer_t* renderer, color_t* pixels, int stride, mapping_t mapping) {
 
 	// Number of iters to be considered in the set
 	const iterc_t max_iters = renderer->cache_max_iters;
 
+	// Can't render to bitmap if renderer hasn't been iterated
+	if (max_iters == 0)
+		return false;
+
 	// Gather up frequently used items
-	const iterc_t* restrict iter_buffer = renderer->iter_buffer;
 	const int pal_size = renderer->palette.size;
 	const int pal_index_max = pal_size - 1;
 	const int pal_offset = g_pal_cycle_offset++;
@@ -162,31 +148,40 @@ void refract_renderer_render(renderer_t* renderer, color_t* pixels, int stride, 
 			indexes[i] = pal_size * i / max_iters;
 		break;
 	case SCALE_AUTO: {
-			iterc_t min, max;
 			refract_renderer_histogram(renderer);
+			iterc_t min, max;
 			refract_renderer_histogram_autoscale(renderer, &min, &max);
-			int range = max - min;
-			for (int i = min; i < max_iters; ++i)
-				indexes[i] = MIN(pal_size * (i - min) / range, pal_size);
+			uint32_t range = max - min;
+
+			for (int i = min; i < max_iters; ++i) {
+				uint32_t index = pal_size * (i - min) / range;
+				indexes[i] = MIN(index, pal_index_max);
+			}
 			break;
 		}
 	case HISTOGRAM: {
-			refract_renderer_histogram(renderer);
+			const uint32_t* restrict histo = refract_renderer_histogram(renderer);
 			uint32_t total = refract_renderer_histogram_total(renderer);
-			uint32_t pal_item_size = total / pal_size;
-			uint32_t histo_acc = 0;
-			const uint32_t* restrict histo = renderer->iter_histogram;
 
-			for (int i = 0; i < max_iters; ++i) {
-				histo_acc += histo[i];
-				indexes[i] = histo_acc / pal_item_size;
+			// Only calculate if there are non-set pixels
+			if (total > 0) {
+				uint32_t pal_item_size = total / pal_size;
+				uint32_t histo_acc = 0;
+
+				for (int i = 0; i < max_iters; ++i) {
+					histo_acc += histo[i];
+					uint32_t index = histo_acc / pal_item_size;
+					indexes[i] = MIN(index, pal_index_max);
+				}
 			}
+			break;
 		}
 	}
 
+	const iterc_t* restrict iter_buffer = renderer->iter_buffer;
 	const color_t* restrict colors = renderer->palette.colors;
+	const color_t set_color = renderer->palette.set_color;
 	color_t* restrict line = pixels;
-	color_t set_color = renderer->palette.set_color;
 
 	// Fill pixel buffer based on palette indexes
 	for (int y = 0, index = 0; y < renderer->height; ++y) {
@@ -196,18 +191,13 @@ void refract_renderer_render(renderer_t* renderer, color_t* pixels, int stride, 
 		}
 		line = (color_t*)((char*)line + stride);
 	}
-
-	// Unlock access to buffers
-	pthread_mutex_unlock(&renderer->buffers_mutex);
+	return true;
 }
 
 /**
  * Frees a renderer
  */
 void refract_renderer_free(renderer_t* renderer) {
-	// Lock access to buffers
-	pthread_mutex_lock(&renderer->buffers_mutex);
-
 	// Free palette
 	refract_palette_free(&renderer->palette);
 
@@ -220,28 +210,24 @@ void refract_renderer_free(renderer_t* renderer) {
 	// Free screen buffers
 	SAFE_FREE(renderer->iter_buffer);
 	SAFE_FREE(renderer->z_cache);
-
-	// Unlock access to buffers
-	pthread_mutex_unlock(&renderer->buffers_mutex);
-
-	// Free mutexes
-	pthread_mutex_destroy(&renderer->buffers_mutex);
 }
 
 /**
  * Calculates a histogram of iteration values
  */
-void refract_renderer_histogram(renderer_t* renderer) {
+uint32_t* refract_renderer_histogram(renderer_t* renderer) {
 	const iterc_t* restrict iters = renderer->iter_buffer;
 	uint32_t* restrict histo = renderer->iter_histogram;
 
 	// Zeroize iter counts
-	for (int c = 0; c < renderer->cache_max_iters; ++c)
+	for (int c = 0; c <= renderer->cache_max_iters; ++c)
 		histo[c] = 0;
 
 	// Accumulate iter counts
 	for (int i = 0; i < (renderer->width * renderer->height); ++i)
 		++histo[iters[i]];
+
+	return histo;
 }
 
 /**
@@ -279,6 +265,7 @@ uint32_t refract_renderer_histogram_total(renderer_t* renderer) {
 	const uint32_t* restrict histo = renderer->iter_histogram;
 	uint32_t total = 0;
 
+	// Count all histogram values up to but not including the max iter value (i.e. the set)
 	for (int i = 0; i < renderer->cache_max_iters; ++i)
 		total += histo[i];
 

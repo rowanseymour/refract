@@ -20,7 +20,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <math.h>
-#include <pthread.h>
 
 #include "color.h"
 
@@ -111,12 +110,9 @@ typedef struct {
 	iterc_t* iter_buffer;
 	uint32_t* iter_histogram;
 
-	bool cache_valid;
 	params_t cache_params;
 	iterc_t cache_max_iters;
 	complex_t* z_cache;
-
-	pthread_mutex_t buffers_mutex;
 
 } renderer_t;
 
@@ -126,7 +122,7 @@ typedef struct {
 bool refract_renderer_init(renderer_t* renderer, int width, int height);
 bool refract_renderer_resize(renderer_t* renderer, int width, int height);
 iterc_t refract_renderer_iterate(renderer_t* renderer, params_t* params, iterc_t iters);
-void refract_renderer_render(renderer_t* renderer, color_t* pixels, int stride, mapping_t mapping);
+bool refract_renderer_render(renderer_t* renderer, color_t* pixels, int stride, mapping_t mapping);
 void refract_renderer_free(renderer_t* renderer);
 
 /**

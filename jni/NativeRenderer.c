@@ -226,10 +226,10 @@ JNIEXPORT jboolean JNICALL Java_com_ijuru_refract_renderer_jni_NativeRenderer_re
 		return (jboolean)false;
 	}
 
-	refract_renderer_render(renderer, pixels, info.stride, pal_mapping);
+	bool result = refract_renderer_render(renderer, pixels, info.stride, pal_mapping);
 
 	AndroidBitmap_unlockPixels(env, bitmap);
-	return (jboolean)true;
+	return (jboolean)result;
 }
 
 /**
