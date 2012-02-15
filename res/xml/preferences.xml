@@ -11,12 +11,6 @@
 		    android:entries="@array/arr_paramsfunctionlabels"
 		    android:entryValues="@array/arr_paramsfunctionkeys"
 		/>
-		<EditTextPreference 
-	    	android:key="itersperframe" 
-	    	android:title="@string/str_itersperframe"
-	    	android:defaultValue="@integer/def_itersperframe"
-	    	android:numeric="integer"
-		/>
 	</PreferenceCategory>
 	<PreferenceCategory android:title="@string/str_coloring">  
 		<com.ijuru.refract.ui.PalettePreference
@@ -31,11 +25,21 @@
 		    android:entries="@array/arr_palettemappinglabels"
 		    android:entryValues="@array/arr_palettemappingkeys"
 		/>
-		<EditTextPreference 
-	    	android:key="palette.size" 
-	    	android:title="@string/str_palettesize"
-	    	android:defaultValue="@integer/def_palettesize"
-	    	android:numeric="integer"
-		/>
+	</PreferenceCategory>
+	<PreferenceCategory android:title="@string/str_advanced"> 
+	    <PreferenceScreen android:title="@string/str_advanced">
+	        <EditTextPreference 
+		    	android:key="itersperframe" 
+		    	android:title="@string/str_itersperframe"
+		    	android:defaultValue="@integer/def_itersperframe"
+		    	android:numeric="integer"
+			/>
+	        <EditTextPreference 
+		    	android:key="palette.size" 
+		    	android:title="@string/str_palettesize"
+		    	android:defaultValue="@integer/def_palettesize"
+		    	android:numeric="integer"
+			/>
+	    </PreferenceScreen>
 	</PreferenceCategory>
 </PreferenceScreen>
