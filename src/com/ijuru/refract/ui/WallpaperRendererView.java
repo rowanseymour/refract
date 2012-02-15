@@ -22,6 +22,8 @@ package com.ijuru.refract.ui;
 import android.app.WallpaperManager;
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.Display;
+import android.view.WindowManager;
 
 /**
  * Renderer view whose renderer size matches the system wallpaper size
@@ -44,7 +46,9 @@ public class WallpaperRendererView extends ScaledRenderView {
 	 */
 	@Override
 	protected int getDesiredRendererWidth(int viewWidth) {
-		return wallpaperManager.getDesiredMinimumWidth();
+		int wpWidth = wallpaperManager.getDesiredMinimumWidth();
+		
+		return (wpWidth > 0) ? wpWidth : getDefaultDisplay().getWidth();
 	}
 
 	/**
@@ -52,6 +56,17 @@ public class WallpaperRendererView extends ScaledRenderView {
 	 */
 	@Override
 	protected int getDesiredRendererHeight(int viewHeight) {
-		return wallpaperManager.getDesiredMinimumHeight();
+		int wpHeight = wallpaperManager.getDesiredMinimumHeight();
+		
+		return (wpHeight > 0) ? wpHeight : getDefaultDisplay().getHeight();
+	}
+	
+	/**
+	 * Gets the default display
+	 * @return the display
+	 */
+	private Display getDefaultDisplay() {
+		WindowManager wm = (WindowManager)getContext().getSystemService(Context.WINDOW_SERVICE);
+		return wm.getDefaultDisplay();
 	}
 }
