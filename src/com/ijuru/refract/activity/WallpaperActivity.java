@@ -93,7 +93,8 @@ public class WallpaperActivity extends Activity implements RendererListener {
 	public void onRendererCreated(RendererView view, Renderer renderer) {
 		// Get renderer options from preferences
 		Palette palette = Palette.getPresetByName(Preferences.getStringPreference(this, Constants.PREF_PALETTE_PRESET, R.string.def_palettepreset));
-		Mapping paletteMapping = Preferences.getMappingPreference(this, Constants.PREF_PALETTE_MAPPING, Mapping.REPEAT);
+		Mapping defMapping = Mapping.parseString(getString(R.string.def_palettemapping));
+		Mapping paletteMapping = Preferences.getMappingPreference(this, Constants.PREF_PALETTE_MAPPING, defMapping);
 		int paletteSize = Preferences.getIntegerPreference(this, Constants.PREF_PALETTE_SIZE, R.integer.def_palettesize);
 		int setColor = Preferences.getIntegerPreference(this, Constants.PREF_PALETTE_SETCOLOR, R.integer.def_palettesetcolor);
 		int itersPerFrame = Preferences.getIntegerPreference(this, Constants.PREF_ITERS_PERFRAME, R.integer.def_itersperframe);
