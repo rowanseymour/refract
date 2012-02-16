@@ -13,10 +13,9 @@
     
     <string name="def_palettepreset">sunset</string>   
     
-    <string name="def_palettemapping">repeat</string>
+    <string name="def_palettemapping">histogram</string>
     <string-array name="arr_palettemappingkeys">
 		<item>repeat</item>
-		<item>repeat_cycle</item>
 		<item>clamp</item>
 		<item>scale_global</item>
 		<item>scale_auto</item>

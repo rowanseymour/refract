@@ -88,7 +88,6 @@ typedef struct {
  */
 typedef enum {
 	REPEAT,
-	REPEAT_CYCLE,
 	CLAMP,
 	SCALE_GLOBAL,
 	SCALE_AUTO,

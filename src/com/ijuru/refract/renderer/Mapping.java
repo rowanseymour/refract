@@ -24,7 +24,6 @@ package com.ijuru.refract.renderer;
  */
 public enum Mapping {
 	REPEAT,
-	REPEAT_CYCLE,
 	CLAMP,
 	SCALE_GLOBAL,
 	SCALE_AUTO,

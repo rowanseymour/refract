@@ -24,6 +24,8 @@
 
 #include "inc/refract.h"
 
+#define LIB_VERSION "1.0"
+
 // Logging macros
 #define LOG_TAG    "librefract"
 #define LOG_D(...)  __android_log_print(ANDROID_LOG_DEBUG,LOG_TAG,__VA_ARGS__)
@@ -71,7 +73,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* jvm, void* reserved)
 	mapping_class = (*env)->NewGlobalRef(env, cls);
 	mapping_ordinal_mid = (*env)->GetMethodID(env, mapping_class, "ordinal", "()I");
 
-	LOG_D("Loaded library");
+	LOG_D("Loaded library (version %s)", LIB_VERSION);
 
 	return JNI_VERSION_1_4;
 }
