@@ -56,7 +56,11 @@ public class Palette {
 		));
 		presets.add(new Palette("electric",
 			new int[] { 0xFF000010, 0xFF1000F0, 0xFFFFFFFF },
-			new float[] { 0.0f, 0.3f, 1.0f }
+			new float[] { 0.0f, 0.5f, 1.0f }
+		));
+		presets.add(new Palette("hotpink",
+				new int[] { 0xFF000000, 0xFFB300B5, 0xFFFFFFFF },
+				new float[] { 0.0f, 0.6f, 1.0f }
 		));
 	}
 	
