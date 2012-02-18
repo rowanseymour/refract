@@ -34,6 +34,8 @@ public class Constants {
 	 */
 	public static final String PREF_PARAMS = "params";
 	public static final String PREF_PARAMS_FUNCTION = "params.function";
+	public static final String PREF_PARAMS_OFFSET = "params.offset";
+	public static final String PREF_PARAMS_ZOOM = "params.zoom";
 	public static final String PREF_ITERS_PERFRAME = "itersperframe";
 	public static final String PREF_PALETTE_PRESET = "palette.preset";
 	public static final String PREF_PALETTE_MAPPING = "palette.mapping";

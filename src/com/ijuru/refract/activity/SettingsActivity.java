@@ -21,6 +21,8 @@ package com.ijuru.refract.activity;
 
 import com.ijuru.refract.Constants;
 import com.ijuru.refract.R;
+import com.ijuru.refract.renderer.Complex;
+import com.ijuru.refract.utils.Preferences;
 
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -72,7 +74,12 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 	public boolean onPreferenceChange(Preference preference, Object value) {
 		Resources res = getResources();
 		
-		if (preference == itersPerFramePref) {
+		if (preference == iterFunctionPref) {
+			// If function is changed - need to reset location
+			Preferences.setComplexPreference(this, Constants.PREF_PARAMS_OFFSET, Complex.ORIGIN);
+			Preferences.setDoublePreference(this, Constants.PREF_PARAMS_ZOOM, 0.0);
+		} 
+		else if (preference == itersPerFramePref) {
 			if (!validateRange(value, res.getInteger(R.integer.min_itersperframe), res.getInteger(R.integer.max_itersperframe)))
 				return false;
 		} 

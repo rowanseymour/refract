@@ -67,23 +67,49 @@ public class Preferences {
 	 * @param defResId the resource id of the default value
 	 * @return the preference value
 	 */
-	public static double getDoublePreference(Context context, String key, double defValue) {
+	public static double getDoublePreference(Context context, String key, Double defValue) {
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-		return Double.parseDouble(preferences.getString(key, "" + defValue));
+		return Double.parseDouble(preferences.getString(key, defValue.toString()));
+	}
+	
+	/**
+	 * Sets a shared preference as a double value
+	 * @param context the context
+	 * @param key the preference key
+	 * @param value the value
+	 */
+	public static void setDoublePreference(Context context, String key, Double value) {
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+		Editor editor = preferences.edit();
+		editor.putString(key, value.toString());
+		editor.commit();
 	}
 	
 	/**
 	 * Gets a shared preference as a complex value
 	 * @param context the context
 	 * @param key the preference key
-	 * @param def the default value
+	 * @param defValue the default value
 	 * @return the preference value
 	 */
-	public static Complex getComplexPreference(Context context, String key, Complex def) {
+	public static Complex getComplexPreference(Context context, String key, Complex defValue) {
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-		String str = preferences.getString(key, def.toString());
+		String str = preferences.getString(key, defValue.toString());
 		Complex complex = Complex.parseComplex(str);
-		return complex != null ? complex : def;
+		return complex != null ? complex : defValue;
+	}
+	
+	/**
+	 * Sets a shared preference as a complex value
+	 * @param context the context
+	 * @param key the preference key
+	 * @param value the value
+	 */
+	public static void setComplexPreference(Context context, String key, Complex value) {
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+		Editor editor = preferences.edit();
+		editor.putString(key, value.toString());
+		editor.commit();
 	}
 	
 	/**
@@ -98,6 +124,19 @@ public class Preferences {
 		String str = preferences.getString(key, def.name().toLowerCase());
 		Function function = Function.parseString(str);
 		return function != null ? function : def;
+	}
+	
+	/**
+	 * Sets a shared preference as a function value
+	 * @param context the context
+	 * @param key the preference key
+	 * @param value the value
+	 */
+	public static void setFunctionPreference(Context context, String key, Function value) {
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+		Editor editor = preferences.edit();
+		editor.putString(key, value.toString());
+		editor.commit();
 	}
 	
 	/**
@@ -135,11 +174,8 @@ public class Preferences {
 	 * @param params the parameters
 	 */
 	public static void setParametersPreference(Context context, String key, RendererParams params) {
-		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-		Editor editor = preferences.edit();
-		editor.putString(key + ".function", params.getFunction().toString());
-		editor.putString(key + ".offset", params.getOffset().toString());
-		editor.putString(key + ".zoom", "" + params.getZoom());
-		editor.commit();
+		setFunctionPreference(context, key + ".function", params.getFunction());
+		setComplexPreference(context, key + ".offset", params.getOffset());
+		setDoublePreference(context, key + ".zoom", params.getZoom());
 	}
 }
