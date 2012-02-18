@@ -145,11 +145,13 @@ bool refract_renderer_render(renderer_t* renderer, color_t* pixels, int stride, 
 			refract_renderer_histogram(renderer);
 			iterc_t min, max;
 			refract_renderer_histogram_autoscale(renderer, &min, &max);
-			uint32_t range = max - min;
+			uint32_t range = (uint32_t)max - min;
 
-			for (int i = min; i < max_iters; ++i) {
-				uint32_t index = pal_size * (i - min) / range;
-				indexes[i] = MIN(index, pal_index_max);
+			if (range > 0) {
+				for (int i = min; i < max_iters; ++i) {
+					uint32_t index = pal_size * (i - min) / range;
+					indexes[i] = MIN(index, pal_index_max);
+				}
 			}
 			break;
 		}

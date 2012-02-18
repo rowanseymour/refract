@@ -24,7 +24,7 @@
 
 #include "inc/refract.h"
 
-#define LIB_VERSION "1.0"
+#define REFRACT_LIB_VERSION "1.0.1"
 
 // Logging macros
 #define LOG_TAG    "librefract"
@@ -73,7 +73,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* jvm, void* reserved)
 	mapping_class = (*env)->NewGlobalRef(env, cls);
 	mapping_ordinal_mid = (*env)->GetMethodID(env, mapping_class, "ordinal", "()I");
 
-	LOG_D("Loaded library (version %s)", LIB_VERSION);
+	LOG_D("Loaded library (version %s)", REFRACT_LIB_VERSION);
 
 	return JNI_VERSION_1_4;
 }
