@@ -97,6 +97,9 @@ public class ExplorerActivity extends Activity implements RendererListener {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
+		case R.id.menugoto:
+			onMenuGoto();
+	    	break;
 		case R.id.menuwallpaper:
 			onMenuWallpaper();
 	    	break;
@@ -108,10 +111,10 @@ public class ExplorerActivity extends Activity implements RendererListener {
 	    	break;
 		case R.id.menusettings:
 			startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
-	    	break;	
-		case R.id.menugoto:
-			onMenuGoto();
 	    	break;
+		case R.id.menuhelp:
+	    	onMenuHelp();
+	    	break;	
 	    case R.id.menuabout:
 	    	onMenuAbout();
 	    	break;
@@ -119,6 +122,48 @@ public class ExplorerActivity extends Activity implements RendererListener {
 		return true;
 	}
 	
+	/**
+	 * Displays the goto dialog
+	 */
+	private void onMenuGoto() {
+		// Get and inflate the dialog view
+		LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+		final View layout = inflater.inflate(R.layout.dialog_goto, (ViewGroup)findViewById(R.id.layout_root));
+		final EditText editReal = (EditText)layout.findViewById(R.id.realcoordinate);
+		final EditText editImag = (EditText)layout.findViewById(R.id.imaginarycoordinate);
+		final EditText editZoom = (EditText)layout.findViewById(R.id.zoomfactor);
+		
+		// Set controls to curent renderer parameters
+		RendererParams params = rendererView.getRendererParams();
+		editReal.setText("" + params.getOffset().re);
+		editImag.setText("" + params.getOffset().im);
+		editZoom.setText("" + params.getZoom());
+
+		// Construct the dialog
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setView(layout);
+		builder.setPositiveButton(android.R.string.ok, new OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int id) {
+				try {
+					double offset_re = Double.parseDouble(editReal.getText().toString());
+					double offset_im = Double.parseDouble(editImag.getText().toString());
+					double zoom = Double.parseDouble(editZoom.getText().toString());
+					rendererView.getRendererParams().setOffset(new Complex(offset_re, offset_im));
+					rendererView.getRendererParams().setZoom(zoom);
+					statusPanel.setParams(rendererView.getRendererParams());
+				}
+				catch (NumberFormatException ex) {
+					Toast.makeText(ExplorerActivity.this, R.string.err_invalidnumber, Toast.LENGTH_SHORT).show();
+				}
+			}
+		});
+		builder.setNegativeButton(android.R.string.cancel, null);
+		
+		// Show it...
+		builder.show();
+	}
+
 	/**
 	 * Displays the wallpaper activity
 	 */
@@ -164,44 +209,18 @@ public class ExplorerActivity extends Activity implements RendererListener {
 	}
 	
 	/**
-	 * Displays the goto dialog
+	 * Displays the help dialog
 	 */
-	private void onMenuGoto() {
+	private void onMenuHelp() {
 		// Get and inflate the dialog view
-		LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
-		final View layout = inflater.inflate(R.layout.dialog_goto, (ViewGroup)findViewById(R.id.layout_root));
-		final EditText editReal = (EditText)layout.findViewById(R.id.realcoordinate);
-		final EditText editImag = (EditText)layout.findViewById(R.id.imaginarycoordinate);
-		final EditText editZoom = (EditText)layout.findViewById(R.id.zoomfactor);
+		LayoutInflater inflater = (LayoutInflater)getSystemService(LAYOUT_INFLATER_SERVICE);
+		final View layout = inflater.inflate(R.layout.dialog_help, (ViewGroup)findViewById(R.id.layout_root));
 		
-		// Set controls to curent renderer parameters
-		RendererParams params = rendererView.getRendererParams();
-		editReal.setText("" + params.getOffset().re);
-		editImag.setText("" + params.getOffset().im);
-		editZoom.setText("" + params.getZoom());
-
 		// Construct the dialog
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(R.string.str_help);
 		builder.setView(layout);
-		builder.setPositiveButton(android.R.string.ok, new OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int id) {
-				try {
-					double offset_re = Double.parseDouble(editReal.getText().toString());
-					double offset_im = Double.parseDouble(editImag.getText().toString());
-					double zoom = Double.parseDouble(editZoom.getText().toString());
-					rendererView.getRendererParams().setOffset(new Complex(offset_re, offset_im));
-					rendererView.getRendererParams().setZoom(zoom);
-					statusPanel.setParams(rendererView.getRendererParams());
-				}
-				catch (NumberFormatException ex) {
-					Toast.makeText(ExplorerActivity.this, R.string.err_invalidnumber, Toast.LENGTH_SHORT).show();
-				}
-			}
-		});
-		builder.setNegativeButton(android.R.string.cancel, null);
-		
-		// Show it...
+		builder.setPositiveButton(android.R.string.ok, null);
 		builder.show();
 	}
 	

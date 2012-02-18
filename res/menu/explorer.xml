@@ -26,6 +26,11 @@
 		android:icon="@drawable/ic_menu_settings"
 	/>
 	<item 
+		android:id="@+id/menuhelp" 
+		android:title="@string/str_help" 
+		android:icon="@drawable/ic_menu_help" 
+	/>
+	<item 
 		android:id="@+id/menuabout" 
 		android:title="@string/str_about" 
 		android:icon="@drawable/ic_menu_about" 
