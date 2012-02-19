@@ -167,10 +167,12 @@ bool refract_renderer_render(renderer_t* renderer, color_t* pixels, int stride, 
 				uint32_t pal_item_size = total / pal_size;
 				uint32_t histo_acc = 0;
 
-				for (int i = 0; i < max_iters; ++i) {
-					histo_acc += histo[i];
-					uint32_t index = histo_acc / pal_item_size;
-					indexes[i] = MIN(index, pal_index_max);
+				if (pal_item_size > 0) {
+					for (int i = 0; i < max_iters; ++i) {
+						histo_acc += histo[i];
+						uint32_t index = histo_acc / pal_item_size;
+						indexes[i] = MIN(index, pal_index_max);
+					}
 				}
 			}
 			break;
