@@ -92,21 +92,24 @@ iterc_t refract_renderer_iterate(renderer_t* renderer, params_t* params, iterc_t
 	// Increment or reset max-iters depending on whether we'll be using the cache
 	iterc_t max_iters = use_cache ? (renderer->cache_max_iters + iters) : iters;
 
-	switch (params->func) {
-	case MANDELBROT:
-		refract_renderer_iterate_m2(renderer, params->offset, params->zoom, max_iters, use_cache);
-		break;
-	case MANDELBROT_3:
-		refract_renderer_iterate_m3(renderer, params->offset, params->zoom, max_iters, use_cache);
-		break;
-	case MANDELBROT_4:
-		refract_renderer_iterate_m4(renderer, params->offset, params->zoom, max_iters, use_cache);
-		break;
-	}
+	// Only iterate if we haven't gone beyond max iters
+	if (max_iters <= ITERC_MAX) {
+		switch (params->func) {
+		case MANDELBROT:
+			refract_renderer_iterate_m2(renderer, params->offset, params->zoom, max_iters, use_cache);
+			break;
+		case MANDELBROT_3:
+			refract_renderer_iterate_m3(renderer, params->offset, params->zoom, max_iters, use_cache);
+			break;
+		case MANDELBROT_4:
+			refract_renderer_iterate_m4(renderer, params->offset, params->zoom, max_iters, use_cache);
+			break;
+		}
 
-	// Update cache status
-	renderer->cache_max_iters = max_iters;
-	renderer->cache_params = *params;
+		// Update cache status
+		renderer->cache_max_iters = max_iters;
+		renderer->cache_params = *params;
+	}
 
 	return renderer->cache_max_iters;
 }

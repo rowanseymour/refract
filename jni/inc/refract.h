@@ -38,7 +38,7 @@ typedef uint16_t iterc_t;
 /**
  * Max count of iterations
  */
-#define ITERC_MAX 0xFFFF
+#define ITERC_MAX 0xFFF // 4095
 
 /**
  * Real and imaginary floating point values

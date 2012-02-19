@@ -24,7 +24,7 @@
 
 #include "inc/refract.h"
 
-#define REFRACT_LIB_VERSION "1.0.1"
+#define REFRACT_LIB_VERSION "1.0.2"
 
 // Logging macros
 #define LOG_TAG    "librefract"
@@ -33,7 +33,7 @@
 #define LOG_E(...)  __android_log_print(ANDROID_LOG_ERROR,LOG_TAG,__VA_ARGS__)
 
 // Set to 1 to enable debug log traces
-#define DEBUG 1
+#define DEBUG 0
 
 #define NATIVERENDERER_CLASS	"com/ijuru/refract/renderer/jni/NativeRenderer"
 #define FUNCTION_CLASS			"com/ijuru/refract/renderer/Function"
