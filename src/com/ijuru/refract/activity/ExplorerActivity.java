@@ -238,9 +238,9 @@ public class ExplorerActivity extends Activity implements RendererListener {
 		LayoutInflater inflater = (LayoutInflater)getSystemService(LAYOUT_INFLATER_SERVICE);
 		final View layout = inflater.inflate(R.layout.dialog_help, (ViewGroup)findViewById(R.id.layout_root));
 		
-		// Construct the dialog
+		// Construct and show the controls help dialog
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle(R.string.str_help);
+		builder.setTitle(R.string.str_controls);
 		builder.setView(layout);
 		builder.setPositiveButton(android.R.string.ok, null);
 		builder.show();

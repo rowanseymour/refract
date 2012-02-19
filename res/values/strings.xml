@@ -9,6 +9,7 @@
 	<string name="str_bookmarkdeleted">Bookmark deleted</string>
 	<string name="str_bookmarksaved">Bookmark saved</string>
 	<string name="str_coloring">Coloring</string>
+	<string name="str_controls">Controls</string>
 	<string name="str_delete">Delete</string>
 	<string name="str_dragtopan">Drag to pan</string>
 	<string name="str_function">Function</string>
