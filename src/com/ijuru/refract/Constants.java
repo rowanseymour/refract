@@ -30,8 +30,14 @@ public class Constants {
 	public static final String EXTRA_PARAMS = "params";
 	
 	/**
+	 * Directories
+	 */
+	public static final String RENDERS_DIRNAME = "Refract";
+	
+	/**
 	 * Preference keys
 	 */
+	public static final String PREF_VERSION = "version";
 	public static final String PREF_PARAMS = "params";
 	public static final String PREF_PARAMS_FUNCTION = "params.function";
 	public static final String PREF_PARAMS_OFFSET = "params.offset";

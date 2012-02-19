@@ -26,7 +26,6 @@ import com.ijuru.refract.renderer.RendererParams;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 
 /**
@@ -80,9 +79,7 @@ public class Preferences {
 	 */
 	public static void setDoublePreference(Context context, String key, Double value) {
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-		Editor editor = preferences.edit();
-		editor.putString(key, value.toString());
-		editor.commit();
+		preferences.edit().putString(key, value.toString()).commit();
 	}
 	
 	/**
@@ -107,9 +104,7 @@ public class Preferences {
 	 */
 	public static void setComplexPreference(Context context, String key, Complex value) {
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-		Editor editor = preferences.edit();
-		editor.putString(key, value.toString());
-		editor.commit();
+		preferences.edit().putString(key, value.toString()).commit();
 	}
 	
 	/**
@@ -134,9 +129,7 @@ public class Preferences {
 	 */
 	public static void setFunctionPreference(Context context, String key, Function value) {
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-		Editor editor = preferences.edit();
-		editor.putString(key, value.toString());
-		editor.commit();
+		preferences.edit().putString(key, value.toString()).commit();
 	}
 	
 	/**

@@ -30,8 +30,6 @@ import android.os.Environment;
  */
 public class RefractApplication extends Application {
 	
-	private static final String RENDER_SAVE_FOLDER = "Refract";
-	
 	private BookmarkManager bookmarkManager = new BookmarkManager(this);
 	
 	/**
@@ -40,7 +38,7 @@ public class RefractApplication extends Application {
 	static {
         System.loadLibrary("refract");
     }
-	
+
 	/**
 	 * Gets the bookmark manager
 	 * @return the manager
@@ -56,11 +54,23 @@ public class RefractApplication extends Application {
 	public File getSaveDirectory() {
 		File picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
 		
-		File rendersDir = new File(picturesDir, RENDER_SAVE_FOLDER);
+		File rendersDir = new File(picturesDir, Constants.RENDERS_DIRNAME);
 		if (!rendersDir.exists())
 			rendersDir.mkdirs();
 		
 		return rendersDir;
+	}
+	
+	/**
+	 * Gets the version code from the manifest
+	 * @return the version code
+	 */
+	public int getVersionCode() {
+		try {
+			return getPackageManager().getPackageInfo(getPackageName(), 0).versionCode;
+		} catch (NameNotFoundException e) {
+			return 0;
+		}
 	}
 	
 	/**
@@ -69,8 +79,7 @@ public class RefractApplication extends Application {
 	 */
 	public String getVersionName() {
 		try {
-			String packageName = getPackageName();
-			return getPackageManager().getPackageInfo(packageName, 0).versionName;
+			return getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
 		} catch (NameNotFoundException e) {
 			return null;
 		}

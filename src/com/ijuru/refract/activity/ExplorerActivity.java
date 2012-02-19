@@ -41,6 +41,7 @@ import com.ijuru.refract.utils.Preferences;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -49,6 +50,7 @@ import android.graphics.Rect;
 import android.graphics.Bitmap.CompressFormat;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -80,6 +82,26 @@ public class ExplorerActivity extends Activity implements RendererListener {
 		
 		rendererView.setRendererListener(this);
     }
+	
+	/**
+	 * @see android.app.Activity#onPostCreate(android.os.Bundle)
+	 */
+	@Override
+	protected void onPostCreate(Bundle savedInstanceState) {
+		super.onPostCreate(savedInstanceState);
+		
+		// Get version from preferences and version from package
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+		int settingsVersion = preferences.getInt(Constants.PREF_VERSION, 0);
+		int packageVersion = ((RefractApplication)getApplication()).getVersionCode();
+		
+		// If this version has not been run before, display help
+		if (settingsVersion < packageVersion)
+			onMenuHelp();
+		
+		// Update preferences version
+		preferences.edit().putInt(Constants.PREF_VERSION, packageVersion).commit();
+	}
 
 	/**
 	 * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
